@@ -1,0 +1,106 @@
+*{
+	box-sizing: border-box;
+}
+
+html, body{
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 0;
+	padding: 0;
+}
+img{
+	width: 100%;
+}
+.row{
+	display: flex;
+	padding: 5px;
+	flex-wrap: wrap;
+}
+.column{
+	flex: 25%;
+	padding: 5px;
+}
+.column img{
+	margin-top: 55px;
+}
+
+@media (max-width: 600px){
+	.column{
+		flex: 100%;
+	}
+}
+.less-padding{
+	padding: 0px 0px;
+}
+
+.nombre-t:hover{	
+	color:#900b0b;
+}
+
+header{
+	padding: 20px;
+	background-color: darkgray;
+	text-align: center;
+}
+
+.container{
+	padding-left: 25px;
+	padding-right: 25px;
+	position: relative;
+}
+
+a{
+	margin-left: 0;
+	padding-left: 0px;
+  text-align: left;
+	color:#900b0b;
+}
+
+a:hover{
+  color: #591717;
+  text-decoration: none;
+}
+
+aside{
+	flex: 30px;
+	background-color: beige;
+	padding: 10px;
+}
+
+/*====================================*/
+/*Basados en wordAnvil*/
+.article-content{
+	font-size:1.2em;
+	line-height:1.4em;
+}
+
+.article-title h1 {
+	font-family:alegreya sc,serif;
+	font-weight:700;
+	font-size:42px;
+	padding-top:20px;
+}
+.page {
+	box-shadow:0 -1px 15px 5px rgba(0,0,0,.2);
+	/*background:url(https://www.worldanvil.com/uploads/images/1fea3f76e20423fa5282e0cf246c0b36.jpg);*/
+	background-color:#e4e0d6;
+	margin-top:0;
+	padding-bottom:2rem;
+	margin-bottom:3rem
+}
+/*================Margins====================*/
+.margin-top-20{
+	margin-top: 20px !important;
+}
+.margin-botton-0{
+	margin-bottom: 0!important;
+}
+/*====================================*/
+section{
+	flex: 70%;
+	padding: 10px;
+}
+@media screen and (max-width: 700px){
+	nav, .row{
+		flex-direction: column;
+	}
+}

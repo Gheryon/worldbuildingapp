@@ -1,0 +1,42 @@
+.contentApp h1{
+	font-family:alegreya,serif;
+	font-weight:700;
+	font-size:32px;
+	color: #900b0b;
+	padding-top:15px;
+	padding-bottom:0;
+}
+
+.contentApp h2{
+	font-family:alegreya,serif;
+	font-weight:700;
+	font-size:30px;
+	color: #900b0b;
+	padding-top:15px;
+	padding-bottom:0;
+	border-bottom-width:1px;
+	border-bottom-style:solid;
+	border-bottom-color:#a08264;
+	text-transform:uppercase;
+}
+
+.contentApp h3{
+	color: #591717;
+	font-family:cinzel,serif;
+	font-size:22px;
+	font-weight:600;
+	margin-top:0;
+	margin-bottom:0;
+}
+
+.contentApp h6{
+	color: #591717;
+	font-size: 16px;
+}
+
+.contentApp p{
+	font-size: 14px;
+  font-weight: bold;
+	margin-top:0;
+	margin-bottom:0;
+}

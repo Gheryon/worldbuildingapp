@@ -1,0 +1,29 @@
+.beligerantes{
+  margin: 10px 0 30px 0;
+}
+
+.beligerantes h4{
+  color: #591717;
+  border-bottom: 1px solid #591717;
+}
+.beligerantes .col .row{
+  text-align: center;
+}
+.lado-izqdo{
+  border-left: 1px solid #591717;
+}
+
+.lado-dercho{
+  border-right: 1px solid #591717;
+  text-align: right;
+}
+
+.beligerantes a{
+  text-align: center;
+	color:#900b0b;
+}
+
+.beligerantes a:hover{
+  color: #591717;
+  text-decoration: none;
+}
