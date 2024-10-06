@@ -3,20 +3,21 @@
 @extends('layouts.menu')
 
 @section('title')
-<title id="title">Organizaciones</title>
+<title id="title">Instituciones</title>
 @endsection
 
 @section('navbar-buttons')
+<a href="{{route('organizacion.create')}}" class="btn btn-dark">Nueva organización</a>
 @endsection
 
 @section('content')
 <div class="row">
-  <h1>Organizaciones</h1>
+  <h1>Instituciones</h1>
 </div>
 <hr>
 
 <!-- Modal -->
-<div class="modal fade" id="confirmar_eliminacion" tabindex="-1" role="dialog" aria-labelledby="Confirmar eliminacion" aria-hidden="true">
+<div class="modal fade" id="eliminar-organizacion" tabindex="-1" role="dialog" aria-labelledby="Confirmar eliminacion" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="card card-danger">
@@ -28,11 +29,11 @@
         </div>
         <div class="card-body">
           <div class="row">
-            <p> ¿Borrar tipo: <span id="texto-borrar"> </span>?</p>
+            <p> ¿Borrar organizacion: <span id="nombre-organizacion-borrar"> </span>?</p>
           </div>
         </div>
         <div class="card-footer">
-          <form id="form-confirmar-borrar" class="col-md-auto" action="{{route('config.destroy')}}" method="POST">
+          <form id="form-confirmar-borrar" class="col-md-auto" action="{{route('organizacion.destroy')}}" method="POST">
             @csrf
             @method('DELETE')
             <input type="hidden" name="id_borrar" id="id_borrar">
@@ -48,45 +49,38 @@
   </div>
 </div>
 
-<div class="modal fade" id="editar_nombre" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="Editar nombre" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="card card-dark">
-        <div class="card-header">
-          <h5 class="card-title" id="nuevoEventoLabel">Editar</h5>
-          <button data-dismiss="modal" aria-label="close" class="close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="card-body">
-          <form id="form-editar-nombre" class="col-md-auto" action="{{route('config.update')}}" method="POST">
-            @csrf
-            @method('PUT')
-            <input type="hidden" name="id_editar" id="id_editar">
-            <input type="hidden" name="tipo_editar" id="tipo_editar">
-            <div class="row">
-              <div class="col">
-                <label for="nombre_editar" class="form-label">Nombre</label>
-                <input type="text" name="nombre_editar" class="form-control" id="nombre_editar" required>
-                <div class="invalid-feedback">
-                  Nombre no puede estar vacío.
-                </div>
-              </div>
-            </div>
-        </div>
-        <div class="card-footer">
-          <button type="button" id="cancelar-editar-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
-          <button type="submit" id="submit-editar-button" class="btn btn-success">Guardar</button>
-          <button type="button" id="cerrar-editar-button" class="btn btn-primary" data-dismiss="modal" style="display:none">Cerrar</button>
-        </div>
-        </form>
+<div class="row">
+@foreach($organizaciones as $organizacion)
+<div class="col-4 col-sm-6 col-md-4 col-lg-3">
+  <div class="card card-dark card-outline">
+    <div class="card-body box-profile">
+      
+      <div class="text-center">
+      <h2 class="lead"><b>{{$organizacion->nombre}}</b></h2>
+        <img class="img-fluid" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" alt="Escudo">
+      </div>
+      <h3 class="profile-username text-center">{{$organizacion->nombre}}</h3>
+      <ul class="list-group list-group-unbordered mb-3">
+        <li class="list-group-item">
+          <b>Tipo:</b> {{$organizacion->tipo}}
+        </li>
+        <li class="list-group-item">
+          <b>Descripción breve: </b>{!!$organizacion->descripcionBreve!!}
+        </li>
+      </ul>
+    </div>
+    <!-- /.card-body -->
+    <div class="card-footer">
+      <div class="row text-right">
+        <a href="{{route('organizacion.show',$organizacion->id_organizacion)}}" type="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+        <a href="{{route('organizacion.edit',$organizacion->id_organizacion)}}" type="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+        <button id="{{$organizacion->id_organizacion}}" nombre="{{$organizacion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-organizacion"><i class="fas fa-trash mr-1"></i></button>
       </div>
     </div>
   </div>
 </div>
-
-
-
+@endforeach
+</div>
 @endsection
 
 @section('specific-scripts')

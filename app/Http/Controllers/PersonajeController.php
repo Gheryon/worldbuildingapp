@@ -19,6 +19,7 @@ class PersonajeController extends Controller
       $personajes=DB::table('personaje')
         ->leftjoin('especies', 'personaje.id_foranea_especie', '=', 'especies.id_especie')
         ->select('id', 'personaje.Nombre', 'Retrato', 'Sexo', 'id_foranea_especie', 'DescripcionShort', 'especies.nombre')
+        ->where('personaje.id', '!=', 0)
         ->orderBy('personaje.Nombre', 'asc')->get();
       return view('personajes.index', ['personajes' => $personajes]);
 

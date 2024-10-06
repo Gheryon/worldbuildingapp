@@ -18,7 +18,7 @@ Route::get('/', function () {
 
 /*******personajes routes********/
 Route::get('/personajes/index', [App\Http\Controllers\PersonajeController::class, 'index'])->name('personajes.index');
-Route::get('/content/{id}', [App\Http\Controllers\VistaController::class, 'show_personaje'])->name('personaje.show');
+Route::get('/personaje/{id}', [App\Http\Controllers\VistaController::class, 'show_personaje'])->name('personaje.show');
 Route::get('/personajes/create', [App\Http\Controllers\PersonajeController::class, 'create'])->name('personaje.create');
 Route::post('/personajes/store', [App\Http\Controllers\PersonajeController::class, 'store'])->name('personaje.store');
 Route::get('/personajes/{id}/edit', [App\Http\Controllers\PersonajeController::class, 'edit'])->name('personaje.edit');
@@ -33,22 +33,30 @@ Route::delete('/timelines/destroy', [App\Http\Controllers\TimelineController::cl
 
 /*******organizaciones routes********/
 Route::get('/organizaciones/index', [App\Http\Controllers\OrganizacionController::class, 'index'])->name('organizaciones.index');
-//Route::get('/content/{id}', [App\Http\Controllers\VistaController::class, 'show_personaje'])->name('personaje.show');
-//Route::get('/personajes/create', [App\Http\Controllers\PersonajeController::class, 'create'])->name('personaje.create');
-//Route::post('/personajes/store', [App\Http\Controllers\PersonajeController::class, 'store'])->name('personaje.store');
-//Route::get('/personajes/{id}/edit', [App\Http\Controllers\PersonajeController::class, 'edit'])->name('personaje.edit');
-//Route::put('/personajes/{id}', [App\Http\Controllers\PersonajeController::class, 'update'])->name('personaje.update');
-//Route::delete('/personaje/destroy', [App\Http\Controllers\PersonajeController::class, 'destroy'])->name('personaje.destroy');
+Route::get('/content/{id}', [App\Http\Controllers\VistaController::class, 'show_organizacion'])->name('organizacion.show');
+Route::get('/organizaciones/create', [App\Http\Controllers\OrganizacionController::class, 'create'])->name('organizacion.create');
+Route::post('/organizaciones/store', [App\Http\Controllers\OrganizacionController::class, 'store'])->name('organizacion.store');
+Route::get('/organizaciones/{id}/edit', [App\Http\Controllers\OrganizacionController::class, 'edit'])->name('organizacion.edit');
+Route::put('/organizaciones/{id}', [App\Http\Controllers\OrganizacionController::class, 'update'])->name('organizacion.update');
+Route::delete('/organizacion/destroy', [App\Http\Controllers\OrganizacionController::class, 'destroy'])->name('organizacion.destroy');
 
 /*******articulos routes********/
-Route::get('/articulos/index', [App\Http\Controllers\ArticuloController::class, 'index'])->name('articulos');
-Route::get('/articulos/create', [App\Http\Controllers\ArticuloController::class, 'create'])->name('articulos.create');
-Route::post('/articulos/articulos', [App\Http\Controllers\ArticuloController::class, 'store'])->name('articulos.store');
-Route::get('/articulos/{id}', [App\Http\Controllers\ArticuloController::class, 'show'])->name('articulos.show');
-Route::get('/articulos/{id}/get', [App\Http\Controllers\ArticuloController::class, 'get'])->name('articulos.get');
-Route::get('/articulos/{id}/edit', [App\Http\Controllers\ArticuloController::class, 'edit'])->name('articulos.edit');
-Route::put('/articulos/{id}', [App\Http\Controllers\ArticuloController::class, 'update'])->name('articulos.update');
-Route::delete('/articulos/{id}', [App\Http\Controllers\ArticuloController::class, 'destroy'])->name('articulos.destroy');
+Route::controller(App\Http\Controllers\ArticuloController::class)->group(function () {
+    Route::get('/articulos/index', 'index')->name('articulos');
+    Route::get('/articulos/create', 'create')->name('articulos.create');
+    Route::post('/articulos/articulos', 'store')->name('articulos.store');
+    Route::get('/articulos/{id}', 'show')->name('articulos.show');
+    Route::get('/articulos/{id}/get', 'get')->name('articulos.get');
+    Route::get('/articulos/{id}/edit', 'edit')->name('articulos.edit');
+    Route::put('/articulos/{id}', 'update')->name('articulos.update');
+    Route::delete('/articulos/{id}', 'destroy')->name('articulos.destroy');
+
+});
+
+/*******imagenes routes********/
+Route::get('/galeria/index', [App\Http\Controllers\ImagenController::class, 'index'])->name('galeria.index');
+Route::post('/galeria/store', [App\Http\Controllers\ImagenController::class, 'store'])->name('galeria.store');
+Route::get('/galeria/limpiar_imagenes', [App\Http\Controllers\ImagenController::class, 'limpiar_imagenes'])->name('galeria.limpiar_imagenes');
 
 /*******configuracion routes********/
 Route::get('/config/index', [App\Http\Controllers\ConfigurationController::class, 'index'])->name('config.index');

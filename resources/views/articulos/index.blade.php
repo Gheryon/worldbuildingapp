@@ -7,7 +7,7 @@
 @endsection
 
 @section('navbar-buttons')
-<a href="{{url('/articulos/create')}}" class="btn btn-dark">Nuevo articulo</a>
+<a href="{{route('articulos.create')}}" class="btn btn-dark">Nuevo articulo</a>
 @endsection
 
 @section('content')
@@ -74,11 +74,6 @@
                 </a>
                 <a href="{{route('articulos.edit',$articulo->id_articulo)}}" type="button" title="Editar" class="btn btn-success"><i class="fas fa-pencil-alt"></i></a>
                 <button type="button" title="borrar" class="borrar btn btn-danger" data-toggle="modal" data-target="#eliminar-articulo"><i class="fas fa-trash"></i></button>
-                <!--<form action="{{route('articulos',$articulo->id_articulo)}}" method="POST">
-                  @csrf
-                  @method('DELETE')
-                  <button type="submit" title="borrar" class="btn btn-danger"><i class="fas fa-trash"></i></button>
-                </form>-->
               </div>
             </td>
           </tr>

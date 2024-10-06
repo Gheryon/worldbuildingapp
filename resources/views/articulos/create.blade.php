@@ -2,6 +2,14 @@
 @extends('layouts.navbar')
 @extends('layouts.menu')
 
+@section('title')
+<title id="title">Nuevo artículo</title>
+@endsection
+
+@section('navbar-buttons')
+<a href="{{route('articulos')}}" class="btn btn-dark">Cancelar</a>
+@endsection
+
 @section('content')
 <div class="row">
   <h1>Nuevo artículo</h1>
@@ -61,41 +69,6 @@
 @endsection
 
 @section('specific-scripts')
-<!--<script src="../js/summernote-bs4.min.js"></script>
-<script src="../js/articulos.js"></script>-->
-<script>
-  $(function() {
-    // Summernote
-    $('.summernote').summernote({
-      height: 300,
-      callbacks: {
-        onImageUpload: function(files) {
-          sendFile(files[0]);
-        }
-      }
-    })
-
-    function sendFile(file) {
-      //var url = '{{ route("articulos.get", ":id") }}';
-      //url = url.replace(':id', id);
-
-      data = new FormData();
-      data.append("file", file);
-      $.ajax({
-        data: data,
-        type: "POST",
-        url: "../controlador/imagenesController.php",
-        cache: false,
-        contentType: false,
-        processData: false,
-        success: function(url) {
-          $('.summernote').summernote("insertImage", url, 'filename');
-        },
-        error: function(data) {
-          console.log(data);
-        }
-      });
-    }
-  });
-</script>
+<!--<script src="../js/summernote-bs4.min.js"></script>-->
+<script src="{{asset('dist/js/common.js')}}"></script>
 @endsection

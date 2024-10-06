@@ -89,6 +89,7 @@
   <div class="row">
     <button id="back_up" class="btn btn-primary backup_button">Copia de seguridad</button>
   </div>
+  <!--<a href="{{route('galeria.limpiar_imagenes')}}" class="btn btn-dark">Limpiar imágenes</a>-->
   <div class="row">
 
     <div class="card col ml-1">

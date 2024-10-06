@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\personaje;
 use App\Models\Fecha;
+use App\Models\organizacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -69,5 +70,50 @@ class VistaController extends Controller
       $edad="Desconocida";
     }
     return view('personajes.show', ['vista'=>$personaje, 'nacimiento'=>$fecha_nacimiento, 'fallecimiento'=>$fecha_fallecimiento, 'edad'=>$edad, 'especie'=>$especie[0]->nombre]);
+  }
+
+  public function show_organizacion($id)
+  {
+    $meses=array("Semana año nuevo", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+
+    $organizacion=organizacion::findorfail($id);
+    $tipo = DB::select('select nombre from tipo_organizacion where id = ?', [$organizacion->id_tipo_organizacion]);
+
+    if($organizacion->id_owner!=0){
+      $ownerb=DB::select('select nombre, id_organizacion from organizaciones where id_organizacion = ?', [$organizacion->id_owner]);
+      $owner=$ownerb[0];
+    }else{
+      $owner=0;
+    }
+
+    if($organizacion->id_ruler!=0&&$organizacion->id_ruler!=null){
+      $soberanob=DB::select('select Nombre, id from personaje where id = ?', [$organizacion->id_ruler]);
+      $soberano=$soberanob[0];
+    }else{
+      $soberano=0;
+    }
+
+    if($organizacion->fundacion!=0&&$organizacion->fundacion!=null){
+      $fundacion=Fecha::find($organizacion->fundacion);
+      if($fundacion->dia&&$fundacion->mes==0){
+        $fecha_fundacion=$organizacion->anno;
+      }else{
+        $fecha_fundacion=$fundacion->dia."-".$meses[$fundacion->mes]."-".$fundacion->anno;
+      }
+    }else{
+      $fecha_fundacion="Desconocido";
+    }
+    if($organizacion->disolucion!=0&&$organizacion->disolucion!=null){
+      $disolucion=Fecha::find($organizacion->disolucion);
+      if($disolucion->dia&&$disolucion->mes==0){
+        $fecha_disolucion=$organizacion->anno;
+      }else{
+        $fecha_disolucion=$disolucion->dia."-".$meses[$disolucion->mes]."-".$disolucion->anno;
+      }
+    }else{
+      $fecha_disolucion="Desconocido";
+    }
+
+    return view('organizaciones.show', ['vista'=>$organizacion, 'fundacion'=>$fecha_fundacion, 'disolucion'=>$fecha_disolucion, 'tipo'=>$tipo[0]->nombre, 'owner'=>$owner, 'soberano'=>$soberano]);
   }
 }

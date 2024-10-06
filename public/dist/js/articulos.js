@@ -29,6 +29,7 @@ $(document).ready(function() {
         /*response es un JSON directamente desde el Controlador*/
         if(response.mensaje=='borrado'){
           toastr.success('Artículo eliminado.', 'Éxito');
+          console.log(response.mensaje2);
         }else{
           toastr.error('No se pudo eliminar el artículo.', 'Error');
         }
@@ -52,26 +53,3 @@ $(document).ready(function() {
 	});
 
 });
-
-function ver_articulo(id) {
-  $.ajax({
-    type: 'GET',
-    url: id+"/get",
-    data: {
-      id: id,
-    },
-    success: function (response) {
-      /*response es un JSON directamente desde el Controlador*/
-      //if(funcion=='ver'){
-        $('#title').html(response.articulo.nombre);
-        $('#content-title-h1').html(response.articulo.nombre);
-        $('#contenido').html(response.articulo.contenido)
-      //}else{
-        //console.log('editar');
-      //}
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-       alert('Ocurrió un error ' + jqXHR.responseText )
-    }
-  });
-};

@@ -2,6 +2,15 @@
 @extends('layouts.navbar')
 @extends('layouts.menu')
 
+@section('title')
+<title id="title">{{$articulo->nombre}}</title>
+@endsection
+
+@section('navbar-buttons')
+<a type="button" title="Volver" href="{{route('articulos')}}" class="nuevo btn btn-dark">Volver</a>
+<a href="{{route('articulos.edit',$articulo->id_articulo)}}" type="button" title="Editar" class="btn ml-1 btn-dark"><i class="fas fa-pencil-alt mr-2"></i>Editar</a>
+@endsection
+
 @section('content')
 <!-- Content Header (Page header) -->
 <section class="content-header">
@@ -20,13 +29,13 @@
     <div class="row article-content">
       <div class="col">
         <div class="row personaje" id="contenido">
-          
+          {{$articulo->contenido}}
+          {!!$articulo->contenido!!}
         </div>
       </div>
     </div>
     <div class="row justify-content-md-center">
       <div class="col-2">
-        <a type="button" class="btn btn-success mr-1" href="{{url('/articulos/index')}}">Volver</a>
       </div>
     </div>
   </div>
@@ -35,9 +44,5 @@
 @endsection
 
 @section('specific-scripts')
-<!-- articulos javascript -->
-<script src="{{asset('dist/js/articulos.js')}}"></script>
-<script>
-document.getElementById("_body_").onload = function() {ver_articulo('{{$id}}')};
-</script>
+
 @endsection

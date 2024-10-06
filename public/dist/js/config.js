@@ -37,4 +37,15 @@ $(document).ready(function () {
     $('#descripcion').summernote('reset');
   });
 
+  //lleva el id de la organizacion a borrar al modal de confirmacion
+  $(document).on('click', '.borrar', (e) => {
+    const elemento=$(this)[0].activeElement;
+    let id=$(elemento).attr('id');
+    const nombre = $(elemento).attr('nombre');
+
+    $('#id_borrar').val(id);
+    $('#nombre-organizacion-borrar').html(nombre);
+    $('#nombre_borrado').val(nombre);
+  });
+
 });

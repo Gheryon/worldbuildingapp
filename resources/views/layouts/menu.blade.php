@@ -65,6 +65,14 @@
       </p>
     </a>
   </li>
+  <li class="nav-item">
+    <a href="{{route('galeria.index')}}" class="nav-link">
+      <i class="nav-icon fas fa-columns"></i>
+      <p>
+        Galería de imágenes
+      </p>
+    </a>
+  </li>
   <li class="nav-header">OTROS</li>
   <li class="nav-item">
     <a href="{{url('/articulos/index')}}" class="nav-link">

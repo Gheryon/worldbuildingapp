@@ -2,15 +2,23 @@
 @extends('layouts.navbar')
 @extends('layouts.menu')
 
+@section('title')
+<title id="title">Editar {{$articulo->nombre}}</title>
+@endsection
+
+@section('navbar-buttons')
+<a href="{{route('articulos')}}" class="btn btn-dark">Cancelar</a>
+@endsection
+
 @section('content')
 <div class="row">
-  <h1 id="title-h1">Editar artículo </h1>
+  <h1 id="title-h1">Editar artículo {{$articulo->nombre}}</h1>
 </div>
 <hr>
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-edit" action="{{url('/articulos', $id)}}" method="post">
+  <form id="form-edit" action="{{url('/articulos', $articulo->id_articulo)}}" method="post">
     @csrf
     @method('PUT')
     <div class="row mb-3 justify-content-center">
@@ -24,10 +32,9 @@
           <div class="card card-outline">
             <div class="card-header">
               <div class="row mb-2">
-                <input id="id_editar" name="id_editar" type="hidden">
                 <div class="col">
                   <label for="nombre" class="form-label">Nombre</label>
-                  <input type="text" value="" name="nombre" class="form-control" id="nombre" placeholder="Nombre" required>
+                  <input type="text" value="{{$articulo->nombre}}" name="nombre" class="form-control" id="nombre" placeholder="Nombre" required>
                   @error('nombre')
                   <small style="color: red">{{$message}}</small>
                   @enderror
@@ -45,7 +52,7 @@
             <!-- /.card-header -->
             <div class="card-body">
               <label for="contenido" class="form-label">Contenido</label>
-              <textarea class="form-control summernote" id="contenido" value="" name="contenido" rows="8" aria-label="With textarea"></textarea>
+              <textarea class="form-control summernote" id="contenido" name="contenido" rows="8" aria-label="With textarea">{!!$articulo->contenido!!}</textarea>
                 @error('contenido')
                 <small style="color: red">{{$message}}</small>
                 @enderror
@@ -63,66 +70,16 @@
 @endsection
 
 @section('specific-scripts')
-<!-- articulos javascript -->
-<script src="{{asset('dist/js/articulos.js')}}"></script>
-<script>
-document.getElementById("_body_").onload = function() {get_articulo('{{$id}}')};
-
-function get_articulo(id) {
-  var url = '{{ route("articulos.get", ":id") }}';
-  url = url.replace(':id', id);
-  $.ajax({
-    type: 'GET',
-    url: url,
-    data: {
-      id: id,
-    },
-    success: function (response) {
-      /*response es un JSON directamente desde el Controlador*/
-      $('#title').html("Editar "+response.articulo.nombre);
-      $('#title-h1').html("Editar artículo "+response.articulo.nombre);
-      $('#nombre').val(response.articulo.nombre);
-			$('#tipo').val(response.articulo.tipo);
-			$('#contenido').summernote('code',response.articulo.contenido);
-      
-      console.log(response);
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      alert('Ocurrió un error ' + jqXHR.responseText )
-    }
-  });
-};
-</script>
+<script src="{{asset('dist/js/common.js')}}"></script>
 <script>
   $(function() {
     // Summernote
     $('.summernote').summernote({
-      height: 300,
-      callbacks: {
-        onImageUpload: function(files) {
-          sendFile(files[0]);
-        }
-      }
+      height: 300
     })
 
-    function sendFile(file) {
-      data = new FormData();
-      data.append("file", file);
-      $.ajax({
-        data: data,
-        type: "POST",
-        url: "../controlador/imagenesController.php",
-        cache: false,
-        contentType: false,
-        processData: false,
-        success: function(url) {
-          $('.summernote').summernote("insertImage", url, 'filename');
-        },
-        error: function(data) {
-          console.log(data);
-        }
-      });
-    }
+    $('#tipo').val('{{$articulo->tipo}}');
+    $('#contenido').summernote('code','{{$articulo->contenido}}');
   });
 </script>
 @endsection
