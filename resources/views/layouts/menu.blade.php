@@ -22,7 +22,7 @@
     </ul>
   </li>
   <li class="nav-item">
-    <a href="{{url('/personajes/index')}}" class="nav-link">
+    <a href="{{route('personajes.index')}}" class="nav-link">
       <i class="nav-icon fa-solid fa-people-group"></i>
       <p>Personajes</p>
     </a>
@@ -42,7 +42,7 @@
     </a>
   </li>
   <li class="nav-item">
-    <a href="lugares.php" class="nav-link">
+    <a href="{{route('lugares.index')}}" class="nav-link">
       <i class="nav-icon fas fa-tree"></i>
       <p>
         Lugares
@@ -75,7 +75,7 @@
   </li>
   <li class="nav-header">OTROS</li>
   <li class="nav-item">
-    <a href="{{url('/articulos/index')}}" class="nav-link">
+    <a href="{{route('articulos')}}" class="nav-link">
       <i class="nav-icon fa-solid fa-book-open"></i>
       <p>
         Apuntes y relatos
@@ -91,7 +91,7 @@
     </a>
   </li>
   <li class="nav-item">
-    <a href="enlaces.php" class="nav-link">
+    <a href="{{route('enlaces.index')}}" class="nav-link">
       <i class="nav-icon fas fa-file"></i>
       <p>Enlaces</p>
     </a>

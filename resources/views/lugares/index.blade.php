@@ -3,21 +3,21 @@
 @extends('layouts.menu')
 
 @section('title')
-<title id="title">Instituciones</title>
+<title id="title">Lugares</title>
 @endsection
 
 @section('navbar-buttons')
-<a href="{{route('organizacion.create')}}" class="btn btn-dark">Nueva organización</a>
+<a href="{{route('lugar.create')}}" class="btn btn-dark">Nuevo lugar</a>
 @endsection
 
 @section('content')
 <div class="row">
-  <h1>Instituciones</h1>
+  <h1>Lugares</h1>
 </div>
 <hr>
 
 <!-- Modal -->
-<div class="modal fade" id="eliminar-organizacion" tabindex="-1" role="dialog" aria-labelledby="Confirmar eliminacion" aria-hidden="true">
+<div class="modal fade" id="eliminar-lugar" tabindex="-1" role="dialog" aria-labelledby="Confirmar eliminacion" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="card card-danger">
@@ -29,11 +29,11 @@
         </div>
         <div class="card-body">
           <div class="row">
-            <p> ¿Borrar organizacion: <span id="nombre-borrar"> </span>?</p>
+            <p> ¿Borrar lugar: <span id="nombre-borrar"> </span>?</p>
           </div>
         </div>
         <div class="card-footer">
-          <form id="form-confirmar-borrar" class="col-md-auto" action="{{route('organizacion.destroy')}}" method="POST">
+          <form id="form-confirmar-borrar" class="col-md-auto" action="{{route('lugar.destroy')}}" method="POST">
             @csrf
             @method('DELETE')
             <input type="hidden" name="id_borrar" id="id_borrar">
@@ -50,31 +50,26 @@
 </div>
 
 <div class="row">
-@foreach($organizaciones as $organizacion)
+@foreach($lugares as $lugar)
 <div class="col-4 col-sm-6 col-md-4 col-lg-3">
   <div class="card card-dark card-outline">
     <div class="card-body box-profile">
-      
-      <div class="text-center">
-      <h2 class="lead"><b>{{$organizacion->nombre}}</b></h2>
-        <img class="img-fluid" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" alt="Escudo">
-      </div>
-      <h3 class="profile-username text-center">{{$organizacion->nombre}}</h3>
+      <h3 class="profile-username text-center">{{$lugar->nombre}}</h3>
       <ul class="list-group list-group-unbordered mb-3">
         <li class="list-group-item">
-          <b>Tipo:</b> {{$organizacion->tipo}}
+          <b>Tipo:</b> {{$lugar->tipo}}
         </li>
         <li class="list-group-item">
-          <b>Descripción breve: </b>{!!$organizacion->descripcionBreve!!}
+          <b>Descripción breve: </b>{!!$lugar->descripcion_breve!!}
         </li>
       </ul>
     </div>
     <!-- /.card-body -->
     <div class="card-footer">
       <div class="row text-right">
-        <a href="{{route('organizacion.show',$organizacion->id_organizacion)}}" type="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-        <a href="{{route('organizacion.edit',$organizacion->id_organizacion)}}" type="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-        <button id="{{$organizacion->id_organizacion}}" nombre="{{$organizacion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-organizacion"><i class="fas fa-trash mr-1"></i></button>
+        <a href="{{route('lugar.show',$lugar->id)}}" type="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+        <a href="{{route('lugar.edit',$lugar->id)}}" type="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+        <button id="{{$lugar->id}}" nombre="{{$lugar->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-lugar"><i class="fas fa-trash mr-1"></i></button>
       </div>
     </div>
   </div>

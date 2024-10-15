@@ -135,42 +135,42 @@
     <div class="row mt-2 mb-3">
       <div class="col">
         <label for="DescripcionShort" class="form-label">Descripción breve</label>
-        <textarea name="DescripcionShort" class="form-control summernote-lite" id="DescripcionShort" rows="2" aria-label="With textarea"></textarea>
+        <textarea name="DescripcionShort" class="form-control summernote-lite" id="DescripcionShort" rows="2" aria-label="With textarea">{!!$organizacion->DescripcionShort!!}</textarea>
       </div>
     </div>
     <!----------------------------------------------->
     <label for="descripcion" class="form-label">Descripción física</label>
-    <textarea name="descripcion" class="form-control summernote-lite" id="descripcion" rows="4" aria-label="With textarea"></textarea>
+    <textarea name="descripcion" class="form-control summernote-lite" id="descripcion" rows="4" aria-label="With textarea">{!!$organizacion->Descripcion!!}</textarea>
 
     <label for="personalidad" class="form-label">Personalidad</label>
-    <textarea name="personalidad" class="form-control summernote-lite" id="personalidad" rows="4" aria-label="With textarea"></textarea>
+    <textarea name="personalidad" class="form-control summernote-lite" id="personalidad" rows="4" aria-label="With textarea">{!!$organizacion->Personalidad!!}</textarea>
 
     <label for="deseos" class="form-label">Principales deseos</label>
-    <textarea name="deseos" class="form-control summernote-lite" id="deseos" rows="4" aria-label="With textarea"></textarea>
+    <textarea name="deseos" class="form-control summernote-lite" id="deseos" rows="4" aria-label="With textarea">{!!$organizacion->Deseos!!}</textarea>
 
     <label for="miedos" class="form-label">Principales miedos</label>
-    <textarea name="miedos" class="form-control summernote-lite" id="miedos" rows="4" aria-label="With textarea"></textarea>
+    <textarea name="miedos" class="form-control summernote-lite" id="miedos" rows="4" aria-label="With textarea">{!!$organizacion->Miedos!!}</textarea>
 
     <label for="magia" class="form-label">Habilidades Mágicas</label>
-    <textarea name="magia" class="form-control summernote-lite" id="magia" rows="4" aria-label="With textarea"></textarea>
+    <textarea name="magia" class="form-control summernote-lite" id="magia" rows="4" aria-label="With textarea">{!!$organizacion->Magia!!}</textarea>
     <!----------------------------------------------->
     <label for="educacion" class="form-label">Educación y cultura</label>
-    <textarea name="educacion" class="form-control summernote-lite" id="educacion" rows="4" aria-label="With textarea"></textarea>
+    <textarea name="educacion" class="form-control summernote-lite" id="educacion" rows="4" aria-label="With textarea">{!!$organizacion->educacion!!}</textarea>
 
     <label for="religion" class="form-label">Religión</label>
-    <textarea name="religion" class="form-control summernote-lite" id="religion" rows="4" aria-label="With textarea"></textarea>
+    <textarea name="religion" class="form-control summernote-lite" id="religion" rows="4" aria-label="With textarea">{!!$organizacion->Religion!!}</textarea>
 
     <label for="familia" class="form-label">Familia y riqueza</label>
-    <textarea name="familia" class="form-control summernote-lite" id="familia" rows="4" aria-label="With textarea"></textarea>
+    <textarea name="familia" class="form-control summernote-lite" id="familia" rows="4" aria-label="With textarea">{!!$organizacion->Familia!!}</textarea>
 
     <label for="politica" class="form-label">Política y títulos</label>
-    <textarea name="politica" class="form-control summernote-lite" id="politica" rows="4" aria-label="With textarea"></textarea>
+    <textarea name="politica" class="form-control summernote-lite" id="politica" rows="4" aria-label="With textarea">{!!$organizacion->Politica!!}</textarea>
     <!----------------------------------------------->
     <label for="historia" class="form-label">Historia</label>
-    <textarea name="historia" class="form-control summernote" id="historia" rows="8" aria-label="With textarea"></textarea>
+    <textarea name="historia" class="form-control summernote" id="historia" rows="8" aria-label="With textarea">{!!$organizacion->Historia!!}</textarea>
 
     <label for="otros" class="form-label">Otros</label>
-    <textarea name="otros" class="form-control summernote-lite" id="otros" rows="4" aria-label="With textarea"></textarea>
+    <textarea name="otros" class="form-control summernote-lite" id="otros" rows="4" aria-label="With textarea">{!!$organizacion->otros!!}</textarea>
   </form>
 
 </section>
@@ -182,38 +182,16 @@
   $(function() {
     // Summernote
     $('.summernote').summernote({
-      height: 300,
-      callbacks: {
-        onImageUpload: function(files) {
-          sendFile(files[0]);
-        }
-      }
+      height: 300
     })
 
     $('.summernote-lite').summernote({
-      height: 150,
-      callbacks: {
-        onImageUpload: function(files) {
-          sendFile(files[0]);
-        }
-      }
+      height: 150
     })
 
     $('#select_especie').val('{{$personaje->id_foranea_especie}}');
     $('#sexo').val('{{$personaje->Sexo}}');
-    $('#descripcion').summernote('code', '{{$personaje->Descripcion}}');
-    $('#DescripcionShort').summernote('code', '{{$personaje->DescripcionShort}}');
-    $('#personalidad').summernote('code', '{{$personaje->personalidad}}');
-    $('#miedos').summernote('code', '{{$personaje->Miedos}}');
-    $('#deseos').summernote('code', '{{$personaje->Deseos}}');
-    $('#magia').summernote('code', '{{$personaje->Magia}}');
-    $('#educacion').summernote('code', '{{$personaje->educacion}}');
-    $('#religion').summernote('code', '{{$personaje->Religion}}');
-    $('#familia').summernote('code', '{{$personaje->Familia}}');
-    $('#politica').summernote('code', '{{$personaje->Politica}}');
-    $('#historia').summernote('code', '{{$personaje->Historia}}');
-    $('#otros').summernote('code', '{{$personaje->Otros}}');
-
+    
     if('{{$personaje->nacimiento}}'!=0){
       $('#id_nacimiento').val('{{$personaje->nacimiento}}');
       $('#dnacimiento').val('{{$nacimiento->dia}}');
@@ -226,28 +204,6 @@
       $('#dfallecimiento').val('{{$fallecimiento->dia}}');
       $('#mfallecimiento').val('{{$fallecimiento->mes}}');
       $('#afallecimiento').val('{{$fallecimiento->anno}}');
-    }
-
-    function sendFile(file) {
-      //var url = '{{ route("articulos.get", ":id") }}';
-      //url = url.replace(':id', id);
-
-      data = new FormData();
-      data.append("file", file);
-      $.ajax({
-        data: data,
-        type: "POST",
-        url: "../controlador/imagenesController.php",
-        cache: false,
-        contentType: false,
-        processData: false,
-        success: function(url) {
-          $('.summernote').summernote("insertImage", url, 'filename');
-        },
-        error: function(data) {
-          console.log(data);
-        }
-      });
     }
   });
 </script>

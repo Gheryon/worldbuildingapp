@@ -56,7 +56,7 @@
           <div class="icon">
             <i class="fas fa-tree"></i>
           </div>
-          <a href="#" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+          <a href="{{route('lugares.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
       <div class="col-lg-3 col-6">
@@ -105,6 +105,18 @@
             <i class="fa-solid fa-pencil"></i>
           </div>
           <a href="{{route('articulos')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-dark">
+          <div class="inner">
+            <h3>Enlaces</h3>
+          </div>
+          <div class="icon">
+            <i class="fa-solid fa-pencil"></i>
+          </div>
+          <a href="{{route('enlaces.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
     </div>

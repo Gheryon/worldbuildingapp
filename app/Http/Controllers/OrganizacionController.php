@@ -22,7 +22,7 @@ class OrganizacionController extends Controller
         ->join('tipo_organizacion', 'organizaciones.id_tipo_organizacion', '=', 'tipo_organizacion.id')
         ->select('organizaciones.id_organizacion', 'organizaciones.nombre', 'organizaciones.escudo', 'organizaciones.descripcionBreve', 'tipo_organizacion.nombre AS tipo')
         ->where('organizaciones.id_organizacion', '!=', 0)
-        ->orderBy('id_organizacion', 'desc')->get();
+        ->orderBy('organizaciones.nombre', 'asc')->get();
       return view('organizaciones.index', ['organizaciones' => $organizaciones]);
     }
 

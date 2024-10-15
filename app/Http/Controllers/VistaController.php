@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\personaje;
 use App\Models\Fecha;
 use App\Models\organizacion;
+use App\Models\Lugar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -115,5 +116,20 @@ class VistaController extends Controller
     }
 
     return view('organizaciones.show', ['vista'=>$organizacion, 'fundacion'=>$fecha_fundacion, 'disolucion'=>$fecha_disolucion, 'tipo'=>$tipo[0]->nombre, 'owner'=>$owner, 'soberano'=>$soberano]);
+  }
+
+  public function show_lugar($id)
+  {
+    $lugar=Lugar::findorfail($id);
+    $tipo = DB::select('select nombre from tipo_lugar where id = ?', [$lugar->id_tipo_lugar]);
+
+    if($lugar->id_owner!=0){
+      $ownerb=DB::select('select nombre, id_organizacion from organizaciones where id_organizacion = ?', [$lugar->id_owner]);
+      $owner=$ownerb[0];
+    }else{
+      $owner=0;
+    }
+
+    return view('lugares.show', ['vista'=>$lugar, 'tipo'=>$tipo[0]->nombre, 'owner'=>$owner]);
   }
 }

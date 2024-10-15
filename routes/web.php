@@ -17,13 +17,34 @@ Route::get('/', function () {
 });
 
 /*******personajes routes********/
-Route::get('/personajes/index', [App\Http\Controllers\PersonajeController::class, 'index'])->name('personajes.index');
-Route::get('/personaje/{id}', [App\Http\Controllers\VistaController::class, 'show_personaje'])->name('personaje.show');
-Route::get('/personajes/create', [App\Http\Controllers\PersonajeController::class, 'create'])->name('personaje.create');
-Route::post('/personajes/store', [App\Http\Controllers\PersonajeController::class, 'store'])->name('personaje.store');
-Route::get('/personajes/{id}/edit', [App\Http\Controllers\PersonajeController::class, 'edit'])->name('personaje.edit');
-Route::put('/personajes/{id}', [App\Http\Controllers\PersonajeController::class, 'update'])->name('personaje.update');
-Route::delete('/personaje/destroy', [App\Http\Controllers\PersonajeController::class, 'destroy'])->name('personaje.destroy');
+Route::controller(App\Http\Controllers\PersonajeController::class)->group(function () {
+    Route::get('/personajes/index', 'index')->name('personajes.index');
+    Route::get('/personajes/create', 'create')->name('personaje.create');
+    Route::post('/personajes/store', 'store')->name('personaje.store');
+    Route::get('/personajes/{id}/edit', 'edit')->name('personaje.edit');
+    Route::put('/personajes/{id}', 'update')->name('personaje.update');
+    Route::delete('/personaje/destroy', 'destroy')->name('personaje.destroy');    
+});
+
+/*******organizaciones routes********/
+Route::controller(App\Http\Controllers\OrganizacionController::class)->group(function () {
+    Route::get('/organizaciones/index', 'index')->name('organizaciones.index');
+    Route::get('/organizaciones/create', 'create')->name('organizacion.create');
+    Route::post('/organizaciones/store', 'store')->name('organizacion.store');
+    Route::get('/organizaciones/{id}/edit', 'edit')->name('organizacion.edit');
+    Route::put('/organizaciones/{id}', 'update')->name('organizacion.update');
+    Route::delete('/organizacion/destroy', 'destroy')->name('organizacion.destroy');
+});
+
+/*******lugares routes********/
+Route::controller(App\Http\Controllers\LugaresController::class)->group(function () {
+    Route::get('/lugares/index', 'index')->name('lugares.index');
+    Route::get('/lugares/create', 'create')->name('lugar.create');
+    Route::post('/lugares/store', 'store')->name('lugar.store');
+    Route::get('/lugares/{id}/edit', 'edit')->name('lugar.edit');
+    Route::put('/lugares/{id}', 'update')->name('lugar.update');
+    Route::delete('/lugar/destroy', 'destroy')->name('lugar.destroy');
+});
 
 /*******timelines routes********/
 Route::get('/timelines/index/{orden?}/{cronologia?}', [App\Http\Controllers\TimelineController::class, 'index'])->name('timelines.index');
@@ -31,14 +52,12 @@ Route::post('/timelines/store', [App\Http\Controllers\TimelineController::class,
 Route::get('/timelines/{id}/edit', [App\Http\Controllers\TimelineController::class, 'edit'])->name('evento.edit');
 Route::delete('/timelines/destroy', [App\Http\Controllers\TimelineController::class, 'destroy'])->name('evento.destroy');
 
-/*******organizaciones routes********/
-Route::get('/organizaciones/index', [App\Http\Controllers\OrganizacionController::class, 'index'])->name('organizaciones.index');
-Route::get('/content/{id}', [App\Http\Controllers\VistaController::class, 'show_organizacion'])->name('organizacion.show');
-Route::get('/organizaciones/create', [App\Http\Controllers\OrganizacionController::class, 'create'])->name('organizacion.create');
-Route::post('/organizaciones/store', [App\Http\Controllers\OrganizacionController::class, 'store'])->name('organizacion.store');
-Route::get('/organizaciones/{id}/edit', [App\Http\Controllers\OrganizacionController::class, 'edit'])->name('organizacion.edit');
-Route::put('/organizaciones/{id}', [App\Http\Controllers\OrganizacionController::class, 'update'])->name('organizacion.update');
-Route::delete('/organizacion/destroy', [App\Http\Controllers\OrganizacionController::class, 'destroy'])->name('organizacion.destroy');
+/*******vistas routes********/
+Route::controller(App\Http\Controllers\VistaController::class)->group(function () {
+    Route::get('/content/{id}', 'show_organizacion')->name('organizacion.show');
+    Route::get('/personaje/{id}', 'show_personaje')->name('personaje.show');
+    Route::get('/lugares/{id}', 'show_lugar')->name('lugar.show');
+});
 
 /*******articulos routes********/
 Route::controller(App\Http\Controllers\ArticuloController::class)->group(function () {
@@ -50,7 +69,6 @@ Route::controller(App\Http\Controllers\ArticuloController::class)->group(functio
     Route::get('/articulos/{id}/edit', 'edit')->name('articulos.edit');
     Route::put('/articulos/{id}', 'update')->name('articulos.update');
     Route::delete('/articulos/{id}', 'destroy')->name('articulos.destroy');
-
 });
 
 /*******imagenes routes********/
@@ -58,12 +76,22 @@ Route::get('/galeria/index', [App\Http\Controllers\ImagenController::class, 'ind
 Route::post('/galeria/store', [App\Http\Controllers\ImagenController::class, 'store'])->name('galeria.store');
 Route::get('/galeria/limpiar_imagenes', [App\Http\Controllers\ImagenController::class, 'limpiar_imagenes'])->name('galeria.limpiar_imagenes');
 
+/*******enlaces routes********/
+Route::controller(App\Http\Controllers\EnlacesController::class)->group(function () {
+    Route::get('/enlaces/index', 'index')->name('enlaces.index');
+    Route::post('/enlaces/store', 'store')->name('enlace.store');
+    Route::put('/enlaces/update', 'update')->name('enlace.update');
+    Route::delete('/enlaces/destroy', 'destroy')->name('enlace.destroy');
+});
+
 /*******configuracion routes********/
-Route::get('/config/index', [App\Http\Controllers\ConfigurationController::class, 'index'])->name('config.index');
-Route::post('/config/store/tipo_asentamiento', [App\Http\Controllers\ConfigurationController::class, 'store_tipo_asentamiento'])->name('config.store_tipo_asentamiento');
-Route::post('/config/store/tipo_conflicto', [App\Http\Controllers\ConfigurationController::class, 'store_tipo_conflicto'])->name('config.store_tipo_conflicto');
-Route::post('/config/store/tipo_lugar', [App\Http\Controllers\ConfigurationController::class, 'store_tipo_lugar'])->name('config.store_tipo_lugar');
-Route::post('/config/store/tipo_organizacion', [App\Http\Controllers\ConfigurationController::class, 'store_tipo_organizacion'])->name('config.store_tipo_organizacion');
-Route::post('/config/store/linea_temporal', [App\Http\Controllers\ConfigurationController::class, 'store_linea_temporal'])->name('config.store_linea_temporal');
-Route::put('/config/update', [App\Http\Controllers\ConfigurationController::class, 'update'])->name('config.update');
-Route::delete('/config/destroy', [App\Http\Controllers\ConfigurationController::class, 'destroy'])->name('config.destroy');
+Route::controller(App\Http\Controllers\ConfigurationController::class)->group(function () {
+    Route::get('/config/index', 'index')->name('config.index');
+    Route::post('/config/store/tipo_asentamiento', 'store_tipo_asentamiento')->name('config.store_tipo_asentamiento');
+    Route::post('/config/store/tipo_conflicto', 'store_tipo_conflicto')->name('config.store_tipo_conflicto');
+    Route::post('/config/store/tipo_lugar', 'store_tipo_lugar')->name('config.store_tipo_lugar');
+    Route::post('/config/store/tipo_organizacion', 'store_tipo_organizacion')->name('config.store_tipo_organizacion');
+    Route::post('/config/store/linea_temporal', 'store_linea_temporal')->name('config.store_linea_temporal');
+    Route::put('/config/update', 'update')->name('config.update');
+    Route::delete('/config/destroy', 'destroy')->name('config.destroy');
+});

@@ -73,7 +73,8 @@ class ImagenController extends Controller
   public function store_for_summernote($content, string $table_owner, int $id_owner)
   {
     $dom = new \DomDocument();
-    $dom->loadHtml($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    $searchPage = mb_convert_encoding($content, 'HTML-ENTITIES', "UTF-8"); //necesario para mantener las tildes en el texto
+    $dom->loadHtml($searchPage, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
     $imageFile = $dom->getElementsByTagName('img');
     
     foreach ($imageFile as $item => $image) {
@@ -103,11 +104,12 @@ class ImagenController extends Controller
   /**
    * Update a resource from summernote in storage.
    */
-  public function update_for_summernote($content, string $table_owner, int $id_owner)
+  public function update_for_summernote($content, string $table_owner, int $id_owner=0)
   {
     $dom = new \DomDocument();
     libxml_use_internal_errors(true);
-    $dom->loadHtml($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | libxml_use_internal_errors(true));
+    $searchPage = mb_convert_encoding($content, 'HTML-ENTITIES', "UTF-8"); //necesario para mantener las tildes en el texto
+    $dom->loadHtml($searchPage, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | libxml_use_internal_errors(true));
     $imageFile = $dom->getElementsByTagName('img');
     
     //no se borran las imagenes antiguas en caso de existir, esto se hace desde otra función

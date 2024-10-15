@@ -37,15 +37,30 @@ $(document).ready(function () {
     $('#descripcion').summernote('reset');
   });
 
-  //lleva el id de la organizacion a borrar al modal de confirmacion
+  //lleva el id a borrar al modal de confirmacion
   $(document).on('click', '.borrar', (e) => {
     const elemento=$(this)[0].activeElement;
     let id=$(elemento).attr('id');
     const nombre = $(elemento).attr('nombre');
 
     $('#id_borrar').val(id);
-    $('#nombre-organizacion-borrar').html(nombre);
+    $('#nombre-borrar').html(nombre);
     $('#nombre_borrado').val(nombre);
+  });
+
+  //lleva datos al modal editar enlace
+  $(document).on('click', '.editar-enlace', (e) => {
+    const elemento=$(this)[0].activeElement;
+    let id=$(elemento).attr('id');
+    const nombre = $(elemento).attr('nombre');
+    const tipo = $(elemento).attr('tipo');
+    const url = $(elemento).attr('url');
+
+    $('#id_editar').val(id);
+    $('#nombre-borrar').html(nombre);
+    $('#nombre_editar').val(nombre);
+    $('#url_editar').val(url);
+    $('#tipo_editar').val(tipo);
   });
 
 });
