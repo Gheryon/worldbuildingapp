@@ -8,6 +8,7 @@ use App\Models\tipo_conflicto;
 use App\Models\tipo_lugar;
 use App\Models\tipo_organizacion;
 use App\Models\lineas_temporales;
+use App\Models\Fecha;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -223,5 +224,37 @@ class ConfigurationController extends Controller
         return redirect()->route('config.index')->with('error', $excepcion->getMessage());
       }
     return redirect()->route('config.index')->with('error', 'No se pudo borrar.');
+  }
+
+  /**
+   * Store the specified resource in storage.
+   */
+  public function store_fecha($dia=0, $mes=0, $anno=0, $tabla)
+  {
+    //si los input de las fechas no se introducen, la fecha es indeterminada, se establece a 0-0-0 por defecto
+    if($anno==0&&$mes==0&&$dia==0){
+      $id_fecha=0;
+    }else{
+      $fecha=new Fecha();
+      $fecha->tabla=$tabla;
+      $fecha->anno=$anno;
+      $fecha->mes=$mes;
+      $fecha->dia=$dia;
+      $fecha->save();
+      $id_fecha=DB::scalar("SELECT MAX(id) as id FROM fechas");
+    }
+    return $id_fecha;
+  }
+
+  /**
+   * Update the specified resource in storage.
+   */
+  public function update_fecha($dia=0, $mes=0, $anno=0, $id)
+  {
+    $fecha=Fecha::find($id);
+    $fecha->anno=$anno;
+    $fecha->mes=$mes;
+    $fecha->dia=$dia;
+    $fecha->save();
   }
 }

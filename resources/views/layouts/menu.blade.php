@@ -8,18 +8,10 @@
     </a>
   </li>
   <li class="nav-item">
-    <a href="#" class="nav-link">
+    <a href="{{route('religiones.index')}}" class="nav-link">
       <i class="nav-icon fa-solid fa-place-of-worship"></i>
-      <p>Religiones<i class="fas fa-angle-left right"></i></p>
+      <p>Religiones</p>
     </a>
-    <ul class="nav nav-treeview">
-      <li class="nav-item">
-        <a href="createReligion.php" class="nav-link">
-          <i class="far fa-circle nav-icon"></i>
-          <p>Nueva religión</p>
-        </a>
-      </li>
-    </ul>
   </li>
   <li class="nav-item">
     <a href="{{route('personajes.index')}}" class="nav-link">

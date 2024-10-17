@@ -6,6 +6,7 @@ use App\Models\personaje;
 use App\Models\Fecha;
 use App\Models\organizacion;
 use App\Models\Lugar;
+use App\Models\Religion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -131,5 +132,35 @@ class VistaController extends Controller
     }
 
     return view('lugares.show', ['vista'=>$lugar, 'tipo'=>$tipo[0]->nombre, 'owner'=>$owner]);
+  }
+
+  public function show_religion($id)
+  {
+    $meses=array("Semana año nuevo", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+
+    $religion=Religion::findorfail($id);
+
+    if($religion->fundacion!=0&&$religion->fundacion!=null){
+      $fundacion=Fecha::find($religion->fundacion);
+      if($fundacion->dia&&$fundacion->mes==0){
+        $fecha_fundacion=$religion->anno;
+      }else{
+        $fecha_fundacion=$fundacion->dia."-".$meses[$fundacion->mes]."-".$fundacion->anno;
+      }
+    }else{
+      $fecha_fundacion="Desconocido";
+    }
+    if($religion->disolucion!=0&&$religion->disolucion!=null){
+      $disolucion=Fecha::find($religion->disolucion);
+      if($disolucion->dia&&$disolucion->mes==0){
+        $fecha_disolucion=$religion->anno;
+      }else{
+        $fecha_disolucion=$disolucion->dia."-".$meses[$disolucion->mes]."-".$disolucion->anno;
+      }
+    }else{
+      $fecha_disolucion="Desconocido";
+    }
+
+    return view('religiones.show', ['vista'=>$religion, 'fundacion'=>$fecha_fundacion, 'disolucion'=>$fecha_disolucion]);
   }
 }

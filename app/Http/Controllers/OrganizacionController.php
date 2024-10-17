@@ -118,31 +118,8 @@ class OrganizacionController extends Controller
         }
 
         //------------fechas----------//
-        $fecha=new Fecha();
-        $fecha->tabla="organizaciones";
-        //si los input de las fechas no se introducen, la fecha es indeterminada, se establece a 0-0-0 por defecto
-        $fecha->anno=$request->input('afundacion', 0);
-        $fecha->mes=$request->input('mfundacion', 0);
-        $fecha->dia=$request->input('dfundacion', 0);
-        if($fecha->anno==0&&$fecha->mes==0&&$fecha->dia==0){
-          $organizacion->fundacion=0;
-        }else{
-          $fecha->save();
-          $fundacion=DB::scalar("SELECT MAX(id) as id FROM fechas");
-          $organizacion->fundacion=$fundacion;
-        }
-        $fecha=new Fecha();
-        $fecha->tabla="organizaciones";
-        $fecha->anno=$request->input('adisolucion', 0);
-        $fecha->mes=$request->input('mdisolucion', 0);
-        $fecha->dia=$request->input('ddisolucion', 0);
-        if($fecha->anno==0&&$fecha->mes==0&&$fecha->dia==0){
-          $organizacion->disolucion=0;
-        }else{
-          $fecha->save();
-          $disolucion=DB::scalar("SELECT MAX(id) as id FROM fechas");
-          $organizacion->disolucion=$disolucion;
-        }
+        $organizacion->fundacion=app(ConfigurationController::class)->store_fecha($request->input('dfundacion', 0), $request->input('mfundacion', 0), $request->input('afundacion', 0), "organizaciones");
+        $organizacion->disolucion=app(ConfigurationController::class)->store_fecha($request->input('ddisolucion', 0), $request->input('mdisolucion', 0), $request->input('adisolucion', 0), "organizaciones");
 
         $organizacion->save();
         return redirect()->route('organizaciones.index')->with('message','Organización añadida correctamente.');
@@ -279,43 +256,20 @@ class OrganizacionController extends Controller
         if($request->input('afundacion', 0)!=0){
           if($organizacion->fundacion!=0){
             //la organizacion ya tenía fecha de fundacion antes de editar
-            $fecha=Fecha::find($organizacion->fundacion);
-            $fecha->anno=$request->input('afundacion');
-            $fecha->mes=$request->input('mfundacion');
-            $fecha->dia=$request->input('dfundacion');
-            $fecha->save();
+            app(ConfigurationController::class)->update_fecha($request->input('dfundacion', 0), $request->input('mfundacion', 0), $request->input('afundacion', 0), $organizacion->fundacion);
           }else{
             //la organizacion no tenía fecha de fundacion antes de editar, hay que añadirla a la db.
-            $fecha=new Fecha();
-            $fecha->tabla="organizaciones";
-            $fecha->anno=$request->input('afundacion', 0);
-            $fecha->mes=$request->input('mfundacion', 0);
-            $fecha->dia=$request->input('dfundacion', 0);
-            $fecha->save();
-            $fundacion=DB::scalar("SELECT MAX(id) as id FROM fechas");
-            $organizacion->fundacion=$fundacion;
+            $organizacion->fundacion=app(ConfigurationController::class)->store_fecha($request->input('dfundacion', 0), $request->input('mfundacion', 0), $request->input('afundacion', 0), "organizaciones");
           }
-  
         }
   
         if($request->input('adisolucion', 0)!=0){
           if($organizacion->disolucion!=0){
             //el organizacion ya tenía fecha de disolucion antes de editar
-            $fecha=Fecha::find($organizacion->disolucion);
-            $fecha->anno=$request->input('adisolucion');
-            $fecha->mes=$request->input('mdisolucion');
-            $fecha->dia=$request->input('ddisolucion');
-            $fecha->save();
+            app(ConfigurationController::class)->update_fecha($request->input('ddisolucion', 0), $request->input('mdisolucion', 0), $request->input('adisolucion', 0), $organizacion->disolucion);
           }else{
             //el organizacion no tenía fecha de disolucion antes de editar, hay que añadirla a la db.
-            $fecha=new Fecha();
-            $fecha->tabla="organizacions";
-            $fecha->anno=$request->input('adisolucion', 0);
-            $fecha->mes=$request->input('mdisolucion', 0);
-            $fecha->dia=$request->input('ddisolucion', 0);
-            $fecha->save();
-            $disolucion=DB::scalar("SELECT MAX(id) as id FROM fechas");
-            $organizacion->disolucion=$disolucion;
+            $organizacion->disolucion=app(ConfigurationController::class)->store_fecha($request->input('ddisolucion', 0), $request->input('mdisolucion', 0), $request->input('adisolucion', 0), "organizaciones");
           }
         }
   

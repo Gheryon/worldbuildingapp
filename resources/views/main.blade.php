@@ -27,6 +27,18 @@
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">
+            <h3>Religiones</h3>
+          </div>
+          <div class="icon">
+            <i class="fa-solid fa-place-of-worship"></i>
+          </div>
+          <a href="{{route('religiones.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-dark">
+          <div class="inner">
             <h3>Personajes</h3>
           </div>
           <div class="icon">
@@ -92,7 +104,7 @@
           <div class="icon">
             <i class="fas fa-columns"></i>
           </div>
-          <a href="#" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+          <a href="{{route('timelines.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
       <div class="col-lg-3 col-6">

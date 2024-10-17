@@ -120,31 +120,8 @@ class PersonajeController extends Controller
       }
   
       //------------fechas----------//
-      $fecha=new Fecha();
-      $fecha->tabla="personajes";
-      //si los input de las fechas no se introducen, la fecha es indeterminada, se establece a 0-0-0 por defecto
-      $fecha->anno=$request->input('anacimiento', 0);
-      $fecha->mes=$request->input('mnacimiento', 0);
-      $fecha->dia=$request->input('dnacimiento', 0);
-      if($fecha->anno==0&&$fecha->mes==0&&$fecha->dia==0){
-        $personaje->nacimiento=0;
-      }else{
-        $fecha->save();
-        $nacimiento=DB::scalar("SELECT MAX(id) as id FROM fechas");
-        $personaje->nacimiento=$nacimiento;
-      }
-      $fecha=new Fecha();
-      $fecha->tabla="personajes";
-      $fecha->anno=$request->input('afallecimiento', 0);
-      $fecha->mes=$request->input('mfallecimiento', 0);
-      $fecha->dia=$request->input('dfallecimiento', 0);
-      if($fecha->anno==0&&$fecha->mes==0&&$fecha->dia==0){
-        $personaje->fallecimiento=0;
-      }else{
-        $fecha->save();
-        $fallecimiento=DB::scalar("SELECT MAX(id) as id FROM fechas");
-        $personaje->fallecimiento=$fallecimiento;
-      }
+      $personaje->nacimiento=app(ConfigurationController::class)->store_fecha($request->input('dnacimiento', 0), $request->input('mnacimiento', 0), $request->input('anacimiento', 0), "personajes");
+      $personaje->fallecimiento=app(ConfigurationController::class)->store_fecha($request->input('dfallecimiento', 0), $request->input('mfallecimiento', 0), $request->input('afallecimiento', 0), "personajes");
 
       $personaje->save();
       return redirect()->route('personajes.index')->with('message','Personaje añadido correctamente.');
@@ -280,42 +257,20 @@ class PersonajeController extends Controller
       if($request->input('dnacimiento', 0)!=0){
         if($personaje->nacimiento!=0){
           //el personaje ya tenía fecha de nacimiento antes de editar
-          $fecha=Fecha::find($personaje->nacimiento);
-          $fecha->anno=$request->input('anacimiento');
-          $fecha->mes=$request->input('mnacimiento');
-          $fecha->dia=$request->input('dnacimiento');
-          $fecha->save();
+          app(ConfigurationController::class)->update_fecha($request->input('dnacimiento', 0), $request->input('mnacimiento', 0), $request->input('anacimiento', 0), $personaje->nacimiento);
         }else{
           //el personaje no tenía fecha de nacimiento antes de editar, hay que añadirla a la db.
-          $fecha=new Fecha();
-          $fecha->tabla="personajes";
-          $fecha->anno=$request->input('anacimiento', 0);
-          $fecha->mes=$request->input('mnacimiento', 0);
-          $fecha->dia=$request->input('dnacimiento', 0);
-          $fecha->save();
-          $nacimiento=DB::scalar("SELECT MAX(id) as id FROM fechas");
-          $personaje->nacimiento=$nacimiento;
+          $personaje->nacimiento=app(ConfigurationController::class)->store_fecha($request->input('dnacimiento', 0), $request->input('mnacimiento', 0), $request->input('anacimiento', 0), "personajes");
         }
       }
 
       if($request->input('dfallecimiento', 0)!=0){
         if($personaje->fallecimiento!=0){
           //el personaje ya tenía fecha de fallecimiento antes de editar
-          $fecha=Fecha::find($personaje->fallecimiento);
-          $fecha->anno=$request->input('afallecimiento');
-          $fecha->mes=$request->input('mfallecimiento');
-          $fecha->dia=$request->input('dfallecimiento');
-          $fecha->save();
+          app(ConfigurationController::class)->update_fecha($request->input('dfallecimiento', 0), $request->input('mfallecimiento', 0), $request->input('afallecimiento', 0), $personaje->fallecimiento);
         }else{
           //el personaje no tenía fecha de fallecimiento antes de editar, hay que añadirla a la db.
-          $fecha=new Fecha();
-          $fecha->tabla="personajes";
-          $fecha->anno=$request->input('afallecimiento', 0);
-          $fecha->mes=$request->input('mfallecimiento', 0);
-          $fecha->dia=$request->input('dfallecimiento', 0);
-          $fecha->save();
-          $fallecimiento=DB::scalar("SELECT MAX(id) as id FROM fechas");
-          $personaje->fallecimiento=$fallecimiento;
+          $personaje->nacimiento=app(ConfigurationController::class)->store_fecha($request->input('dfallecimiento', 0), $request->input('mfallecimiento', 0), $request->input('afallecimiento', 0), "personajes");
         }
       }
 

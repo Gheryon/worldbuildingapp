@@ -33,7 +33,7 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{{url('/')}}" class="brand-link">
-      <span class="brand-text text-center font-weight-light">AdminLTE 3</span>
+      <span class="brand-text text-center font-weight-light">Inicio</span>
     </a>
 
     <!-- Sidebar -->
