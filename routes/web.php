@@ -35,6 +35,7 @@ Route::controller(App\Http\Controllers\OrganizacionController::class)->group(fun
     Route::put('/organizaciones/{id}', 'update')->name('organizacion.update');
     Route::delete('/organizacion/destroy', 'destroy')->name('organizacion.destroy');
 });
+
 /*******religiones routes********/
 Route::controller(App\Http\Controllers\ReligionesController::class)->group(function () {
     Route::get('/religiones/index', 'index')->name('religiones.index');
@@ -43,6 +44,16 @@ Route::controller(App\Http\Controllers\ReligionesController::class)->group(funct
     Route::get('/religiones/{id}/edit', 'edit')->name('religion.edit');
     Route::put('/religiones/{id}', 'update')->name('religion.update');
     Route::delete('/religiones/destroy', 'destroy')->name('religion.destroy');
+});
+
+/*******especies routes********/
+Route::controller(App\Http\Controllers\EspecieController::class)->group(function () {
+    Route::get('/especies/index', 'index')->name('especies.index');
+    Route::get('/especies/create', 'create')->name('especie.create');
+    Route::post('/especies/store', 'store')->name('especie.store');
+    Route::get('/especies/{id}/edit', 'edit')->name('especie.edit');
+    Route::put('/especies/{id}', 'update')->name('especie.update');
+    Route::delete('/especie/destroy', 'destroy')->name('especie.destroy');
 });
 
 /*******lugares routes********/
@@ -65,6 +76,7 @@ Route::delete('/timelines/destroy', [App\Http\Controllers\TimelineController::cl
 Route::controller(App\Http\Controllers\VistaController::class)->group(function () {
     Route::get('/content/{id}', 'show_organizacion')->name('organizacion.show');
     Route::get('/personaje/{id}', 'show_personaje')->name('personaje.show');
+    Route::get('/especies/{id}', 'show_especie')->name('especie.show');
     Route::get('/lugares/{id}', 'show_lugar')->name('lugar.show');
     Route::get('/religiones/{id}', 'show_religion')->name('religion.show');
 });
