@@ -7,7 +7,6 @@
 @endsection
 
 @section('content')
-<h1>Main</h1>
 <section class="content">
   <div class="container-fluid">
     <div class="row">
@@ -68,7 +67,7 @@
           <div class="icon">
             <i class="fa-solid fa-landmark"></i>
           </div>
-          <a href="#" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+          <a href="{{route('asentamientos.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
       <div class="col-lg-3 col-6">

@@ -36,9 +36,15 @@ class LugaresController extends Controller
    */
   public function create()
   {
-    $tipo_lugar =tipo_lugar::orderBy('nombre', 'asc')->get();
-
-    return view('lugares.create', ['tipos'=>$tipo_lugar]);
+    try {
+      $tipo_lugar =tipo_lugar::orderBy('nombre', 'asc')->get();
+  
+      return view('lugares.create', ['tipos'=>$tipo_lugar]);
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      return view('lugares.index')->with('error', 'Se produjo un problema en la base de datos.');
+    }catch(Exception $excepcion){
+      return view('lugares.index')->with('error', $excepcion->getMessage());
+    }
   }
 
   /**
@@ -51,10 +57,17 @@ class LugaresController extends Controller
       'select_tipo'=>'required',
     ]);
 
-    $lugar=new lugar();
-    $lugar->save();
+    try {
+      $lugar=new lugar();
+      $lugar->save();
+  
+      $id_lugar=DB::scalar("SELECT MAX(id) as id FROM lugares");
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      return view('lugares.index')->with('error', 'Se produjo un problema en la base de datos.');
+    }catch(Exception $excepcion){
+      return view('lugares.index')->with('error', $excepcion->getMessage());
+    }
 
-    $id_lugar=DB::scalar("SELECT MAX(id) as id FROM lugares");
     if($request->filled('nombre')){
       $lugar->Nombre=$request->nombre;
     }
@@ -111,10 +124,16 @@ class LugaresController extends Controller
    */
   public function edit($id)
   {
-    $lugar=lugar::findorfail($id);
-    $tipo_lugar =tipo_lugar::orderBy('nombre', 'asc')->get();
-
-    return view('lugares.edit', ['lugar'=>$lugar, 'tipos'=>$tipo_lugar]);
+    try {
+      $lugar=lugar::findorfail($id);
+      $tipo_lugar =tipo_lugar::orderBy('nombre', 'asc')->get();
+  
+      return view('lugares.edit', ['lugar'=>$lugar, 'tipos'=>$tipo_lugar]);
+    } catch(\Illuminate\Database\QueryException $excepcion){
+      return view('lugares.index')->with('error', 'Se produjo un problema en la base de datos.');
+    }catch(Exception $excepcion){
+      return view('lugares.index')->with('error', $excepcion->getMessage());
+    }
   }
 
   /**
@@ -127,7 +146,14 @@ class LugaresController extends Controller
       'select_tipo'=>'required',
     ]);
 
-    $lugar=lugar::find($request->id);
+    try {
+      $lugar=lugar::findorfail($request->id);
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      return view('lugares.index')->with('error', 'Se produjo un problema en la base de datos.');
+    }catch(Exception $excepcion){
+      return view('lugares.index')->with('error', $excepcion->getMessage());
+    }
+    
     if($request->filled('nombre')){
       $lugar->Nombre=$request->nombre;
     }

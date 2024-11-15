@@ -79,11 +79,17 @@ class ConfigurationController extends Controller
       'nuevo_tipo_asentamiento'=>'required|max:128',
     ]);
 
-    $nuevo=new tipo_asentamiento();
-    $nuevo->nombre=$request->input('nuevo_tipo_asentamiento');
-    $nuevo->save();
-
-    return redirect()->route('config.index')->with('message', $nuevo->nombre.' añadido correctamente.');
+    try{
+      $nuevo=new tipo_asentamiento();
+      $nuevo->nombre=$request->input('nuevo_tipo_asentamiento');
+      $nuevo->save();
+  
+      return redirect()->route('config.index')->with('message', $nuevo->nombre.' añadido correctamente.');      
+    }catch (\Illuminate\Database\QueryException $excepcion) {
+      return redirect()->route('config.index')->with('error', 'Se produjo un problema en la base de datos.');
+    } catch (Exception $excepcion) {
+      return redirect()->route('config.index')->with('error', $excepcion->getMessage());
+    }
   }
 
   public function store_tipo_conflicto(Request $request)
@@ -231,19 +237,25 @@ class ConfigurationController extends Controller
    */
   public function store_fecha($dia=0, $mes=0, $anno=0, $tabla)
   {
-    //si los input de las fechas no se introducen, la fecha es indeterminada, se establece a 0-0-0 por defecto
-    if($anno==0&&$mes==0&&$dia==0){
-      $id_fecha=0;
-    }else{
-      $fecha=new Fecha();
-      $fecha->tabla=$tabla;
-      $fecha->anno=$anno;
-      $fecha->mes=$mes;
-      $fecha->dia=$dia;
-      $fecha->save();
-      $id_fecha=DB::scalar("SELECT MAX(id) as id FROM fechas");
+    try {
+      //si los input de las fechas no se introducen, la fecha es indeterminada, se establece a 0-0-0 por defecto
+      if($anno==0&&$mes==0&&$dia==0){
+        $id_fecha=0;
+      }else{
+        $fecha=new Fecha();
+        $fecha->tabla=$tabla;
+        $fecha->anno=$anno;
+        $fecha->mes=$mes;
+        $fecha->dia=$dia;
+        $fecha->save();
+        $id_fecha=DB::scalar("SELECT MAX(id) as id FROM fechas");
+      }
+      return $id_fecha;
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      return redirect()->route('config.index')->with('error', 'Se produjo un problema en la base de datos.');
+    } catch (Exception $excepcion) {
+      return redirect()->route('config.index')->with('error', $excepcion->getMessage());
     }
-    return $id_fecha;
   }
 
   /**
@@ -251,10 +263,16 @@ class ConfigurationController extends Controller
    */
   public function update_fecha($dia=0, $mes=0, $anno=0, $id)
   {
-    $fecha=Fecha::find($id);
-    $fecha->anno=$anno;
-    $fecha->mes=$mes;
-    $fecha->dia=$dia;
-    $fecha->save();
+    try {
+      $fecha=Fecha::findorfail($id);
+      $fecha->anno=$anno;
+      $fecha->mes=$mes;
+      $fecha->dia=$dia;
+      $fecha->save();
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      return redirect()->route('config.index')->with('error', 'Se produjo un problema en la base de datos.');
+    } catch (Exception $excepcion) {
+      return redirect()->route('config.index')->with('error', $excepcion->getMessage());
+    }
   }
 }

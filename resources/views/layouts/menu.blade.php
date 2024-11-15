@@ -26,7 +26,7 @@
     </a>
   </li>
   <li class="nav-item">
-    <a href="asentamientos.php" class="nav-link">
+    <a href="{{route('asentamientos.index')}}" class="nav-link">
       <i class="nav-icon fa-solid fa-landmark"></i>
       <p>
         Asentamientos

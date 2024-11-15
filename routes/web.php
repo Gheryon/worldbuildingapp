@@ -56,6 +56,16 @@ Route::controller(App\Http\Controllers\EspecieController::class)->group(function
     Route::delete('/especie/destroy', 'destroy')->name('especie.destroy');
 });
 
+/*******asentamientos routes********/
+Route::controller(App\Http\Controllers\AsentamientoController::class)->group(function () {
+    Route::get('/asentamientos/index', 'index')->name('asentamientos.index');
+    Route::get('/asentamientos/create', 'create')->name('asentamiento.create');
+    Route::post('/asentamientos/store', 'store')->name('asentamiento.store');
+    Route::get('/asentamientos/{id}/edit', 'edit')->name('asentamiento.edit');
+    Route::put('/asentamientos/{id}', 'update')->name('asentamiento.update');
+    Route::delete('/asentamiento/destroy', 'destroy')->name('asentamiento.destroy');
+});
+
 /*******lugares routes********/
 Route::controller(App\Http\Controllers\LugaresController::class)->group(function () {
     Route::get('/lugares/index', 'index')->name('lugares.index');
@@ -77,6 +87,7 @@ Route::controller(App\Http\Controllers\VistaController::class)->group(function (
     Route::get('/content/{id}', 'show_organizacion')->name('organizacion.show');
     Route::get('/personaje/{id}', 'show_personaje')->name('personaje.show');
     Route::get('/especies/{id}', 'show_especie')->name('especie.show');
+    Route::get('/asentamientos/{id}', 'show_asentamiento')->name('asentamiento.show');
     Route::get('/lugares/{id}', 'show_lugar')->name('lugar.show');
     Route::get('/religiones/{id}', 'show_religion')->name('religion.show');
 });

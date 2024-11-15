@@ -47,12 +47,19 @@ class EspecieController extends Controller
       'estatus'=>'required'
     ]);
 
-    $especie=new Especie();
-    
-    $especie->nombre=$request->nombre;
-    $especie->save();
+    try {
+      $especie=new Especie();
+      
+      $especie->nombre=$request->nombre;
+      $especie->save();
+  
+      $id_especie=DB::scalar("SELECT MAX(id) as id FROM especies");
+    } catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('especies.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+    }catch(Exception $excepcion){
+      return redirect()->route('especies.index')->with('error', $excepcion->getMessage());
+    }
 
-    $id_especie=DB::scalar("SELECT MAX(id) as id FROM especies");
     if($request->filled('edad')){
       $especie->edad=$request->edad;
     }
@@ -116,9 +123,15 @@ class EspecieController extends Controller
    */
   public function edit($id)
   {
-    $especie=Especie::findorfail($id);
-
-    return view('especies.edit', ['especie'=>$especie]);
+    try {
+      $especie=Especie::findorfail($id);
+  
+      return view('especies.edit', ['especie'=>$especie]);
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('especies.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+    }catch(Exception $excepcion){
+      return redirect()->route('especies.index')->with('error', $excepcion->getMessage());
+    }
   }
 
   /**
@@ -131,7 +144,13 @@ class EspecieController extends Controller
       'estatus'=>'required'
     ]);
 
-    $especie=new Especie();
+    try {
+      $especie=Especie::findorfail($request->id);
+    } catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('especies.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+    }catch(Exception $excepcion){
+      return redirect()->route('especies.index')->with('error', $excepcion->getMessage());
+    }
     
     $especie->nombre=$request->nombre;
 

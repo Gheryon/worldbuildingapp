@@ -37,9 +37,15 @@ class PersonajeController extends Controller
    */
   public function create()
   {
-    $especies = DB::select('select id_especie, nombre from especies');
-
-    return view('personajes.create', ['especies'=>$especies]);
+    try {
+      $especies = DB::select('select id_especie, nombre from especies');
+  
+      return view('personajes.create', ['especies'=>$especies]);
+    } catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('personajes.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+    }catch(Exception $excepcion){
+      return redirect()->route('personajes.index')->with('error', $excepcion->getMessage());
+    }
   }
 
   /**
@@ -55,6 +61,144 @@ class PersonajeController extends Controller
     ]);
 
     $personaje=new personaje();
+    $personaje->Nombre=$request->nombre;
+    $personaje->save();
+
+    $id=DB::scalar("SELECT MAX(id_organizacion) as id FROM organizaciones");
+
+    if($request->filled('apellidos')){
+      $personaje->Apellidos=$request->apellidos;
+    }
+    if($request->filled('nombre_familia')){
+      $personaje->nombreFamilia=$request->nombre_familia;
+    }
+    if($request->filled('lugar_nacimiento')){
+      $personaje->lugar_nacimiento=$request->lugar_nacimiento;
+    }
+    if($request->filled('causa_fallecimiento')){
+      $personaje->causa_fallecimiento=$request->causa_fallecimiento;
+    }
+    if($request->filled('descripcion')){
+      $personaje->Descripcion=app(ImagenController::class)->update_for_summernote($request->descripcion, "personajes", $id);
+    }
+    if($request->filled('DescripcionShort')){
+      $personaje->DescripcionShort=app(ImagenController::class)->update_for_summernote($request->DescripcionShort, "personajes", $id);
+    }
+    if($request->filled('personalidad')){
+      $personaje->Personalidad=app(ImagenController::class)->update_for_summernote($request->personalidad, "personajes", $id);
+    }
+    if($request->filled('deseos')){
+      $personaje->Deseos=app(ImagenController::class)->update_for_summernote($request->deseos, "personajes", $id);
+    }
+    if($request->filled('miedos')){
+      $personaje->Miedos=app(ImagenController::class)->update_for_summernote($request->miedos, "personajes", $id);
+    }
+    if($request->filled('magia')){
+      $personaje->Magia=app(ImagenController::class)->update_for_summernote($request->magia, "personajes", $id);
+    }
+    if($request->filled('educacion')){
+      $personaje->educacion=app(ImagenController::class)->update_for_summernote($request->educacion, "personajes", $id);
+    }
+    if($request->filled('historia')){
+      $personaje->Historia=app(ImagenController::class)->update_for_summernote($request->historia, "personajes", $id);
+    }
+    if($request->filled('religion')){
+      $personaje->Religion=app(ImagenController::class)->update_for_summernote($request->religion, "personajes", $id);
+    }
+    if($request->filled('familia')){
+      $personaje->Familia=app(ImagenController::class)->update_for_summernote($request->familia, "personajes", $id);;
+    }
+    if($request->filled('politica')){
+      $personaje->Politica=app(ImagenController::class)->update_for_summernote($request->politica, "personajes", $id);;
+    }
+    if($request->filled('otros')){
+      $personaje->otros=app(ImagenController::class)->update_for_summernote($request->otros, "personajes", $id);
+    }
+
+    $personaje->id_foranea_especie=$request->select_especie;
+    $personaje->sexo=$request->sexo;
+    
+    try{
+      //------------retrato----------//
+      if($request->hasFile('retrato')){
+        $path = $request->file('retrato')->store('retratos', 'public');
+        $personaje->Retrato=basename($path);
+      }else{
+        $personaje->Retrato="default.png";
+      }
+  
+      //------------fechas----------//
+      $personaje->nacimiento=app(ConfigurationController::class)->store_fecha($request->input('dnacimiento', 0), $request->input('mnacimiento', 0), $request->input('anacimiento', 0), "personajes");
+      $personaje->fallecimiento=app(ConfigurationController::class)->store_fecha($request->input('dfallecimiento', 0), $request->input('mfallecimiento', 0), $request->input('afallecimiento', 0), "personajes");
+
+      $personaje->save();
+      return redirect()->route('personajes.index')->with('message','Personaje añadido correctamente.');
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('personajes.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+    }catch(Exception $excepcion){
+      return redirect()->route('personajes.index')->with('error', $excepcion->getMessage());
+    }
+    
+  }
+
+  /**
+   * Display the specified resource.
+   */
+  public function show(personaje $personaje)
+  {
+    //se hace desde vistacontroller
+  }
+
+  /**
+   * Show the form for editing the specified resource.
+   */
+  public function edit($id)
+  {
+    try{
+      $personaje=personaje::findorfail($id);
+      $especies = DB::select('select id_especie, nombre from especies');
+      $fecha_fallecimiento=0;
+      $fecha_nacimiento=0;
+      if($personaje->nacimiento!=0){
+        $fecha_nacimiento=Fecha::find($personaje->nacimiento);
+      }else{
+        $fecha_nacimiento=Fecha::find(0);
+      }
+  
+      if($personaje->fallecimiento!=0){
+        $fecha_fallecimiento=Fecha::find($personaje->fallecimiento);
+      }else{
+        $fecha_fallecimiento=Fecha::find(0);
+      }
+  
+      return view('personajes.edit', ['personaje'=>$personaje, 'nacimiento'=>$fecha_nacimiento, 'fallecimiento'=>$fecha_fallecimiento, 'especies'=>$especies]);
+
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('personajes.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+    }catch(Exception $excepcion){
+      return redirect()->route('personajes.index')->with('error', $excepcion->getMessage());
+    }
+  }
+
+  /**
+   * Update the specified resource in storage.
+   */
+  public function update(Request $request)
+  {
+    $request->validate([
+      'nombre'=>'required|max:128',
+      'sexo'=>'required',
+      'select_especie'=>'required',
+      'retrato' => 'file|image|mimes:jpg,png,gif|max:10240',
+    ]);
+
+    try {
+      $personaje=Personaje::findorfail($request->id);
+    } catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('personajes.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+    }catch(Exception $excepcion){
+      return redirect()->route('personajes.index')->with('error', $excepcion->getMessage());
+    }
     if($request->filled('nombre')){
       $personaje->Nombre=$request->nombre;
     }
@@ -109,143 +253,6 @@ class PersonajeController extends Controller
 
     $personaje->id_foranea_especie=$request->select_especie;
     $personaje->sexo=$request->sexo;
-    
-    try{
-      //------------retrato----------//
-      if($request->hasFile('retrato')){
-        $path = $request->file('retrato')->store('retratos', 'public');
-        $personaje->Retrato=basename($path);
-      }else{
-        $personaje->Retrato="default.png";
-      }
-  
-      //------------fechas----------//
-      $personaje->nacimiento=app(ConfigurationController::class)->store_fecha($request->input('dnacimiento', 0), $request->input('mnacimiento', 0), $request->input('anacimiento', 0), "personajes");
-      $personaje->fallecimiento=app(ConfigurationController::class)->store_fecha($request->input('dfallecimiento', 0), $request->input('mfallecimiento', 0), $request->input('afallecimiento', 0), "personajes");
-
-      $personaje->save();
-      return redirect()->route('personajes.index')->with('message','Personaje añadido correctamente.');
-    }catch(\Illuminate\Database\QueryException $excepcion){
-      return redirect()->route('personajes.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
-    }catch(Exception $excepcion){
-      return redirect()->route('personajes.index')->with('error', $excepcion->getMessage());
-    }
-    
-  }
-
-  /**
-   * Display the specified resource.
-   */
-  public function show(personaje $personaje)
-  {
-    //se hace desde vistacontroller
-  }
-
-  /**
-   * Show the form for editing the specified resource.
-   */
-  public function edit($id)
-  {
-    $personaje=personaje::findorfail($id);
-    $especies = DB::select('select id_especie, nombre from especies');
-    $fecha_fallecimiento=0;
-    $fecha_nacimiento=0;
-    if($personaje->nacimiento!=0){
-      $fecha_nacimiento=Fecha::find($personaje->nacimiento);
-    }else{
-      $fecha_nacimiento=Fecha::find(0);
-    }
-
-    if($personaje->fallecimiento!=0){
-      $fecha_fallecimiento=Fecha::find($personaje->fallecimiento);
-    }else{
-      $fecha_fallecimiento=Fecha::find(0);
-    }
-
-    return view('personajes.edit', ['personaje'=>$personaje, 'nacimiento'=>$fecha_nacimiento, 'fallecimiento'=>$fecha_fallecimiento, 'especies'=>$especies]);
-  }
-
-  /**
-   * Update the specified resource in storage.
-   */
-  public function update(Request $request)
-  {
-    $request->validate([
-      'nombre'=>'required|max:128',
-      'sexo'=>'required',
-      'select_especie'=>'required',
-      'retrato' => 'file|image|mimes:jpg,png,gif|max:10240',
-    ]);
-
-    $personaje=Personaje::find($request->id);
-   if($request->filled('nombre')){
-      $personaje->Nombre=$request->nombre;
-    }
-    if($request->filled('apellidos')){
-      $personaje->Apellidos=$request->apellidos;
-    }
-    if($request->filled('nombre_familia')){
-      $personaje->nombreFamilia=$request->nombre_familia;
-    }
-    if($request->filled('lugar_nacimiento')){
-      $personaje->lugar_nacimiento=$request->lugar_nacimiento;
-    }
-    if($request->filled('causa_fallecimiento')){
-      $personaje->causa_fallecimiento=$request->causa_fallecimiento;
-    }
-    if($request->filled('descripcion')){
-      $personaje->Descripcion=app(ImagenController::class)->update_for_summernote($request->descripcion, "personajes", $request->id);
-    }
-    if($request->filled('DescripcionShort')){
-      $personaje->DescripcionShort=app(ImagenController::class)->update_for_summernote($request->DescripcionShort, "personajes", $request->id);
-    }
-    if($request->filled('personalidad')){
-      $personaje->Personalidad=app(ImagenController::class)->update_for_summernote($request->personalidad, "personajes", $request->id);
-    }
-    if($request->filled('deseos')){
-      $personaje->Deseos=app(ImagenController::class)->update_for_summernote($request->deseos, "personajes", $request->id);
-    }
-    if($request->filled('miedos')){
-      $personaje->Miedos=app(ImagenController::class)->update_for_summernote($request->miedos, "personajes", $request->id);
-    }
-    if($request->filled('magia')){
-      $personaje->Magia=app(ImagenController::class)->update_for_summernote($request->magia, "personajes", $request->id);
-    }
-    if($request->filled('educacion')){
-      $personaje->educacion=app(ImagenController::class)->update_for_summernote($request->educacion, "personajes", $request->id);
-    }
-    if($request->filled('historia')){
-      $personaje->Historia=app(ImagenController::class)->update_for_summernote($request->historia, "personajes", $request->id);
-    }
-    if($request->filled('religion')){
-      $personaje->Religion=app(ImagenController::class)->update_for_summernote($request->religion, "personajes", $request->id);
-    }
-    if($request->filled('familia')){
-      $personaje->Familia=app(ImagenController::class)->update_for_summernote($request->familia, "personajes", $request->id);;
-    }
-    if($request->filled('politica')){
-      $personaje->Politica=app(ImagenController::class)->update_for_summernote($request->politica, "personajes", $request->id);;
-    }
-    if($request->filled('otros')){
-      $personaje->otros=app(ImagenController::class)->update_for_summernote($request->otros, "personajes", $request->id);
-    }
-
-    $personaje->id_foranea_especie=$request->select_especie;
-    $personaje->sexo=$request->sexo;
-
-    //------------retrato----------//
-    if($request->hasFile('retrato')){
-      //el retrato anterior hay que borrarlo salvo que sea default.png
-      if($personaje->Retrato!="default.png"){
-        if (file_exists('storage/retratos/' . $personaje->Retrato)) {
-          unlink('storage/retratos/' . $personaje->Retrato);
-        }
-      }
-      $path = $request->file('retrato')->store('retratos', 'public');
-      $personaje->Retrato=basename($path);
-    }else{
-      $personaje->Retrato=$request->retrato;
-    }
 
 
     //------------fechas----------//
@@ -253,6 +260,19 @@ class PersonajeController extends Controller
     $personaje->fallecimiento=$request->input('id_fallecimiento', 0);
     
     try{
+      //------------retrato----------//
+      if($request->hasFile('retrato')){
+        //el retrato anterior hay que borrarlo salvo que sea default.png
+        if($personaje->Retrato!="default.png"){
+          if (file_exists('storage/retratos/' . $personaje->Retrato)) {
+            unlink('storage/retratos/' . $personaje->Retrato);
+          }
+        }
+        $path = $request->file('retrato')->store('retratos', 'public');
+        $personaje->Retrato=basename($path);
+      }else{
+        $personaje->Retrato=$request->retrato;
+      }
       
       if($request->input('dnacimiento', 0)!=0){
         if($personaje->nacimiento!=0){
@@ -288,7 +308,6 @@ class PersonajeController extends Controller
    */
   public function destroy(Request $request)
   {
-    
     try{
       $nacimiento=DB::scalar("SELECT nacimiento FROM personaje where id = ?", [$request->id_personaje]);
       $fallecimiento=DB::scalar("SELECT fallecimiento FROM personaje where id = ?", [$request->id_personaje]);

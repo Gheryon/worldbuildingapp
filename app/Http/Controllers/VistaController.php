@@ -8,6 +8,7 @@ use App\Models\organizacion;
 use App\Models\Lugar;
 use App\Models\Religion;
 use App\Models\Especie;
+use App\Models\Asentamiento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -189,6 +190,47 @@ class VistaController extends Controller
       return view('especies.show', ['vista'=>$especie]);
     }catch(\Illuminate\Database\Eloquent\ModelNotFoundException $excepcion){
       return redirect()->route('especies.index')->with('error','Error, no pudo encontrarse la especie.');
+    }
+  }
+
+  public function show_asentamiento($id)
+  {
+    try{
+      $meses=array("Semana año nuevo", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+      $asentamiento=Asentamiento::findorfail($id);
+      $tipo = DB::select('select nombre from tipo_asentamiento where id = ?', [$asentamiento->id_tipo_asentamiento]);
+
+      if($asentamiento->id_owner!=0){
+        $ownerb=DB::select('select nombre, id_organizacion from organizaciones where id_organizacion = ?', [$asentamiento->id_owner]);
+        $owner=$ownerb[0];
+      }else{
+        $owner=0;
+      }
+
+      if($asentamiento->fundacion!=0&&$asentamiento->fundacion!=null){
+        $fundacion=Fecha::find($asentamiento->fundacion);
+        if($fundacion->dia&&$fundacion->mes==0){
+          $fecha_fundacion=$asentamiento->anno;
+        }else{
+          $fecha_fundacion=$fundacion->dia."-".$meses[$fundacion->mes]."-".$fundacion->anno;
+        }
+      }else{
+        $fecha_fundacion="Desconocido";
+      }
+      if($asentamiento->disolucion!=0&&$asentamiento->disolucion!=null){
+        $disolucion=Fecha::find($asentamiento->disolucion);
+        if($disolucion->dia&&$disolucion->mes==0){
+          $fecha_disolucion=$asentamiento->anno;
+        }else{
+          $fecha_disolucion=$disolucion->dia."-".$meses[$disolucion->mes]."-".$disolucion->anno;
+        }
+      }else{
+        $fecha_disolucion="Desconocido";
+      }
+
+      return view('asentamientos.show', ['vista'=>$asentamiento, 'fundacion'=>$fecha_fundacion, 'disolucion'=>$fecha_disolucion, 'tipo'=>$tipo[0]->nombre, 'owner'=>$owner]);
+    }catch(\Illuminate\Database\Eloquent\ModelNotFoundException $excepcion){
+      return redirect()->route('asentamientos.index')->with('error','Error, no pudo encontrarse el asentamiento.');
     }
   }
 }

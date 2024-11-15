@@ -48,12 +48,19 @@ class ReligionesController extends Controller
       'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
     ]);
 
-    $religion=new Religion();
+    try {
+      $religion=new Religion();
+      
+      $religion->nombre=$request->nombre;
+      $religion->save();
+  
+      $id_religion=DB::scalar("SELECT MAX(id) as id FROM religiones");
+    } catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('religiones.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+    }catch(Exception $excepcion){
+      return redirect()->route('religiones.index')->with('error', $excepcion->getMessage());
+    }
     
-    $religion->nombre=$request->nombre;
-    $religion->save();
-
-    $id_religion=DB::scalar("SELECT MAX(id) as id FROM religiones");
     if($request->filled('lema')){
       $religion->lema=$request->lema;
     }
@@ -151,7 +158,14 @@ class ReligionesController extends Controller
       'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
     ]);
 
-    $religion=Religion::find($request->id);
+    try {
+      $religion=Religion::findorfail($request->id);
+    } catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('religiones.index')->with('error','Se produjo un problema en la base de datos, no se pudo editar.');
+    }catch(Exception $excepcion){
+      return redirect()->route('religiones.index')->with('error', $excepcion->getMessage());
+    }
+
     if($request->filled('nombre')){
       $religion->nombre=$request->nombre;
     }
@@ -189,25 +203,23 @@ class ReligionesController extends Controller
       $religion->otros=app(ImagenController::class)->update_for_summernote($request->otros, "religiones", $request->id);
     }
 
-    //------------escudo----------//
-    if($request->hasFile('escudo')){
-      //el escudo anterior hay que borrarlo salvo que sea default.png
-      if($religion->escudo!="default.png"){
-        if (file_exists('storage/escudos/' . $religion->escudo)) {
-          unlink('storage/escudos/' . $religion->escudo);
-        }
-      }
-      $path = $request->file('escudo')->store('escudos', 'public');
-      $religion->escudo=basename($path);
-    }
-
-
     //------------fechas----------//
     $religion->fundacion=$request->input('id_fundacion', 0);
     $religion->disolucion=$request->input('id_disolucion', 0);
     
     try{
-      
+      //------------escudo----------//
+      if($request->hasFile('escudo')){
+        //el escudo anterior hay que borrarlo salvo que sea default.png
+        if($religion->escudo!="default.png"){
+          if (file_exists('storage/escudos/' . $religion->escudo)) {
+            unlink('storage/escudos/' . $religion->escudo);
+          }
+        }
+        $path = $request->file('escudo')->store('escudos', 'public');
+        $religion->escudo=basename($path);
+      }
+
       if($request->input('dfundacion', 0)!=0){
         if($religion->fundacion!=0){
           //la religion ya tenía fecha de fundacion antes de editar, se actualiza

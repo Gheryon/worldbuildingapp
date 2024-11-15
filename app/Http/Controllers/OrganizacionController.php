@@ -18,12 +18,18 @@ class OrganizacionController extends Controller
      */
     public function index()
     {
-      $organizaciones=DB::table('organizaciones')
-        ->join('tipo_organizacion', 'organizaciones.id_tipo_organizacion', '=', 'tipo_organizacion.id')
-        ->select('organizaciones.id_organizacion', 'organizaciones.nombre', 'organizaciones.escudo', 'organizaciones.descripcionBreve', 'tipo_organizacion.nombre AS tipo')
-        ->where('organizaciones.id_organizacion', '!=', 0)
-        ->orderBy('organizaciones.nombre', 'asc')->get();
-      return view('organizaciones.index', ['organizaciones' => $organizaciones]);
+      try {
+        $organizaciones=DB::table('organizaciones')
+          ->join('tipo_organizacion', 'organizaciones.id_tipo_organizacion', '=', 'tipo_organizacion.id')
+          ->select('organizaciones.id_organizacion', 'organizaciones.nombre', 'organizaciones.escudo', 'organizaciones.descripcionBreve', 'tipo_organizacion.nombre AS tipo')
+          ->where('organizaciones.id_organizacion', '!=', 0)
+          ->orderBy('organizaciones.nombre', 'asc')->get();
+        return view('organizaciones.index', ['organizaciones' => $organizaciones]);
+      } catch(\Illuminate\Database\QueryException $excepcion){
+        return redirect()->route('organizaciones.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+      }catch(Exception $excepcion){
+        return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
+      }
     }
 
     /**
@@ -31,13 +37,19 @@ class OrganizacionController extends Controller
      */
     public function create()
     {
-      $tipo_organizacion =tipo_organizacion::orderBy('nombre', 'asc')->get();
-
-      $personajes=DB::table('personaje')->select('id', 'Nombre')->orderBy('Nombre', 'asc')->get();
-
-      $paises=DB::table('organizaciones')->select('id_organizacion', 'nombre')->orderBy('nombre', 'asc')->get();
-
-      return view('organizaciones.create', ['tipo_organizacion'=>$tipo_organizacion, 'personajes'=>$personajes, 'paises'=>$paises]);
+      try {
+        $tipo_organizacion =tipo_organizacion::orderBy('nombre', 'asc')->get();
+  
+        $personajes=DB::table('personaje')->select('id', 'Nombre')->orderBy('Nombre', 'asc')->get();
+  
+        $paises=DB::table('organizaciones')->select('id_organizacion', 'nombre')->orderBy('nombre', 'asc')->get();
+  
+        return view('organizaciones.create', ['tipo_organizacion'=>$tipo_organizacion, 'personajes'=>$personajes, 'paises'=>$paises]);
+      } catch(\Illuminate\Database\QueryException $excepcion){
+        return redirect()->route('organizaciones.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+      }catch(Exception $excepcion){
+        return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
+      }
     }
 
     /**
@@ -51,57 +63,67 @@ class OrganizacionController extends Controller
       'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
       ]);
 
-      $organizacion=new organizacion();
-      $organizacion->nombre=$request->nombre;
+      try {
+        $organizacion=new organizacion();
+        $organizacion->nombre=$request->nombre;
+        $organizacion->save();
+
+        $id=DB::scalar("SELECT MAX(id_organizacion) as id FROM organizaciones");
+      } catch(\Illuminate\Database\QueryException $excepcion){
+        return redirect()->route('organizaciones.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+      }catch(Exception $excepcion){
+        return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
+      }
+
       $organizacion->gentilicio=$request->gentilicio;
       $organizacion->capital=$request->capital;
       $organizacion->lema=$request->lema;
 
       //inputs de summernote
       if($request->filled('DescripcionShort')){
-        $organizacion->descripcionBreve=app(ImagenController::class)->update_for_summernote($request->DescripcionShort, "organizaciones", $request->id);
+        $organizacion->descripcionBreve=app(ImagenController::class)->store_for_summernote($request->DescripcionShort, "organizaciones", $id);
       }
       if($request->filled('historia')){
-        $organizacion->historia=app(ImagenController::class)->update_for_summernote($request->historia, "organizaciones", $request->id);;
+        $organizacion->historia=app(ImagenController::class)->store_for_summernote($request->historia, "organizaciones", $id);
       }
       if($request->filled('politica')){
-        $organizacion->politicaExteriorInterior=app(ImagenController::class)->update_for_summernote($request->politica, "organizaciones", $request->id);;
+        $organizacion->politicaExteriorInterior=app(ImagenController::class)->store_for_summernote($request->politica, "organizaciones", $id);
       }
       if($request->filled('militar')){
-        $organizacion->militar=app(ImagenController::class)->update_for_summernote($request->militar, "organizaciones", $request->id);;
+        $organizacion->militar=app(ImagenController::class)->store_for_summernote($request->militar, "organizaciones", $id);
       }
       if($request->filled('estructura')){
-        $organizacion->estructura=app(ImagenController::class)->update_for_summernote($request->estructura, "organizaciones", $request->id);;
+        $organizacion->estructura=app(ImagenController::class)->store_for_summernote($request->estructura, "organizaciones", $id);
       }
       if($request->filled('territorio')){
-        $organizacion->territorio=app(ImagenController::class)->update_for_summernote($request->territorio, "organizaciones", $request->id);;
+        $organizacion->territorio=app(ImagenController::class)->store_for_summernote($request->territorio, "organizaciones", $id);
       }
       if($request->filled('frontera')){
-        $organizacion->frontera=app(ImagenController::class)->update_for_summernote($request->frontera, "organizaciones", $request->id);;
+        $organizacion->frontera=app(ImagenController::class)->store_for_summernote($request->frontera, "organizaciones", $id);
       }
       if($request->filled('religion')){
-        $organizacion->religion=app(ImagenController::class)->update_for_summernote($request->religion, "organizaciones", $request->id);;
+        $organizacion->religion=app(ImagenController::class)->store_for_summernote($request->religion, "organizaciones", $id);
       }
       if($request->filled('demografia')){
-        $organizacion->demografia=app(ImagenController::class)->update_for_summernote($request->demografia, "organizaciones", $request->id);;
+        $organizacion->demografia=app(ImagenController::class)->store_for_summernote($request->demografia, "organizaciones", $id);
       }
       if($request->filled('cultura')){
-        $organizacion->cultura=app(ImagenController::class)->update_for_summernote($request->cultura, "organizaciones", $request->id);;
+        $organizacion->cultura=app(ImagenController::class)->store_for_summernote($request->cultura, "organizaciones", $id);
       }
       if($request->filled('educacion')){
-        $organizacion->educacion=app(ImagenController::class)->update_for_summernote($request->educacion, "organizaciones", $request->id);;
+        $organizacion->educacion=app(ImagenController::class)->store_for_summernote($request->educacion, "organizaciones", $id);
       }
       if($request->filled('tecnologia')){
-        $organizacion->tecnologia=app(ImagenController::class)->update_for_summernote($request->tecnologia, "organizaciones", $request->id);;
+        $organizacion->tecnologia=app(ImagenController::class)->store_for_summernote($request->tecnologia, "organizaciones", $id);
       }
       if($request->filled('economia')){
-        $organizacion->economia=app(ImagenController::class)->update_for_summernote($request->economia, "organizaciones", $request->id);;
+        $organizacion->economia=app(ImagenController::class)->store_for_summernote($request->economia, "organizaciones", $id);
       }
       if($request->filled('recursos')){
-        $organizacion->recursosNaturales=app(ImagenController::class)->update_for_summernote($request->recursos, "organizaciones", $request->id);;
+        $organizacion->recursosNaturales=app(ImagenController::class)->store_for_summernote($request->recursos, "organizaciones", $id);
       }
       if($request->filled('otros')){
-        $organizacion->otros=app(ImagenController::class)->update_for_summernote($request->otros, "organizaciones", $request->id);;
+        $organizacion->otros=app(ImagenController::class)->store_for_summernote($request->otros, "organizaciones", $id);
       }
       
       $organizacion->id_ruler=$request->input('soberano', 0);
@@ -122,7 +144,7 @@ class OrganizacionController extends Controller
         $organizacion->disolucion=app(ConfigurationController::class)->store_fecha($request->input('ddisolucion', 0), $request->input('mdisolucion', 0), $request->input('adisolucion', 0), "organizaciones");
 
         $organizacion->save();
-        return redirect()->route('organizaciones.index')->with('message','Organización añadida correctamente.');
+        return redirect()->route('organizaciones.index')->with('message','Organización '.$organizacion->nombre.' añadida correctamente.');
       }catch(\Illuminate\Database\QueryException $excepcion){
         return redirect()->route('organizaciones.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.'.$excepcion->getMessage());
       }catch(Exception $excepcion){
@@ -144,28 +166,34 @@ class OrganizacionController extends Controller
      */
     public function edit($id)
     {
-      $organizacion=organizacion::findorfail($id);
-      $tipo_organizacion =tipo_organizacion::orderBy('nombre', 'asc')->get();
-
-      $personajes=DB::table('personaje')->select('id', 'Nombre')->orderBy('Nombre', 'asc')->get();
-
-      $paises=DB::table('organizaciones')->select('id_organizacion', 'nombre')->orderBy('nombre', 'asc')->get();
-
-      $fecha_fundacion=0;
-      $fecha_disolucion=0;
-      if($organizacion->fundacion!=0){
-        $fecha_fundacion=Fecha::find($organizacion->fundacion);
-      }else{
-        $fecha_fundacion=Fecha::find(0);
+      try {
+        $organizacion=organizacion::findorfail($id);
+        $tipo_organizacion =tipo_organizacion::orderBy('nombre', 'asc')->get();
+  
+        $personajes=DB::table('personaje')->select('id', 'Nombre')->orderBy('Nombre', 'asc')->get();
+  
+        $paises=DB::table('organizaciones')->select('id_organizacion', 'nombre')->orderBy('nombre', 'asc')->get();
+  
+        $fecha_fundacion=0;
+        $fecha_disolucion=0;
+        if($organizacion->fundacion!=0){
+          $fecha_fundacion=Fecha::find($organizacion->fundacion);
+        }else{
+          $fecha_fundacion=Fecha::find(0);
+        }
+  
+        if($organizacion->disolucion!=0){
+          $fecha_disolucion=Fecha::find($organizacion->disolucion);
+        }else{
+          $fecha_disolucion=Fecha::find(0);
+        }
+        
+        return view('organizaciones.edit', ['organizacion'=>$organizacion, 'fundacion'=>$fecha_fundacion, 'disolucion'=>$fecha_disolucion, 'tipo_organizacion'=>$tipo_organizacion, 'personajes'=>$personajes, 'paises'=>$paises]);
+      } catch(\Illuminate\Database\QueryException $excepcion){
+        return redirect()->route('organizaciones.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+      }catch(Exception $excepcion){
+        return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
       }
-
-      if($organizacion->disolucion!=0){
-        $fecha_disolucion=Fecha::find($organizacion->disolucion);
-      }else{
-        $fecha_disolucion=Fecha::find(0);
-      }
-      
-      return view('organizaciones.edit', ['organizacion'=>$organizacion, 'fundacion'=>$fecha_fundacion, 'disolucion'=>$fecha_disolucion, 'tipo_organizacion'=>$tipo_organizacion, 'personajes'=>$personajes, 'paises'=>$paises]);
     }
 
     /**
@@ -179,7 +207,13 @@ class OrganizacionController extends Controller
         'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
       ]);
   
-      $organizacion=organizacion::find($request->id);
+      try {
+        $organizacion=organizacion::findorfail($request->id);
+      } catch(\Illuminate\Database\QueryException $excepcion){
+        return redirect()->route('organizaciones.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+      }catch(Exception $excepcion){
+        return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
+      }
       $organizacion->nombre=$request->nombre;
       $organizacion->gentilicio=$request->gentilicio;
       $organizacion->capital=$request->capital;
@@ -235,24 +269,24 @@ class OrganizacionController extends Controller
       $organizacion->id_ruler=$request->input('soberano', 0);
       $organizacion->id_owner=$request->input('owner', 0);
       $organizacion->id_tipo_organizacion=$request->select_tipo;
-  
-      //------------escudo----------//
-      if($request->hasFile('escudo')){
-        //el escudo anterior hay que borrarlo salvo que sea default.png
-        if($organizacion->escudo!="default.png"){
-          if (file_exists('storage/escudos/' . $organizacion->escudo)) {
-            unlink('storage/escudos/' . $organizacion->escudo);
-          }
-        }
-        $path = $request->file('escudo')->store('escudos', 'public');
-        $organizacion->escudo=basename($path);
-      }
 
       //------------fechas----------//
       $organizacion->fundacion=$request->input('id_fundacion', 0);
       $organizacion->disolucion=$request->input('id_disolucion', 0);
       
-      try{
+      try{  
+        //------------escudo----------//
+        if($request->hasFile('escudo')){
+          //el escudo anterior hay que borrarlo salvo que sea default.png
+          if($organizacion->escudo!="default.png"){
+            if (file_exists('storage/escudos/' . $organizacion->escudo)) {
+              unlink('storage/escudos/' . $organizacion->escudo);
+            }
+          }
+          $path = $request->file('escudo')->store('escudos', 'public');
+          $organizacion->escudo=basename($path);
+        }
+
         if($request->input('afundacion', 0)!=0){
           if($organizacion->fundacion!=0){
             //la organizacion ya tenía fecha de fundacion antes de editar
