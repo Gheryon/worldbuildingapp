@@ -75,7 +75,7 @@
     </a>
   </li>
   <li class="nav-item">
-    <a href="notasNombres.php" class="nav-link">
+    <a href="{{route('nombres.index')}}" class="nav-link">
       <i class="nav-icon fas fa-pencil-alt"></i>
       <p>
         Lista de nombres

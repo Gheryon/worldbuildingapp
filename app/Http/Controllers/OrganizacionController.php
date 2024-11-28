@@ -24,12 +24,13 @@ class OrganizacionController extends Controller
           ->select('organizaciones.id_organizacion', 'organizaciones.nombre', 'organizaciones.escudo', 'organizaciones.descripcionBreve', 'tipo_organizacion.nombre AS tipo')
           ->where('organizaciones.id_organizacion', '!=', 0)
           ->orderBy('organizaciones.nombre', 'asc')->get();
-        return view('organizaciones.index', ['organizaciones' => $organizaciones]);
+        
       } catch(\Illuminate\Database\QueryException $excepcion){
-        return redirect()->route('organizaciones.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+        $organizaciones=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
       }catch(Exception $excepcion){
-        return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
+        $organizaciones=['error' => ['error' => $excepcion->getMessage()]];
       }
+      return view('organizaciones.index', ['organizaciones' => $organizaciones]);
     }
 
     /**
@@ -37,19 +38,31 @@ class OrganizacionController extends Controller
      */
     public function create()
     {
-      try {
+      try{
         $tipo_organizacion =tipo_organizacion::orderBy('nombre', 'asc')->get();
-  
-        $personajes=DB::table('personaje')->select('id', 'Nombre')->orderBy('Nombre', 'asc')->get();
-  
-        $paises=DB::table('organizaciones')->select('id_organizacion', 'nombre')->orderBy('nombre', 'asc')->get();
-  
-        return view('organizaciones.create', ['tipo_organizacion'=>$tipo_organizacion, 'personajes'=>$personajes, 'paises'=>$paises]);
-      } catch(\Illuminate\Database\QueryException $excepcion){
-        return redirect()->route('organizaciones.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $tipo_organizacion=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
       }catch(Exception $excepcion){
-        return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
+        $tipo_organizacion=['error' => ['error' => $excepcion->getMessage()]];
       }
+
+      try{
+        $personajes=DB::table('personaje')->select('id', 'Nombre')->where('id','!=', 0)->orderBy('Nombre', 'asc')->get();
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $personajes=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $personajes=['error' => ['error' => $excepcion->getMessage()]];
+      }
+
+      try{
+        $paises=DB::table('organizaciones')->select('id_organizacion', 'nombre')->where('id_organizacion','!=', 0)->orderBy('nombre', 'asc')->get();
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $paises=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $paises=['error' => ['error' => $excepcion->getMessage()]];
+      }
+      
+      return view('organizaciones.create', ['tipo_organizacion'=>$tipo_organizacion, 'personajes'=>$personajes, 'paises'=>$paises]);
     }
 
     /**
@@ -166,34 +179,54 @@ class OrganizacionController extends Controller
      */
     public function edit($id)
     {
-      try {
+      $fecha_fundacion=0;
+      $fecha_disolucion=0;
+
+      try{
         $organizacion=organizacion::findorfail($id);
-        $tipo_organizacion =tipo_organizacion::orderBy('nombre', 'asc')->get();
-  
-        $personajes=DB::table('personaje')->select('id', 'Nombre')->orderBy('Nombre', 'asc')->get();
-  
-        $paises=DB::table('organizaciones')->select('id_organizacion', 'nombre')->orderBy('nombre', 'asc')->get();
-  
-        $fecha_fundacion=0;
-        $fecha_disolucion=0;
-        if($organizacion->fundacion!=0){
-          $fecha_fundacion=Fecha::find($organizacion->fundacion);
-        }else{
-          $fecha_fundacion=Fecha::find(0);
-        }
-  
-        if($organizacion->disolucion!=0){
-          $fecha_disolucion=Fecha::find($organizacion->disolucion);
-        }else{
-          $fecha_disolucion=Fecha::find(0);
-        }
-        
-        return view('organizaciones.edit', ['organizacion'=>$organizacion, 'fundacion'=>$fecha_fundacion, 'disolucion'=>$fecha_disolucion, 'tipo_organizacion'=>$tipo_organizacion, 'personajes'=>$personajes, 'paises'=>$paises]);
-      } catch(\Illuminate\Database\QueryException $excepcion){
-        return redirect()->route('organizaciones.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $organizacion=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
       }catch(Exception $excepcion){
-        return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
+        $organizacion=['error' => ['error' => $excepcion->getMessage()]];
       }
+
+      try{
+        $tipo_organizacion =tipo_organizacion::orderBy('nombre', 'asc')->get();
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $tipo_organizacion=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $tipo_organizacion=['error' => ['error' => $excepcion->getMessage()]];
+      }
+
+      try{
+        $personajes=DB::table('personaje')->select('id', 'Nombre')->where('id','!=', 0)->orderBy('Nombre', 'asc')->get();
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $personajes=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $personajes=['error' => ['error' => $excepcion->getMessage()]];
+      }
+
+      try{
+        $paises=DB::table('organizaciones')->select('id_organizacion', 'nombre')->where('id_organizacion','!=', 0)->orderBy('nombre', 'asc')->get();
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $paises=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $paises=['error' => ['error' => $excepcion->getMessage()]];
+      }
+
+      if($organizacion->fundacion!=0){
+        $fecha_fundacion=Fecha::find($organizacion->fundacion);
+      }else{
+        $fecha_fundacion=Fecha::find(0);
+      }
+
+      if($organizacion->disolucion!=0){
+        $fecha_disolucion=Fecha::find($organizacion->disolucion);
+      }else{
+        $fecha_disolucion=Fecha::find(0);
+      }
+      
+      return view('organizaciones.edit', ['organizacion'=>$organizacion, 'fundacion'=>$fecha_fundacion, 'disolucion'=>$fecha_disolucion, 'tipo_organizacion'=>$tipo_organizacion, 'personajes'=>$personajes, 'paises'=>$paises]);
     }
 
     /**

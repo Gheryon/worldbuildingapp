@@ -11,7 +11,7 @@
 
 @section('content')
 <div class="row">
-  <h1>Configuracion</h1>
+  <h1>Configuración</h1>
 </div>
 <hr>
 
@@ -86,8 +86,71 @@
 </div>
 
 <div class="col-md-12">
-  <div class="row">
+  <!--<div class="row">
     <button id="back_up" class="btn btn-primary backup_button">Copia de seguridad</button>
+  </div>-->
+  
+  <div class="row">
+    <div class="col-4">
+    <form id="form-edit-nombre_mundo" class="form-inline" action="{{route('config.update_nombre_mundo')}}" method="POST">
+      @csrf
+      <div class="form-group mb-2">
+        <label for="nombre_mundo" class="sr-only">Nombre del mundo</label>
+        <input type="text" readonly class="form-control-plaintext" id="nombre_mundo" value="Nombre del mundo">
+      </div>
+      <div class="form-group mx-sm-3 mb-2">
+        <label for="nuevo_nombre_mundo" class="sr-only">Nombre del mundo</label>
+        <input type="text" value="{{$Nombre_mundo}}" name="nuevo_nombre_mundo" class="form-control" id="nuevo_nombre_mundo" placeholder="Ej: Córdoba">
+        @error('nuevo_nombre_mundo')
+        <small style="color: red">{{$message}}</small>
+        @enderror
+        <button type="submit" class="btn btn-primary">Cambiar</button>
+      </div>
+      <input type="hidden" name="id" id="id" value="Nombre_mundo">
+    </form>
+
+    </div>
+    <div class="col-8">
+    <form id="form-edit-fecha_mundo" class="form-inline" action="{{route('config.update_fecha_mundo')}}" method="POST">
+      @csrf
+      <div class="form-group mb-2">
+        <label for="nombre_mundo" class="sr-only">Fecha actual</label>
+        <input type="text" readonly class="form-control-plaintext" id="nombre_mundo" value="Fecha actual">
+      </div>
+      <div class="form-group mx-sm-3 mb-2">
+        <input type="text" id="dia" name="dia" class="form-control col-2" placeholder="Día">
+        @error('dia')
+        <small style="color: red">{{$message}}</small>
+        @enderror
+        <select class="form-select form-control col-4" type="number" id="mes" name="mes">
+          <option selected disabled value="">Mes</option>
+          <option value="0">Semana de año nuevo</option>
+          <option value="1">Enero</option>
+          <option value="2">Febrero</option>
+          <option value="3">Marzo</option>
+          <option value="4">Abril</option>
+          <option value="5">Mayo</option>
+          <option value="6">Junio</option>
+          <option value="7">Julio</option>
+          <option value="8">Agosto</option>
+          <option value="9">Septiembre</option>
+          <option value="10">Octubre</option>
+          <option value="11">Noviembre</option>
+          <option value="12">Diciembre</option>
+        </select>
+        @error('mes')
+        <small style="color: red">{{$message}}</small>
+        @enderror
+        <input type="text" id="anno" name="anno" class="form-control col-2" placeholder="Año">
+        @error('anno')
+        <small style="color: red">{{$message}}</small>
+        @enderror
+        <button type="submit" class="btn btn-primary">Cambiar</button>
+      </div>
+    </form>
+      
+    </div>
+
   </div>
   <!--<a href="{{route('galeria.limpiar_imagenes')}}" class="btn btn-dark">Limpiar imágenes</a>-->
   <div class="row">
@@ -372,6 +435,13 @@
 
 @section('specific-scripts')
 <script src="{{asset('dist/js/config.js')}}"></script>
+<script>
+  $(function() {
+    $('#dia').val('{{$fecha->dia}}');
+    $('#mes').val('{{$fecha->mes}}');
+    $('#anno').val('{{$fecha->anno}}');
+  });
+</script>
 <script>
   @if(Session::has('message'))
   toastr.options = {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Nombres;
 use App\Models\configuration;
 use App\Models\tipo_asentamiento;
 use App\Models\tipo_conflicto;
@@ -20,6 +21,22 @@ class ConfigurationController extends Controller
    */
   public function index()
   {
+    try{//el nombre del mundo se guarda en la fila con el tipo Nombre_mundo
+      $nombre_mundo=DB::table('nombres')->select('lista')->where('tipo', '=', 'Nombre_mundo')->get();
+    }catch (\Illuminate\Database\QueryException $excepcion) {
+      $nombre_mundo=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $nombre_mundo=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try{//la fecha actual del mundo se guarda en la fila con el id 1
+      $fecha=Fecha::where('id', '=', '1')->get();
+    }catch (\Illuminate\Database\QueryException $excepcion) {
+      $fecha=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $fecha=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
     try{
       $tipos_asentamiento=tipo_asentamiento::orderBy('nombre', 'asc')->get();
     }catch (\Illuminate\Database\QueryException $excepcion) {
@@ -59,7 +76,7 @@ class ConfigurationController extends Controller
     } catch (Exception $excepcion) {
       $lineas_temporales=['error' => ['error' => $excepcion->getMessage()]];
     }
-    return view('config.index', ['tipos_asentamiento'=>$tipos_asentamiento, 'tipos_conflicto'=>$tipos_conflicto, 'tipos_lugar'=>$tipos_lugar, 'tipos_organizaciones'=>$tipos_organizacion, 'lineas_temporales'=>$lineas_temporales]);
+    return view('config.index', ['tipos_asentamiento'=>$tipos_asentamiento, 'tipos_conflicto'=>$tipos_conflicto, 'tipos_lugar'=>$tipos_lugar, 'tipos_organizaciones'=>$tipos_organizacion, 'lineas_temporales'=>$lineas_temporales, 'Nombre_mundo'=>$nombre_mundo[0]->lista, 'fecha'=>$fecha[0]]);
   }
 
   /**
@@ -173,6 +190,54 @@ class ConfigurationController extends Controller
   /**
    * Update the specified resource in storage.
    */
+  public function update_nombre_mundo(Request $request)
+  {
+    $request->validate([
+      'nuevo_nombre_mundo'=>'required',
+    ]);
+
+    try{
+      $id=$request->input('id');
+      $nuevo=$request->input('nuevo_nombre_mundo');
+      $nombre_old=Nombres::where('tipo', $id)->firstorfail();
+
+      $nombre_old->lista=$nuevo;
+      $nombre_old->save();
+  
+      return redirect()->route('config.index')->with('message', 'Nombre del mundo editado correctamente.');      
+    }catch (\Illuminate\Database\QueryException $excepcion) {
+      return redirect()->route('config.index')->with('error', 'Se produjo un problema en la base de datos.');
+    } catch (Exception $excepcion) {
+      return redirect()->route('config.index')->with('error', $excepcion->getMessage());
+    }
+  }
+
+  /**
+   * Update the specified resource in storage.
+   */
+  public function update_fecha_mundo(Request $request)
+  {
+    $request->validate([
+      'dia'=>'required',
+      'mes'=>'required',
+      'anno'=>'required',
+    ]);
+
+    try{
+      //se le manda 1 al final que es el id de la fila en el que se guarda la fecha del mundo
+      app(ConfigurationController::class)->update_fecha($request->input('dia', 0), $request->input('mes', 0), $request->input('anno', 0), 1);
+  
+      return redirect()->route('config.index')->with('message', 'Fecha del mundo editada correctamente.');      
+    }catch (\Illuminate\Database\QueryException $excepcion) {
+      return redirect()->route('config.index')->with('error', 'Se produjo un problema en la base de datos.');
+    } catch (Exception $excepcion) {
+      return redirect()->route('config.index')->with('error', $excepcion->getMessage());
+    }
+  }
+
+  /**
+   * Update the specified resource in storage.
+   */
   public function update(Request $request)
   {
     try {
@@ -199,7 +264,6 @@ class ConfigurationController extends Controller
     } catch (Exception $excepcion) {
       return redirect()->route('config.index')->with('error', $excepcion->getMessage());
     }
-    return redirect()->route('config.index')->with('error', 'Se produjo un error.');
   }
 
   /**

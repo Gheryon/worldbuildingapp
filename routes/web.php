@@ -117,9 +117,18 @@ Route::controller(App\Http\Controllers\EnlacesController::class)->group(function
     Route::delete('/enlaces/destroy', 'destroy')->name('enlace.destroy');
 });
 
+/*******nombres routes********/
+Route::controller(App\Http\Controllers\NombresController::class)->group(function () {
+    Route::get('/nombres/index', 'index')->name('nombres.index');
+    Route::post('/nombres/store/nombre', 'store_nombre')->name('nombre.store_nombre');
+    Route::put('/nombres/update', 'update')->name('nombres.update');
+});
+
 /*******configuracion routes********/
 Route::controller(App\Http\Controllers\ConfigurationController::class)->group(function () {
     Route::get('/config/index', 'index')->name('config.index');
+    Route::post('/config/update/nombre_mundo', 'update_nombre_mundo')->name('config.update_nombre_mundo');
+    Route::post('/config/update/fecha_mundo', 'update_fecha_mundo')->name('config.update_fecha_mundo');
     Route::post('/config/store/tipo_asentamiento', 'store_tipo_asentamiento')->name('config.store_tipo_asentamiento');
     Route::post('/config/store/tipo_conflicto', 'store_tipo_conflicto')->name('config.store_tipo_conflicto');
     Route::post('/config/store/tipo_lugar', 'store_tipo_lugar')->name('config.store_tipo_lugar');

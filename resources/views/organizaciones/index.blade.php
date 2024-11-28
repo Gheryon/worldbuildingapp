@@ -50,6 +50,10 @@
 </div>
 
 <div class="row">
+@if (Arr::has($organizaciones, 'error.error'))
+<div class="text-center">No se encontraron religiones.
+{{Arr::get($organizaciones, 'error.error')}}</div>
+@else
 @foreach($organizaciones as $organizacion)
 <div class="col-4 col-sm-6 col-md-4 col-lg-3">
   <div class="card card-dark card-outline">
@@ -80,6 +84,7 @@
   </div>
 </div>
 @endforeach
+@endif
 </div>
 @endsection
 

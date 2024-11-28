@@ -22,48 +22,74 @@
           <h1>{{$vista->Nombre}} {{$vista->nombreFamilia}} {{$vista->Apellidos}}</h1>
         </div>
         <h3 class="mt-3">Descripción breve</h3>
-        <p class="ml-2 mr-2">{{$vista->DescripcionShort}}</p>
+        <p class="ml-2 mr-2">{!!$vista->DescripcionShort!!}</p>
 
         <h2 class="mb-3">Descripción</h2>
+        @if (isset($vista->Descripcion))
         <h3>Descripción física</h3>
-        <p class="ml-2 mr-2">{{$vista->Descripcion}}</p>
+        <p class="ml-2 mr-2">{!!$vista->Descripcion!!}</p>
+        @endif
+
+        @if (isset($vista->Personalidad))
         <h3>Personalidad</h3>
-        <p class="ml-2 mr-2">{{$vista->Personalidad}}</p>
+        <p class="ml-2 mr-2">{!!$vista->Personalidad!!}</p>
+        @endif
+        @if (isset($vista->Deseos))
         <h3>Deseos</h3>
-        <p class="ml-2 mr-2">{{$vista->Deseos}}</p>
+        <p class="ml-2 mr-2">{!!$vista->Deseos!!}</p>
+        @endif
+        @if (isset($vista->Miedos))
         <h3>Miedos</h3>
-        <p class="ml-2 mr-2">{{$vista->Miedos}}</p>
+        <p class="ml-2 mr-2">{!!$vista->Miedos!!}</p>
+        @endif
+        @if (isset($vista->Magia))
         <h3>Habilidades mágicas</h3>
-        <p class="ml-2 mr-2">{{$vista->Magia}}</br></p>
+        <p class="ml-2 mr-2">{!!$vista->Magia!!}</br></p>
+        @endif
+        @if (isset($vista->educacion))
         <h3>Educación</h3>
-        <p class="ml-2 mr-2">{{$vista->educacion}}</br></p>
+        <p class="ml-2 mr-2">{!!$vista->educacion!!}</br></p>
+        @endif
+        @if (isset($vista->Historia))
         <h2>Historia</h2>
-        <p class="ml-2 mr-2">{{$vista->Historia}}</p>
+        <p class="ml-2 mr-2">{!!$vista->Historia!!}</p>
+        @endif
         <h2 class="mb-3">Aspectos sociales</h2>
+        @if (isset($vista->Religion))
         <h3>Religión</h3>
-        <p class="ml-2 mr-2">{{$vista->Religion}}</p>
+        <p class="ml-2 mr-2">{!!$vista->Religion!!}</p>
+        @endif
+        @if (isset($vista->Familia))
         <h3>Familia</h3>
-        <p class="ml-2 mr-2">{{$vista->Familia}}</p>
+        <p class="ml-2 mr-2">{!!$vista->Familia!!}</p>
+        @endif
+        @if (isset($vista->Politica))
         <h3>Política</h3>
-        <p class="ml-2 mr-2">{{$vista->Politica}}</p>
+        <p class="ml-2 mr-2">{!!$vista->Politica!!}</p>
+        @endif
+        @if (isset($vista->otros))
         <h2>Otros</h2>
-        <p class="ml-2 mr-2">{{$vista->otros}}</p>
+        <p class="ml-2 mr-2">{!!$vista->otros!!}</p>
+        @endif
       </div>
       <div class="col-md-4">
         <div class="card">
           <div class="card-body contentApp" id="content-right">
             <h3>Retrato</h3>
             <div class="row">
-              <img alt="retrato" id="retrato" class="img-fluid" src="{{asset("images/retratos/{$vista->Retrato}")}}" width="300" height="300">
+              <img alt="retrato" id="retrato" class="img-fluid" src="{{asset("storage/retratos/{$vista->Retrato}")}}" width="300" height="300">
             </div>
             <h3>Especie</h3>
-            <p class="ml-1 mr-2"><a href="#">{{$especie}}</a></p>
+            <p class="ml-1 mr-2"><a href="{{route('especie.show', [$vista->id_foranea_especie] )}}">{{$especie}}</a></p>
 
             <h3>Sexo</h3>
             <p class="ml-2 mr-2">{{$vista->Sexo}}</p>
 
+            
+            @if (isset($vista->lugarNacimiento))
             <h3>Lugar de nacimiento</h3>
             <p class="ml-2 mr-2">{{$vista->lugarNacimiento}}</p>
+            @endif
 
             <h3>Fecha de nacimiento</h3>
             <p class="ml-2 mr-2">{{$nacimiento}}</p>

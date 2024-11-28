@@ -7,7 +7,7 @@
 @endsection
 
 @section('navbar-buttons')
-<a href="{{url('/personajes/create')}}" class="btn btn-dark">Nuevo personaje</a>
+<a href="{{route('personaje.create')}}" class="btn btn-dark">Nuevo personaje</a>
 @endsection
 
 @section('content')
@@ -43,18 +43,22 @@
 </div>
 
 <div class="row">
+@if (Arr::has($personajes, 'error.error'))
+  {{Arr::get($personajes, 'error.error')}}
+@else
+
 @foreach($personajes as $personaje)
-<div class="col-4 col-sm-6 col-md-4 col-lg-3">
+<div class="col-4 col-sm-12 col-md-4 col-lg-3">
   <div class="card card-dark card-outline">
     <div class="card-body box-profile">
       <div class="text-center">
         <img class="profile-user-img img-fluid img-circle" src="{{asset("storage/retratos/{$personaje->Retrato}")}}" alt="User profile picture">
       </div>
       <h3 class="profile-username text-center">{{$personaje->Nombre}}</h3>
-      <p class="text-muted">{{$personaje->DescripcionShort}}</p>
-      <ul class="list-group list-group-unbordered mb-3">
+      <p class="text-muted">{!!$personaje->DescripcionShort!!}</p>
+      <ul class="list-group list-group-unbordered">
         <li class="list-group-item">
-          <b><i class="fa-solid fa-dna"></i> Especie</b> <a class="float-right">{{$personaje->nombre}}</a>
+          <b><i class="fa-solid fa-dna"></i> Especie</b> <a class="float-right">{{$personaje->especie}}</a>
         </li>
         <li class="list-group-item">
           <b><i class="fas fa-lg fa-smile-wink"></i> Sexo</b> <a class="float-right">{{$personaje->Sexo}}</a>
@@ -73,6 +77,7 @@
 </div>
 @endforeach
 </div>
+@endif
 
 @endsection
 

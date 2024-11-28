@@ -5,7 +5,6 @@ $(document).ready(function () {
     }
   });
 
-  
   $(document).on('click', '.editar-tipo',(e)=>{
     const elemento=$(this)[0].activeElement;
     let id=$(elemento).attr('id');
@@ -61,6 +60,16 @@ $(document).ready(function () {
     $('#nombre_editar').val(nombre);
     $('#url_editar').val(url);
     $('#tipo_editar').val(tipo);
+  });
+  
+  $(document).on('click', '.editar-nombres',(e)=>{
+    const elemento=$(this)[0].activeElement;
+    let id=$(elemento).attr('id');
+    const nombre = $(elemento).attr('nombre');
+    
+    console.log(id+' '+nombre);
+    $('#id_editar').val(id);
+    $('#nombres_editar').val(nombre);
   });
 
 });

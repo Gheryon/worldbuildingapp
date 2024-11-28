@@ -33,7 +33,7 @@ class VistaController extends Controller
       //$left=array("Nombre"=>"a", "Apellidos"=>"b", "nombreFamilia"=>"v", "DescripcionShort"=>"", "Descripcion"=>"", "Personalidad"=>"", "Deseos"=>"", "Miedo"=>"", "Magia"=>"", "educacion"=>"", "Historia"=>"", "Religion"=>"", "Familia"=>"", "Politica"=>"", "otros"=>"");
       //$right=array("retrato"=>"", "nombreEspecie"=>"", "sexo"=>"", "lugar_nacimiento"=>"", "nacimiento"=>"", "fallecimiento"=>"", "causa_fallecimiento"=>"");
       $personaje=personaje::findorfail($id);
-      $especie = DB::select('select nombre from especies where id_especie = ?', [$personaje->id_foranea_especie]);
+      $especie = DB::select('select nombre from especies where id = ?', [$personaje->id_foranea_especie]);
   
       if($personaje->nacimiento!=0){
         $nacimiento=Fecha::find($personaje->nacimiento);

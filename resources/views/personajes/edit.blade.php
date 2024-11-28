@@ -20,6 +20,9 @@
 
 <!-- Main content -->
 <section class="content">
+@if (Arr::has($personaje, 'error.error'))
+  {{Arr::get($personaje, 'error.error')}}
+@else
   <form id="form-edit-personaje" class="position-relative needs-validation" action="{{route('personaje.update', $personaje->id )}}" method="post" enctype="multipart/form-data">
     @csrf
     @method('PUT')
@@ -58,13 +61,17 @@
             </select>
           </div>
           <div class="col-md-3">
-            <label for="select_especie" class="form-label">Especie</label>
-            <select class="form-select form-control" name="select_especie" id="select_especie" required>
-              <option selected disabled value="">Elegir</option>
-              @foreach($especies as $especie)
-              <option value="{{$especie->id_especie}}">{{$especie->nombre}}</option>
-              @endforeach
-            </select>
+            @if (Arr::has($especies, 'error.error'))
+              {{Arr::get($especies, 'error.error')}}
+            @else
+              <label for="select_especie" class="form-label">Especie</label>
+              <select class="form-select form-control" name="select_especie" id="select_especie" required>
+                <option selected disabled value="">Elegir</option>
+                @foreach($especies as $especie)
+                <option value="{{$especie->id}}">{{$especie->nombre}}</option>
+                @endforeach
+              </select>
+            @endif
           </div>
           <div class="col-md">
             <label for="lugar_nacimiento" class="form-label">Lugar de nacimiento</label>
@@ -135,43 +142,44 @@
     <div class="row mt-2 mb-3">
       <div class="col">
         <label for="DescripcionShort" class="form-label">Descripción breve</label>
-        <textarea name="DescripcionShort" class="form-control summernote-lite" id="DescripcionShort" rows="2" aria-label="With textarea">{!!$organizacion->DescripcionShort!!}</textarea>
+        <textarea name="DescripcionShort" class="form-control summernote-lite" id="DescripcionShort" rows="2" aria-label="With textarea">{!!$personaje->DescripcionShort!!}</textarea>
       </div>
     </div>
     <!----------------------------------------------->
     <label for="descripcion" class="form-label">Descripción física</label>
-    <textarea name="descripcion" class="form-control summernote-lite" id="descripcion" rows="4" aria-label="With textarea">{!!$organizacion->Descripcion!!}</textarea>
+    <textarea name="descripcion" class="form-control summernote-lite" id="descripcion" rows="4" aria-label="With textarea">{!!$personaje->Descripcion!!}</textarea>
 
     <label for="personalidad" class="form-label">Personalidad</label>
-    <textarea name="personalidad" class="form-control summernote-lite" id="personalidad" rows="4" aria-label="With textarea">{!!$organizacion->Personalidad!!}</textarea>
+    <textarea name="personalidad" class="form-control summernote-lite" id="personalidad" rows="4" aria-label="With textarea">{!!$personaje->Personalidad!!}</textarea>
 
     <label for="deseos" class="form-label">Principales deseos</label>
-    <textarea name="deseos" class="form-control summernote-lite" id="deseos" rows="4" aria-label="With textarea">{!!$organizacion->Deseos!!}</textarea>
+    <textarea name="deseos" class="form-control summernote-lite" id="deseos" rows="4" aria-label="With textarea">{!!$personaje->Deseos!!}</textarea>
 
     <label for="miedos" class="form-label">Principales miedos</label>
-    <textarea name="miedos" class="form-control summernote-lite" id="miedos" rows="4" aria-label="With textarea">{!!$organizacion->Miedos!!}</textarea>
+    <textarea name="miedos" class="form-control summernote-lite" id="miedos" rows="4" aria-label="With textarea">{!!$personaje->Miedos!!}</textarea>
 
     <label for="magia" class="form-label">Habilidades Mágicas</label>
-    <textarea name="magia" class="form-control summernote-lite" id="magia" rows="4" aria-label="With textarea">{!!$organizacion->Magia!!}</textarea>
+    <textarea name="magia" class="form-control summernote-lite" id="magia" rows="4" aria-label="With textarea">{!!$personaje->Magia!!}</textarea>
     <!----------------------------------------------->
     <label for="educacion" class="form-label">Educación y cultura</label>
-    <textarea name="educacion" class="form-control summernote-lite" id="educacion" rows="4" aria-label="With textarea">{!!$organizacion->educacion!!}</textarea>
+    <textarea name="educacion" class="form-control summernote-lite" id="educacion" rows="4" aria-label="With textarea">{!!$personaje->educacion!!}</textarea>
 
     <label for="religion" class="form-label">Religión</label>
-    <textarea name="religion" class="form-control summernote-lite" id="religion" rows="4" aria-label="With textarea">{!!$organizacion->Religion!!}</textarea>
+    <textarea name="religion" class="form-control summernote-lite" id="religion" rows="4" aria-label="With textarea">{!!$personaje->Religion!!}</textarea>
 
     <label for="familia" class="form-label">Familia y riqueza</label>
-    <textarea name="familia" class="form-control summernote-lite" id="familia" rows="4" aria-label="With textarea">{!!$organizacion->Familia!!}</textarea>
+    <textarea name="familia" class="form-control summernote-lite" id="familia" rows="4" aria-label="With textarea">{!!$personaje->Familia!!}</textarea>
 
     <label for="politica" class="form-label">Política y títulos</label>
-    <textarea name="politica" class="form-control summernote-lite" id="politica" rows="4" aria-label="With textarea">{!!$organizacion->Politica!!}</textarea>
+    <textarea name="politica" class="form-control summernote-lite" id="politica" rows="4" aria-label="With textarea">{!!$personaje->Politica!!}</textarea>
     <!----------------------------------------------->
     <label for="historia" class="form-label">Historia</label>
-    <textarea name="historia" class="form-control summernote" id="historia" rows="8" aria-label="With textarea">{!!$organizacion->Historia!!}</textarea>
+    <textarea name="historia" class="form-control summernote" id="historia" rows="8" aria-label="With textarea">{!!$personaje->Historia!!}</textarea>
 
     <label for="otros" class="form-label">Otros</label>
-    <textarea name="otros" class="form-control summernote-lite" id="otros" rows="4" aria-label="With textarea">{!!$organizacion->otros!!}</textarea>
+    <textarea name="otros" class="form-control summernote-lite" id="otros" rows="4" aria-label="With textarea">{!!$personaje->otros!!}</textarea>
   </form>
+@endif
 
 </section>
 <!-- /.content -->

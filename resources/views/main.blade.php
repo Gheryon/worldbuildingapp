@@ -142,6 +142,18 @@
           <a href="{{route('enlaces.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
+      <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-dark">
+          <div class="inner">
+            <h3>Apuntes</h3>
+          </div>
+          <div class="icon">
+            <i class="fa-solid fa-pencil"></i>
+          </div>
+          <a href="{{route('nombres.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
     </div>
     <!--<img src="/Aeberion/imagenes/Aeberion.jpeg" class="img-fluid" alt="Aeberion.jpeg">-->
   </div>

@@ -57,13 +57,17 @@
             </select>
           </div>
           <div class="col-md-3">
-            <label for="select_especie" class="form-label">Especie</label>
-            <select class="form-select form-control" name="select_especie" id="select_especie" required>
-              <option selected disabled value="">Elegir</option>
-                @foreach($especies as $especie)
-                <option value="{{$especie->id_especie}}">{{$especie->nombre}}</option>
-                @endforeach
-            </select>
+            @if (Arr::has($especies, 'error.error'))
+              {{Arr::get($especies, 'error.error')}}
+            @else
+              <label for="select_especie" class="form-label">Especie</label>
+              <select class="form-select form-control" name="select_especie" id="select_especie" required>
+                <option selected disabled value="">Elegir</option>
+                  @foreach($especies as $especie)
+                  <option value="{{$especie->id}}">{{$especie->nombre}}</option>
+                  @endforeach
+              </select>
+              @endif
           </div>
           <div class="col-md">
             <label for="lugar_nacimiento" class="form-label">Lugar de nacimiento</label>
