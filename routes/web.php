@@ -76,6 +76,16 @@ Route::controller(App\Http\Controllers\LugaresController::class)->group(function
     Route::delete('/lugar/destroy', 'destroy')->name('lugar.destroy');
 });
 
+/*******conflictos routes********/
+Route::controller(App\Http\Controllers\ConflictoController::class)->group(function () {
+    Route::get('/conflictos/index', 'index')->name('conflictos.index');
+    Route::get('/conflictos/create', 'create')->name('conflicto.create');
+    Route::post('/conflictos/store', 'store')->name('conflicto.store');
+    Route::get('/conflictos/{id}/edit', 'edit')->name('conflicto.edit');
+    Route::put('/conflictos/{id}', 'update')->name('conflicto.update');
+    Route::delete('/conflicto/destroy', 'destroy')->name('conflicto.destroy');
+});
+
 /*******timelines routes********/
 Route::get('/timelines/index/{orden?}/{cronologia?}', [App\Http\Controllers\TimelineController::class, 'index'])->name('timelines.index');
 Route::post('/timelines/store', [App\Http\Controllers\TimelineController::class, 'store'])->name('evento.store');
@@ -89,6 +99,7 @@ Route::controller(App\Http\Controllers\VistaController::class)->group(function (
     Route::get('/especies/{id}', 'show_especie')->name('especie.show');
     Route::get('/asentamientos/{id}', 'show_asentamiento')->name('asentamiento.show');
     Route::get('/lugares/{id}', 'show_lugar')->name('lugar.show');
+    Route::get('/conflictos/{id}', 'show_conflicto')->name('conflicto.show');
     Route::get('/religiones/{id}', 'show_religion')->name('religion.show');
 });
 

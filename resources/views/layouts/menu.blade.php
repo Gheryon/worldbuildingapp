@@ -42,10 +42,10 @@
     </a>
   </li>
   <li class="nav-item">
-    <a href="conflictos.php" class="nav-link">
+    <a href="{{route('conflictos.index')}}" class="nav-link">
       <i class="nav-icon fa-solid fa-shield-halved"></i>
       <p>
-        Guerras y batallas
+        Conflictos y batallas
       </p>
     </a>
   </li>

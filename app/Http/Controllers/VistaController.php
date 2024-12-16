@@ -6,10 +6,11 @@ use App\Models\personaje;
 use App\Models\Fecha;
 use App\Models\organizacion;
 use App\Models\Lugar;
+use App\Models\Conflicto;
 use App\Models\Religion;
 use App\Models\Especie;
 use App\Models\Asentamiento;
-use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 class VistaController extends Controller
@@ -146,6 +147,79 @@ class VistaController extends Controller
     }catch(\Illuminate\Database\Eloquent\ModelNotFoundException $excepcion){
       return redirect()->route('lugares.index')->with('error','Error, no pudo encontrarse el lugar.');
     }
+  }
+
+  public function show_conflicto($id)
+  {
+    $meses=array("Semana año nuevo", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+    try{
+      $conflicto=Conflicto::findorfail($id);
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $conflicto=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $conflicto=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    try{
+      $tipo = DB::select('select nombre from tipo_conflicto where id = ?', [$conflicto->id_tipo_conflicto]);
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $tipo=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $tipo=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    try{
+      /*$atacantes=DB::table('organizaciones')
+      ->select('organizaciones.nombre', 'organizaciones.id_organizacion')
+      ->where('conflicto_beligerantes.id_organizacion', '=','organizaciones.id_organizacion')
+      ->where('conflicto_beligerantes.id_conflicto', '=', $id)
+      ->where('conflicto_beligerantes.lado', '=', 'atacante')
+      ->orderBy('organizaciones.nombre', 'asc')->get();*/
+      $atacantes = DB::select('SELECT *, organizaciones.nombre as nombre FROM conflicto_beligerantes JOIN organizaciones ON conflicto_beligerantes.id_organizacion=organizaciones.id_organizacion WHERE lado = "atacante" AND id_conflicto = ?', [$conflicto->id]);
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $atacantes=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $atacantes=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    try{
+      $defensores = DB::select('SELECT *, organizaciones.nombre as nombre FROM conflicto_beligerantes JOIN organizaciones ON conflicto_beligerantes.id_organizacion=organizaciones.id_organizacion WHERE lado = "defensor" AND id_conflicto = ?', [$conflicto->id]);
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $defensores=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $defensores=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    try{
+      if($conflicto->fecha_inicio!=0&&$conflicto->fecha_inicio!=null){
+        $fecha_inicio=Fecha::find($conflicto->fecha_inicio);
+        if($fecha_inicio->dia&&$fecha_inicio->mes==0){
+          $fecha_inicio=$conflicto->anno;
+        }else{
+          $fecha_inicio=$fecha_inicio->dia."-".$meses[$fecha_inicio->mes]."-".$fecha_inicio->anno;
+        }
+      }else{
+        $fecha_inicio="Desconocido";
+      }
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $fecha_inicio=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $fecha_inicio=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try{
+      if($conflicto->fecha_fin!=0&&$conflicto->fecha_fin!=null){
+        $fecha_fin=Fecha::find($conflicto->fecha_fin);
+        if($fecha_fin->dia&&$fecha_fin->mes==0){
+          $fecha_fin=$conflicto->anno;
+        }else{
+          $fecha_fin=$fecha_fin->dia."-".$meses[$fecha_fin->mes]."-".$fecha_fin->anno;
+        }
+      }else{
+        $fecha_fin="Desconocido";
+      }
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $fecha_fin=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $fecha_fin=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    return view('conflictos.show', ['vista'=>$conflicto, 'tipo'=>$tipo[0]->nombre, 'atacantes'=>$atacantes, 'defensores'=>$defensores, 'inicio'=>$fecha_inicio, 'fin'=>$fecha_fin]);
   }
 
   public function show_religion($id)

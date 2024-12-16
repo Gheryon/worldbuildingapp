@@ -91,7 +91,7 @@
           <div class="icon">
             <i class="fa-solid fa-shield-halved"></i>
           </div>
-          <a href="#" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+          <a href="{{route('conflictos.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
       <div class="col-lg-3 col-6">
