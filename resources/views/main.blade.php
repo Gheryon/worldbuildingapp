@@ -10,7 +10,7 @@
 <section class="content">
   <div class="container-fluid">
     <div class="row">
-      <div class="col-lg-3 col-6">
+      <div class="col">
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">
@@ -22,7 +22,7 @@
           <a href="{{route('organizaciones.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col">
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">
@@ -34,7 +34,7 @@
           <a href="{{route('religiones.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col">
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">
@@ -46,7 +46,7 @@
           <a href="{{route('personajes.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col">
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">
@@ -58,7 +58,7 @@
           <a href="{{route('especies.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col">
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">
@@ -70,7 +70,7 @@
           <a href="{{route('asentamientos.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col">
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">
@@ -82,7 +82,7 @@
           <a href="{{route('lugares.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col">
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">
@@ -94,7 +94,7 @@
           <a href="{{route('conflictos.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col">
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">
@@ -106,7 +106,7 @@
           <a href="#" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col">
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">
@@ -118,7 +118,7 @@
           <a href="{{route('timelines.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col">
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">
@@ -130,7 +130,7 @@
           <a href="{{route('articulos')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col">
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">
@@ -142,7 +142,7 @@
           <a href="{{route('enlaces.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col">
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">

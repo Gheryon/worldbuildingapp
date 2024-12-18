@@ -63,7 +63,6 @@
       <h2 class="lead"><b>{{$organizacion->nombre}}</b></h2>
         <img class="img-fluid" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" alt="Escudo">
       </div>
-      <h3 class="profile-username text-center">{{$organizacion->nombre}}</h3>
       <ul class="list-group list-group-unbordered mb-3">
         <li class="list-group-item">
           <b>Tipo:</b> {{$organizacion->tipo}}

@@ -131,7 +131,7 @@
       </div>
       <div class="col-md-3 mt-2 mb-2">
         <label for="retrato" class="form-label">Retrato</label>
-        <img alt="retrato" id="retrato-img" src="{{asset('images/retratos/default.png')}}" class="img-fluid" width="185" height="180">
+        <img alt="retrato" id="retrato-img" src="{{asset('storage/retratos/default.png')}}" class="img-fluid" width="185" height="180">
         <input type="file" name="retrato" class="form-control" id="retrato">
       </div>
     </div>

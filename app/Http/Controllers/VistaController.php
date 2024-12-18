@@ -83,51 +83,92 @@ class VistaController extends Controller
 
   public function show_organizacion($id)
   {
+    $meses=array("Semana año nuevo", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
     try{
-      $meses=array("Semana año nuevo", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
-  
       $organizacion=organizacion::findorfail($id);
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $organizacion=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $organizacion=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try{
       $tipo = DB::select('select nombre from tipo_organizacion where id = ?', [$organizacion->id_tipo_organizacion]);
-  
-      if($organizacion->id_owner!=0){
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $tipo=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $tipo=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try{
+      $subditos = organizacion::select('id_organizacion', 'nombre')->where('id_owner', '=', $id)->orderBy('nombre', 'asc')->get();
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $subditos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $subditos=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    
+    if($organizacion->id_owner!=0){
+      try{
         $ownerb=DB::select('select nombre, id_organizacion from organizaciones where id_organizacion = ?', [$organizacion->id_owner]);
         $owner=$ownerb[0];
-      }else{
-        $owner=0;
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $owner=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $owner=['error' => ['error' => $excepcion->getMessage()]];
       }
+    }else{
+      $owner=0;
+    }
   
-      if($organizacion->id_ruler!=0&&$organizacion->id_ruler!=null){
+    if($organizacion->id_ruler!=0&&$organizacion->id_ruler!=null){
+      try{
         $soberanob=DB::select('select Nombre, id from personaje where id = ?', [$organizacion->id_ruler]);
         $soberano=$soberanob[0];
-      }else{
-        $soberano=0;
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $soberano=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $soberano=['error' => ['error' => $excepcion->getMessage()]];
       }
-  
-      if($organizacion->fundacion!=0&&$organizacion->fundacion!=null){
-        $fundacion=Fecha::find($organizacion->fundacion);
+    }else{
+      $soberano=0;
+    }
+
+    if($organizacion->fundacion!=0&&$organizacion->fundacion!=null){
+      try{
+        $fundacion=Fecha::findorfail($organizacion->fundacion);
         if($fundacion->dia&&$fundacion->mes==0){
           $fecha_fundacion=$organizacion->anno;
         }else{
           $fecha_fundacion=$fundacion->dia."-".$meses[$fundacion->mes]."-".$fundacion->anno;
         }
-      }else{
-        $fecha_fundacion="Desconocido";
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $fecha_fundacion=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $fecha_fundacion=['error' => ['error' => $excepcion->getMessage()]];
       }
-      if($organizacion->disolucion!=0&&$organizacion->disolucion!=null){
-        $disolucion=Fecha::find($organizacion->disolucion);
+    }else{
+      $fecha_fundacion="Desconocido";
+    }
+    
+    if($organizacion->disolucion!=0&&$organizacion->disolucion!=null){
+      try{
+        $disolucion=Fecha::findorfail($organizacion->disolucion);
         if($disolucion->dia&&$disolucion->mes==0){
           $fecha_disolucion=$organizacion->anno;
         }else{
           $fecha_disolucion=$disolucion->dia."-".$meses[$disolucion->mes]."-".$disolucion->anno;
-        }
-      }else{
-        $fecha_disolucion="Desconocido";
+        }          
+      }catch(\Illuminate\Database\Eloquent\ModelNotFoundException $excepcion){
+        $fecha_disolucion=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $fecha_disolucion=['error' => ['error' => $excepcion->getMessage()]];
       }
-  
-      return view('organizaciones.show', ['vista'=>$organizacion, 'fundacion'=>$fecha_fundacion, 'disolucion'=>$fecha_disolucion, 'tipo'=>$tipo[0]->nombre, 'owner'=>$owner, 'soberano'=>$soberano]);
-    }catch(\Illuminate\Database\Eloquent\ModelNotFoundException $excepcion){
-      return redirect()->route('organizaciones.index')->with('error','Error, no pudo encontrarse la organización.');
+    }else{
+      $fecha_disolucion="Desconocido";
     }
+
+    return view('organizaciones.show', ['vista'=>$organizacion, 'fundacion'=>$fecha_fundacion, 'disolucion'=>$fecha_disolucion, 'tipo'=>$tipo[0]->nombre, 'owner'=>$owner, 'soberano'=>$soberano, 'subditos'=>$subditos]);
   }
 
   public function show_lugar($id)

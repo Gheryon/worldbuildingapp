@@ -91,14 +91,23 @@
             <p class="ml-2 mr-2">{{$vista->lugarNacimiento}}</p>
             @endif
 
+            @if ($vista->nacimiento!=0)
             <h3>Fecha de nacimiento</h3>
             <p class="ml-2 mr-2">{{$nacimiento}}</p>
+            @endif
 
+            @if ($vista->fallecimiento!=0)
             <h3>Fecha de fallecimiento</h3>
             <p class="ml-2 mr-2">{{$fallecimiento}}</p>
+            @endif
 
             <h3>Edad</h3>
             <p class="ml-2 mr-2">{{$edad}}</p>
+
+            @if (isset($vista->causa_fallecimiento))
+            <h3>Causa de fallecimiento</h3>
+            <p class="ml-2 mr-2">{{$vista->causa_fallecimiento}}</p>
+            @endif
           </div>
         </div>
       </div>

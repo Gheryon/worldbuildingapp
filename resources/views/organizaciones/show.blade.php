@@ -106,11 +106,6 @@
             <p class="ml-2 mr-2"><a href="{{route('personaje.show',$soberano->id)}}">{{$soberano->Nombre}}</a></p>
             @endif
 
-            @if (isset($owner->id_organizacion))
-              <h3 class="mt-2">Bajo control de:</h3>
-              <p class="ml-1 mr-2"><a href="{{route('organizacion.show',$owner->id_organizacion)}}">{{$owner->nombre}}</a></p>
-            @endif
-
             @if (isset($vista->capital))
             <h3 class="mt-2">Capitial</h3>
             <p class="ml-2 mr-2">{{$vista->capital}}</p>
@@ -129,6 +124,20 @@
             @if (isset($vista->lema))
             <h3 class="mt-2">Lema</h3>
             <p class="ml-2 mr-2">{{$vista->lema}}</p>
+            @endif
+
+            @if (isset($owner->id_organizacion))
+              <h3 class="mt-2">Bajo control de:</h3>
+              <p class="ml-1 mr-2"><a href="{{route('organizacion.show',$owner->id_organizacion)}}">{{$owner->nombre}}</a></p>
+            @endif
+            
+            @if (isset($subditos))
+              @if (filled($subditos))
+              <h3 class="mt-2">Súbditos</h3>
+              @foreach($subditos as $subdito)
+                <p class="ml-1 mr-2"><a href="{{route('organizacion.show', [$subdito->id_organizacion] )}}">{{$subdito->nombre}}</a></p>
+              @endforeach
+              @endif
             @endif
           </div>
         </div>
