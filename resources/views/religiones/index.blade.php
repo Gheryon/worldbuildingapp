@@ -59,11 +59,6 @@
     <div class="card card-dark card-outline">
       <div class="card-body box-profile">
         <h3 class="profile-username text-center">{{$religion->nombre}}</h3>
-        <ul class="list-group list-group-unbordered mb-3">
-          <li class="list-group-item">
-            <b>Descripción breve: </b>
-          </li>
-        </ul>
       </div>
       <!-- /.card-body -->
       <div class="card-footer">

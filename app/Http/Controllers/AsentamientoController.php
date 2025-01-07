@@ -59,7 +59,7 @@ class AsentamientoController extends Controller
       $request->validate([
         'nombre'=>'required|max:128',
         'select_tipo'=>'required',
-        'poblacion'=>'numeric',
+        'poblacion'=>'nullable|numeric',
       ]);
 
       $asentamiento=new Asentamiento();

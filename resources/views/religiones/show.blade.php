@@ -69,6 +69,10 @@
       <div class="col-md-4">
         <div class="card">
           <div class="card-body contentApp" id="content-right">
+            <h3>Escudo</h3>
+            <div class="row">
+              <img alt="escudo" id="escudo" class="img-fluid" src="{{asset("storage/escudos/{$vista->escudo}")}}" width="300" height="300">
+            </div>
 
             @if ($vista->fundacion!=0)
             <h3 class="mt-2">Fecha de fundación</h3>

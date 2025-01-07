@@ -310,42 +310,71 @@ class VistaController extends Controller
 
   public function show_asentamiento($id)
   {
+    $meses=array("Semana año nuevo", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+    
     try{
-      $meses=array("Semana año nuevo", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
       $asentamiento=Asentamiento::findorfail($id);
-      $tipo = DB::select('select nombre from tipo_asentamiento where id = ?', [$asentamiento->id_tipo_asentamiento]);
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('asentamientos.index')->with('error','Error, no pudo encontrarse el asentamiento.');
+    }catch(Exception $excepcion){
+      return redirect()->route('asentamientos.index')->with('error','Error, '.$excepcion->getMessage());
+    }
 
-      if($asentamiento->id_owner!=0){
+    try{
+      $tipo = DB::select('select nombre from tipo_asentamiento where id = ?', [$asentamiento->id_tipo_asentamiento]);
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $tipo=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $tipo=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    if($asentamiento->id_owner!=0){
+      try{
         $ownerb=DB::select('select nombre, id_organizacion from organizaciones where id_organizacion = ?', [$asentamiento->id_owner]);
         $owner=$ownerb[0];
-      }else{
-        $owner=0;
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $owner=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $owner=['error' => ['error' => $excepcion->getMessage()]];
       }
+    }else{
+      $owner=0;
+    }
 
-      if($asentamiento->fundacion!=0&&$asentamiento->fundacion!=null){
-        $fundacion=Fecha::find($asentamiento->fundacion);
-        if($fundacion->dia&&$fundacion->mes==0){
-          $fecha_fundacion=$asentamiento->anno;
+    if($asentamiento->fundacion!=0&&$asentamiento->fundacion!=null){
+      try{
+        $fundacion=Fecha::findorfail($asentamiento->fundacion);
+        if($fundacion->dia==0&&$fundacion->mes==0){
+          $fecha_fundacion=$fundacion->anno;
         }else{
           $fecha_fundacion=$fundacion->dia."-".$meses[$fundacion->mes]."-".$fundacion->anno;
         }
-      }else{
-        $fecha_fundacion="Desconocido";
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $fecha_fundacion=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $fecha_fundacion=['error' => ['error' => $excepcion->getMessage()]];
       }
-      if($asentamiento->disolucion!=0&&$asentamiento->disolucion!=null){
-        $disolucion=Fecha::find($asentamiento->disolucion);
-        if($disolucion->dia&&$disolucion->mes==0){
-          $fecha_disolucion=$asentamiento->anno;
+    }else{
+      $fecha_fundacion="Sin determinar";
+    }
+    
+    if($asentamiento->disolucion!=0&&$asentamiento->disolucion!=null){
+      try{
+        $disolucion=Fecha::findorfail($asentamiento->disolucion);
+        if($disolucion->dia==0&&$disolucion->mes==0){
+          $fecha_disolucion=$disolucion->anno;
         }else{
           $fecha_disolucion=$disolucion->dia."-".$meses[$disolucion->mes]."-".$disolucion->anno;
-        }
-      }else{
-        $fecha_disolucion="Desconocido";
+        }          
+      }catch(\Illuminate\Database\Eloquent\ModelNotFoundException $excepcion){
+        $fecha_disolucion=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $fecha_disolucion=['error' => ['error' => $excepcion->getMessage()]];
       }
-
-      return view('asentamientos.show', ['vista'=>$asentamiento, 'fundacion'=>$fecha_fundacion, 'disolucion'=>$fecha_disolucion, 'tipo'=>$tipo[0]->nombre, 'owner'=>$owner]);
-    }catch(\Illuminate\Database\Eloquent\ModelNotFoundException $excepcion){
-      return redirect()->route('asentamientos.index')->with('error','Error, no pudo encontrarse el asentamiento.');
+    }else{
+      $fecha_disolucion="Sin determinar";
     }
+
+    return view('asentamientos.show', ['vista'=>$asentamiento, 'fundacion'=>$fecha_fundacion, 'disolucion'=>$fecha_disolucion, 'tipo'=>$tipo[0]->nombre, 'owner'=>$owner]);
   }
 }

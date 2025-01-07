@@ -11,10 +11,6 @@
 @endsection
 
 @section('content')
-<div class="row">
-    <h1>Apuntes</h1>
-</div>
-<hr>
 
 <div class="modal fade" id="eliminar-articulo" tabindex="-1" role="dialog" aria-labelledby="eliminar-articulo" aria-hidden="true">
   <div class="modal-dialog modal-sm" role="document">
@@ -45,47 +41,38 @@
   </div>
 </div>
 
+<div class="row">
 <div class="col-md-12">
-  <div class="card card-outline card-primary">
-    <div class="card-header">
-      <h3 class="card-title">Apuntes</h3>
-      <div class="card-tools">
-      </div>
-    </div>
-    <!-- /.card-header -->
-    <div class="card-body">
-      <table class="table table-bordered table-sm table-striped table-hoover">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>tipo</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach($articulos as $articulo)
-          <tr>
-            <td>{{$articulo->nombre}}</td>
-            <td>{{$articulo->tipo}}</td>
-            <td style="text-align:center" artId="{{$articulo->id_articulo}}" artNombre="{{$articulo->nombre}}">
-              <div class="btn-group" role="group" aria-label="Basic example">
-                <a href="{{route('articulos.show',$articulo->id_articulo)}}" type="button" title="Ver" class="btn btn-info detalles">
-                  <i class="fas fa-id-card mr-1"></i>
-                </a>
-                <a href="{{route('articulos.edit',$articulo->id_articulo)}}" type="button" title="Editar" class="btn btn-success"><i class="fas fa-pencil-alt"></i></a>
-                <button type="button" title="borrar" class="borrar btn btn-danger" data-toggle="modal" data-target="#eliminar-articulo"><i class="fas fa-trash"></i></button>
-              </div>
-            </td>
-          </tr>
-          @endforeach
-        </tbody>
-      </table>
-    </div>
-    <!-- /.card-body -->
-  </div>
-  <!-- /.card -->
+  <table class="table table-bordered table-sm table-striped table-hoover">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>tipo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach($articulos as $articulo)
+      <tr>
+        <td>{{$articulo->nombre}}</td>
+        <td>{{$articulo->tipo}}</td>
+        <td style="text-align:center" artId="{{$articulo->id_articulo}}" artNombre="{{$articulo->nombre}}">
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <a href="{{route('articulos.show',$articulo->id_articulo)}}" type="button" title="Ver" class="btn btn-info detalles">
+              <i class="fas fa-id-card mr-1"></i>
+            </a>
+            <a href="{{route('articulos.edit',$articulo->id_articulo)}}" type="button" title="Editar" class="btn btn-success"><i class="fas fa-pencil-alt"></i></a>
+            <button type="button" title="borrar" class="borrar btn btn-danger" data-toggle="modal" data-target="#eliminar-articulo"><i class="fas fa-trash"></i></button>
+          </div>
+        </td>
+      </tr>
+      @endforeach
+    </tbody>
+  </table>
 </div>
 <!-- /.col -->
+
+</div>
 
 @endsection
 

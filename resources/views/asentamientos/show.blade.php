@@ -80,6 +80,11 @@
             <h3 class="mt-2">Tipo</h3>
             <p class="ml-1 mr-2">{{$tipo}}</p>
 
+            @if (isset($owner->id_organizacion))
+              <h3 class="mt-2">Bajo control de:</h3>
+              <p class="ml-1 mr-2"><a href="{{route('organizacion.show',$owner->id_organizacion)}}">{{$owner->nombre}}</a></p>
+            @endif
+            
             @if (isset($vista->gentilicio))
             <h3 class="mt-2">Gentilicio</h3>
             <p class="ml-2 mr-2">{{$vista->gentilicio}}</p>

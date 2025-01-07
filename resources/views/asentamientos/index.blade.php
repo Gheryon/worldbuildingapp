@@ -51,7 +51,7 @@
 
 <div class="row">
 @foreach($asentamientos as $asentamiento)
-<div class="col-4 col-sm-6 col-md-4 col-lg-3">
+<div class="col col-sm-6 col-md-4 col-lg-2">
   <div class="card card-dark card-outline">
     <div class="card-body box-profile">
       <h3 class="profile-username text-center">{{$asentamiento->nombre}}</h3>
@@ -59,9 +59,9 @@
     <!-- /.card-body -->
     <div class="card-footer">
       <div class="row text-right">
-        <a href="{{route('asentamiento.show',$asentamiento->id)}}" type="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-        <a href="{{route('asentamiento.edit',$asentamiento->id)}}" type="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-        <button id="{{$asentamiento->id}}" nombre="{{$asentamiento->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-asentamiento"><i class="fas fa-trash mr-1"></i></button>
+        <a href="{{route('asentamiento.show',$asentamiento->id)}}" type="button" title="Ver" class="btn btn-info btn-sm col col-sm-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+        <a href="{{route('asentamiento.edit',$asentamiento->id)}}" type="button" title="Editar" class="btn btn-success btn-sm col col-sm-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+        <button id="{{$asentamiento->id}}" nombre="{{$asentamiento->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col col-sm-4" data-toggle="modal" data-target="#eliminar-asentamiento"><i class="fas fa-trash mr-1"></i></button>
       </div>
     </div>
   </div>

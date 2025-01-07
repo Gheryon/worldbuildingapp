@@ -49,6 +49,9 @@
                 <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
                 @endforeach
             </select>
+            @error('select_tipo')
+            <small style="color: red">{{$message}}</small>
+            @enderror
           </div>
           <div class="col-md">
             <label for="select_owner" class="form-label">Controlado por:</label>

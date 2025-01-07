@@ -146,7 +146,7 @@
         <!-- small box -->
         <div class="small-box bg-dark">
           <div class="inner">
-            <h3>Apuntes</h3>
+            <h3>Nombres</h3>
           </div>
           <div class="icon">
             <i class="fa-solid fa-pencil"></i>

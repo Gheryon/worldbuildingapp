@@ -29,7 +29,6 @@
     <div class="row article-content">
       <div class="col">
         <div class="row personaje" id="contenido">
-          {{$articulo->contenido}}
           {!!$articulo->contenido!!}
         </div>
       </div>
