@@ -10,6 +10,29 @@
 <a href="{{route('organizacion.create')}}" class="btn btn-dark">Nueva organización</a>
 @endsection
 
+@section('navbar-search')
+  <li class="nav-item">
+    <a class="nav-link" data-widget="navbar-search" href="#" role="button">
+      <i class="fas fa-search"></i>
+    </a>
+    <div class="navbar-search-block">
+      <form class="form-inline" action="{{route('organizaciones.search')}}" method="GET">
+        <div class="input-group input-group-sm">
+          <input class="form-control form-control-navbar" type="search" placeholder="Nombre a buscar" name="search" id="search" aria-label="Search">
+          <div class="input-group-append">
+            <button class="btn btn-navbar" type="submit">
+              <i class="fas fa-search"></i>
+            </button>
+            <button class="btn btn-navbar" type="button" data-widget="navbar-search">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </li>
+@endsection
+
 @section('content')
 <div class="row">
   <h1>Instituciones</h1>
@@ -51,7 +74,7 @@
 
 <div class="row">
 @if (Arr::has($organizaciones, 'error.error'))
-<div class="text-center">No se encontraron religiones.
+<div class="text-center">No se encontraron resultados.
 {{Arr::get($organizaciones, 'error.error')}}</div>
 @else
 @foreach($organizaciones as $organizacion)

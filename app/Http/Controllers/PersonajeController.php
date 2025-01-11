@@ -352,4 +352,26 @@ class PersonajeController extends Controller
       return redirect()->route('personajes.index')->with('error',$excepcion->getMessage());
     }
   }
+
+   /**
+   * Display a listing of the resource searched.
+   */
+  public function search(Request $request)
+  {
+    $search = $request->input('search');
+    try{
+      $personajes=DB::table('personaje')
+        ->leftjoin('especies', 'personaje.id_foranea_especie', '=', 'especies.id')
+        ->select('personaje.id', 'personaje.Nombre', 'Retrato', 'Sexo', 'id_foranea_especie', 'DescripcionShort', 'especies.nombre AS especie')
+        ->where('personaje.id', '!=', 0)
+        ->where('personaje.Nombre', 'LIKE', "%{$search}%")
+        ->orderBy('personaje.Nombre', 'asc')->get();
+      
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $personajes=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $personajes=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    return view('personajes.index', ['personajes' => $personajes]);
+  }
 }

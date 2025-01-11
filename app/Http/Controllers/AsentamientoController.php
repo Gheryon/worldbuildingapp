@@ -307,4 +307,24 @@ class AsentamientoController extends Controller
         return redirect()->route('asentamientos.index')->with('error',$excepcion->getMessage());
       }
     }
+
+    /**
+   * Display a listing of the resource searched.
+   */
+  public function search(Request $request)
+  {
+    $search = $request->input('search');
+    try{
+      $asentamientos=DB::table('asentamientos')
+        ->select('id', 'nombre')
+        ->where('nombre', 'LIKE', "%{$search}%")
+        ->orderBy('nombre', 'asc')->get();
+      
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $asentamientos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $asentamientos=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    return view('asentamientos.index', ['asentamientos' => $asentamientos]);
+  }
 }

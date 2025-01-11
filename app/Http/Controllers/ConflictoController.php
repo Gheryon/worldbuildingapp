@@ -403,4 +403,26 @@ class ConflictoController extends Controller
     return redirect()->route('conflictos.index')->with('error',$excepcion->getMessage());
   }
   }
+
+  /**
+   * Display a listing of the resource searched.
+   */
+  public function search(Request $request)
+  {
+    $search = $request->input('search');
+    try{
+      $conflictos=DB::table('conflicto')
+      ->leftjoin('tipo_conflicto', 'conflicto.id_tipo_conflicto', '=', 'tipo_conflicto.id')
+      ->select('conflicto.id', 'conflicto.nombre', 'descripcion', 'tipo_conflicto.nombre AS tipo')
+      ->where('conflicto.nombre', 'LIKE', "%{$search}%")
+      ->orderBy('nombre', 'asc')->get();
+      
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $conflictos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $conflictos=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    return view('conflictos.index', ['conflictos' => $conflictos]);
+  }
+
 }

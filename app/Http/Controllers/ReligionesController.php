@@ -296,4 +296,24 @@ class ReligionesController extends Controller
       return redirect()->route('religiones.index')->with('error',$excepcion->getMessage());
     }
   }
+
+  /**
+   * Display a listing of the resource searched.
+   */
+  public function search(Request $request)
+  {
+    $search = $request->input('search');
+    try{
+      $religiones=DB::table('religiones')
+        ->select('id', 'nombre', 'descripcion')
+        ->where('nombre', 'LIKE', "%{$search}%")
+        ->orderBy('nombre', 'asc')->get();
+      
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $religiones=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $religiones=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    return view('religiones.index', ['religiones' => $religiones]);
+  }
 }

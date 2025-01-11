@@ -6,6 +6,7 @@ use App\Models\articulo;
 use App\Models\imagen;
 use App\Http\Controllers\ImagenController;
 use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,7 +17,13 @@ class ArticuloController extends Controller
    */
   public function index()
   {
-    $articulos=articulo::orderBy('id_articulo', 'desc')->get();
+    try{
+      $articulos=articulo::orderBy('nombre', 'asc')->get();
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $articulos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $articulos=['error' => ['error' => $excepcion->getMessage()]];
+    }
     return view('articulos.index', ['articulos' => $articulos]);
   }
 
@@ -59,7 +66,13 @@ class ArticuloController extends Controller
    */
   public function show($id)
   {
-    $articulo=articulo::findorfail($id);
+    try {
+      $articulo = Articulo::findorfail($id);
+    } catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('articulos.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+    }catch(Exception $excepcion){
+      return redirect()->route('articulos.index')->with('error', $excepcion->getMessage());
+    }
     return view('articulos.show', ['articulo' => $articulo]);
   }
 
@@ -93,13 +106,26 @@ class ArticuloController extends Controller
       'tipo' => 'required'
     ]);
 
-    $articulo = Articulo::find($id);
+    try {
+      $articulo = Articulo::findorfail($id);
+    } catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('articulos.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+    }catch(Exception $excepcion){
+      return redirect()->route('articulos.index')->with('error', $excepcion->getMessage());
+    }
+
     $articulo->nombre = $request->nombre;
     $articulo->tipo = $request->tipo;
     $content = $request->contenido;
     $articulo->contenido = app(ImagenController::class)->update_for_summernote($content, "articulos", $id);
 
-    $articulo->save();
+    try {
+      $articulo->save();
+    } catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('articulos.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+    }catch(Exception $excepcion){
+      return redirect()->route('articulos.index')->with('error', $excepcion->getMessage());
+    }    
 
     return redirect()->route('articulos')
       ->with('mensaje', 'articulo actualizado correctamente.')
@@ -132,4 +158,24 @@ class ArticuloController extends Controller
       'mensaje' => "borrado",
     ]);
   }
+
+  /**
+   * Display a listing of the resource searched.
+   */
+  public function search(Request $request)
+  {
+    $search = $request->input('search');
+    try{
+      $articulos = articulo::query()
+        ->where('nombre', 'LIKE', "%{$search}%")
+        ->orderBy('nombre', 'asc')->get();
+      
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $articulos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $articulos=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    return view('articulos.index', ['articulos' => $articulos]);
+  }
+
 }

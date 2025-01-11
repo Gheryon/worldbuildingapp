@@ -23,7 +23,8 @@ Route::controller(App\Http\Controllers\PersonajeController::class)->group(functi
     Route::post('/personajes/store', 'store')->name('personaje.store');
     Route::get('/personajes/{id}/edit', 'edit')->name('personaje.edit');
     Route::put('/personajes/{id}', 'update')->name('personaje.update');
-    Route::delete('/personaje/destroy', 'destroy')->name('personaje.destroy');    
+    Route::delete('/personaje/destroy', 'destroy')->name('personaje.destroy'); 
+    Route::get('/personajes', 'search')->name('personajes.search');   
 });
 
 /*******organizaciones routes********/
@@ -34,6 +35,7 @@ Route::controller(App\Http\Controllers\OrganizacionController::class)->group(fun
     Route::get('/organizaciones/{id}/edit', 'edit')->name('organizacion.edit');
     Route::put('/organizaciones/{id}', 'update')->name('organizacion.update');
     Route::delete('/organizacion/destroy', 'destroy')->name('organizacion.destroy');
+    Route::get('/organizaciones', 'search')->name('organizaciones.search');
 });
 
 /*******religiones routes********/
@@ -44,6 +46,7 @@ Route::controller(App\Http\Controllers\ReligionesController::class)->group(funct
     Route::get('/religiones/{id}/edit', 'edit')->name('religion.edit');
     Route::put('/religiones/{id}', 'update')->name('religion.update');
     Route::delete('/religiones/destroy', 'destroy')->name('religion.destroy');
+    Route::get('/religiones', 'search')->name('religiones.search');
 });
 
 /*******especies routes********/
@@ -64,6 +67,7 @@ Route::controller(App\Http\Controllers\AsentamientoController::class)->group(fun
     Route::get('/asentamientos/{id}/edit', 'edit')->name('asentamiento.edit');
     Route::put('/asentamientos/{id}', 'update')->name('asentamiento.update');
     Route::delete('/asentamiento/destroy', 'destroy')->name('asentamiento.destroy');
+    Route::get('/asentamientos', 'search')->name('asentamientos.search');
 });
 
 /*******lugares routes********/
@@ -74,6 +78,7 @@ Route::controller(App\Http\Controllers\LugaresController::class)->group(function
     Route::get('/lugares/{id}/edit', 'edit')->name('lugar.edit');
     Route::put('/lugares/{id}', 'update')->name('lugar.update');
     Route::delete('/lugar/destroy', 'destroy')->name('lugar.destroy');
+    Route::get('/lugares', 'search')->name('lugares.search');
 });
 
 /*******conflictos routes********/
@@ -84,6 +89,7 @@ Route::controller(App\Http\Controllers\ConflictoController::class)->group(functi
     Route::get('/conflictos/{id}/edit', 'edit')->name('conflicto.edit');
     Route::put('/conflictos/{id}', 'update')->name('conflicto.update');
     Route::delete('/conflicto/destroy', 'destroy')->name('conflicto.destroy');
+    Route::get('/conflictos', 'search')->name('conflictos.search');
 });
 
 /*******timelines routes********/
@@ -113,6 +119,7 @@ Route::controller(App\Http\Controllers\ArticuloController::class)->group(functio
     Route::get('/articulos/{id}/edit', 'edit')->name('articulos.edit');
     Route::put('/articulos/{id}', 'update')->name('articulos.update');
     Route::delete('/articulos/{id}', 'destroy')->name('articulos.destroy');
+    Route::get('/articulos', 'search')->name('articulos.search');
 });
 
 /*******imagenes routes********/

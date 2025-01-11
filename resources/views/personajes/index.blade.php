@@ -10,6 +10,29 @@
 <a href="{{route('personaje.create')}}" class="btn btn-dark">Nuevo personaje</a>
 @endsection
 
+@section('navbar-search')
+  <li class="nav-item">
+    <a class="nav-link" data-widget="navbar-search" href="#" role="button">
+      <i class="fas fa-search"></i>
+    </a>
+    <div class="navbar-search-block">
+      <form class="form-inline" action="{{route('personajes.search')}}" method="GET">
+        <div class="input-group input-group-sm">
+          <input class="form-control form-control-navbar" type="search" placeholder="Nombre a buscar" name="search" id="search" aria-label="Search">
+          <div class="input-group-append">
+            <button class="btn btn-navbar" type="submit">
+              <i class="fas fa-search"></i>
+            </button>
+            <button class="btn btn-navbar" type="button" data-widget="navbar-search">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </li>
+@endsection
+
 @section('content')
 <h1>Personajes</h1>
 

@@ -395,4 +395,26 @@ class OrganizacionController extends Controller
         return redirect()->route('organizaciones.index')->with('error',$excepcion->getMessage());
       }
     }
+
+  /**
+   * Display a listing of the resource searched.
+   */
+  public function search(Request $request)
+  {
+    $search = $request->input('search');
+    try{
+      $organizaciones=DB::table('organizaciones')
+          ->join('tipo_organizacion', 'organizaciones.id_tipo_organizacion', '=', 'tipo_organizacion.id')
+          ->select('organizaciones.id_organizacion', 'organizaciones.nombre', 'organizaciones.escudo', 'organizaciones.descripcionBreve', 'tipo_organizacion.nombre AS tipo')
+          ->where('organizaciones.id_organizacion', '!=', 0)
+          ->where('organizaciones.nombre', 'LIKE', "%{$search}%")
+          ->orderBy('organizaciones.nombre', 'asc')->get();
+      
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $organizaciones=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $organizaciones=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    return view('organizaciones.index', ['organizaciones' => $organizaciones]);
+  }
 }

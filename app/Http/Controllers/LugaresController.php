@@ -226,4 +226,25 @@ class LugaresController extends Controller
       return redirect()->route('lugares.index')->with('error',$excepcion->getMessage());
     }
   }
+
+  /**
+   * Display a listing of the resource searched.
+   */
+  public function search(Request $request)
+  {
+    $search = $request->input('search');
+    try{
+      $lugares=DB::table('lugares')
+        ->leftjoin('tipo_lugar', 'lugares.id_tipo_lugar', '=', 'tipo_lugar.id')
+        ->select('lugares.id', 'lugares.nombre', 'descripcion_breve', 'tipo_lugar.nombre AS tipo')
+        ->where('lugares.nombre', 'LIKE', "%{$search}%")
+        ->orderBy('lugares.nombre', 'asc')->get();
+      
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $lugares=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $lugares=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    return view('lugares.index', ['lugares' => $lugares]);
+  }
 }
