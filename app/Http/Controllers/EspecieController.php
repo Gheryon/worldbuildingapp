@@ -13,12 +13,12 @@ class EspecieController extends Controller
   /**
    * Display a listing of the resource.
    */
-  public function index()
+  public function index($orden='asc')
   {
     try{
       $especies=DB::table('especies')
         ->select('id', 'nombre')
-        ->orderBy('nombre', 'asc')->get();
+        ->orderBy('nombre', $orden)->get();
 
     }catch(\Illuminate\Database\QueryException $excepcion){
       $especies=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
@@ -26,7 +26,7 @@ class EspecieController extends Controller
       $especies=['error' => ['error' => $excepcion->getMessage()]];
     }
 
-    return view('especies.index', ['especies' => $especies]);
+    return view('especies.index', ['especies' => $especies, 'orden'=>$orden]);
   }
 
   /**

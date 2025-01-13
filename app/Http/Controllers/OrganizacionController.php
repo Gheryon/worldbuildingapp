@@ -16,21 +16,37 @@ class OrganizacionController extends Controller
     /**
      * Muestra una lista de las organizaciones guardadas.
      */
-    public function index()
+    public function index($orden='asc', $tipo='0')
     {
       try {
-        $organizaciones=DB::table('organizaciones')
-          ->join('tipo_organizacion', 'organizaciones.id_tipo_organizacion', '=', 'tipo_organizacion.id')
-          ->select('organizaciones.id_organizacion', 'organizaciones.nombre', 'organizaciones.escudo', 'organizaciones.descripcionBreve', 'tipo_organizacion.nombre AS tipo')
-          ->where('organizaciones.id_organizacion', '!=', 0)
-          ->orderBy('organizaciones.nombre', 'asc')->get();
-        
+        if($tipo!=0){
+          $organizaciones=DB::table('organizaciones')
+            ->join('tipo_organizacion', 'organizaciones.id_tipo_organizacion', '=', 'tipo_organizacion.id')
+            ->select('organizaciones.id_organizacion', 'organizaciones.nombre', 'organizaciones.escudo', 'organizaciones.descripcionBreve', 'tipo_organizacion.nombre AS tipo')
+            ->where('organizaciones.id_organizacion', '!=', 0)
+            ->where('organizaciones.id_tipo_organizacion', '=', $tipo)
+            ->orderBy('organizaciones.nombre', $orden)->get();
+        }else{
+          $organizaciones=DB::table('organizaciones')
+            ->join('tipo_organizacion', 'organizaciones.id_tipo_organizacion', '=', 'tipo_organizacion.id')
+            ->select('organizaciones.id_organizacion', 'organizaciones.nombre', 'organizaciones.escudo', 'organizaciones.descripcionBreve', 'tipo_organizacion.nombre AS tipo')
+            ->where('organizaciones.id_organizacion', '!=', 0)
+            ->orderBy('organizaciones.nombre', $orden)->get();
+        }
       } catch(\Illuminate\Database\QueryException $excepcion){
         $organizaciones=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
       }catch(Exception $excepcion){
         $organizaciones=['error' => ['error' => $excepcion->getMessage()]];
       }
-      return view('organizaciones.index', ['organizaciones' => $organizaciones]);
+      try{
+        $tipos_organizacion=tipo_organizacion::orderBy('nombre', 'asc')->get();
+      }catch (\Illuminate\Database\QueryException $excepcion) {
+        $tipos_organizacion=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      } catch (Exception $excepcion) {
+        $tipos_organizacion=['error' => ['error' => $excepcion->getMessage()]];
+      }
+
+      return view('organizaciones.index', ['organizaciones' => $organizaciones, 'tipos'=> $tipos_organizacion, 'orden'=>$orden, 'tipo_o'=>$tipo]);
     }
 
     /**

@@ -15,20 +15,36 @@ class LugaresController extends Controller
   /**
    * Display a listing of the resource.
    */
-  public function index()
+  public function index($orden='asc', $tipo='0')
   {
     try{
-      $lugares=DB::table('lugares')
-        ->leftjoin('tipo_lugar', 'lugares.id_tipo_lugar', '=', 'tipo_lugar.id')
-        ->select('lugares.id', 'lugares.nombre', 'descripcion_breve', 'tipo_lugar.nombre AS tipo')
-        ->orderBy('lugares.nombre', 'asc')->get();
-      return view('lugares.index', ['lugares' => $lugares]);
-
+      if($tipo!=0){
+        $lugares=DB::table('lugares')
+          ->leftjoin('tipo_lugar', 'lugares.id_tipo_lugar', '=', 'tipo_lugar.id')
+          ->select('lugares.id', 'lugares.nombre', 'descripcion_breve', 'tipo_lugar.nombre AS tipo')
+          ->where('lugares.id_tipo_lugar', '=', $tipo)
+          ->orderBy('lugares.nombre', $orden)->get();
+      }else{
+        $lugares=DB::table('lugares')
+          ->leftjoin('tipo_lugar', 'lugares.id_tipo_lugar', '=', 'tipo_lugar.id')
+          ->select('lugares.id', 'lugares.nombre', 'descripcion_breve', 'tipo_lugar.nombre AS tipo')
+          ->orderBy('lugares.nombre', $orden)->get();
+      }
     }catch(\Illuminate\Database\QueryException $excepcion){
-      return view('lugares.index')->with('error', 'Se produjo un problema en la base de datos.');
+      $lugares=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     }catch(Exception $excepcion){
-      return view('lugares.index')->with('error', $excepcion->getMessage());
+      $lugares=['error' => ['error' => $excepcion->getMessage()]];
     }
+
+    try{
+      $tipos=tipo_lugar::orderBy('nombre', 'asc')->get();
+    }catch (\Illuminate\Database\QueryException $excepcion) {
+      $tipos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $tipos=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    return view('lugares.index', ['lugares' => $lugares, 'tipos'=>$tipos, 'orden'=>$orden, 'tipo_o'=>$tipo]);
   }
 
   /**

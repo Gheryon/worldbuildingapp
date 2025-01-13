@@ -8,6 +8,11 @@
 
 @section('navbar-buttons')
 <a href="{{route('especie.create')}}" class="btn btn-dark">Nueva especie</a>
+<select id="order" class="form-select ml-2" name="order">
+  <option selected disabled value="ASC">Orden</option>
+  <option value="asc">Ascendente</option>
+  <option value="desc">Descendente</option>
+</select>
 @endsection
 
 @section('content')
@@ -72,6 +77,17 @@
 
 @section('specific-scripts')
 <script src="{{asset('dist/js/config.js')}}"></script>
+<script>
+  $(function() {
+
+    $(document).on('change', '#order', function(){
+      orden=this.value;
+      let url = "{{ route('especies.index', ['orden'=>'_orden']) }}";
+      url = url.replace('_orden', orden);
+      document.location.href=url;
+    });
+  });
+</script>
 <script>
   @if(Session::has('message'))
   toastr.options = {

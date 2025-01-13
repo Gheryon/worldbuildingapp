@@ -18,7 +18,7 @@ Route::get('/', function () {
 
 /*******personajes routes********/
 Route::controller(App\Http\Controllers\PersonajeController::class)->group(function () {
-    Route::get('/personajes/index', 'index')->name('personajes.index');
+    Route::get('/personajes/index/{orden?}/{tipo?}', 'index')->name('personajes.index');
     Route::get('/personajes/create', 'create')->name('personaje.create');
     Route::post('/personajes/store', 'store')->name('personaje.store');
     Route::get('/personajes/{id}/edit', 'edit')->name('personaje.edit');
@@ -29,7 +29,7 @@ Route::controller(App\Http\Controllers\PersonajeController::class)->group(functi
 
 /*******organizaciones routes********/
 Route::controller(App\Http\Controllers\OrganizacionController::class)->group(function () {
-    Route::get('/organizaciones/index', 'index')->name('organizaciones.index');
+    Route::get('/organizaciones/index/{orden?}/{tipo?}', 'index')->name('organizaciones.index');
     Route::get('/organizaciones/create', 'create')->name('organizacion.create');
     Route::post('/organizaciones/store', 'store')->name('organizacion.store');
     Route::get('/organizaciones/{id}/edit', 'edit')->name('organizacion.edit');
@@ -40,7 +40,7 @@ Route::controller(App\Http\Controllers\OrganizacionController::class)->group(fun
 
 /*******religiones routes********/
 Route::controller(App\Http\Controllers\ReligionesController::class)->group(function () {
-    Route::get('/religiones/index', 'index')->name('religiones.index');
+    Route::get('/religiones/index/{orden?}', 'index')->name('religiones.index');
     Route::get('/religiones/create', 'create')->name('religion.create');
     Route::post('/religiones/store', 'store')->name('religion.store');
     Route::get('/religiones/{id}/edit', 'edit')->name('religion.edit');
@@ -51,7 +51,7 @@ Route::controller(App\Http\Controllers\ReligionesController::class)->group(funct
 
 /*******especies routes********/
 Route::controller(App\Http\Controllers\EspecieController::class)->group(function () {
-    Route::get('/especies/index', 'index')->name('especies.index');
+    Route::get('/especies/index/{orden?}', 'index')->name('especies.index');
     Route::get('/especies/create', 'create')->name('especie.create');
     Route::post('/especies/store', 'store')->name('especie.store');
     Route::get('/especies/{id}/edit', 'edit')->name('especie.edit');
@@ -61,7 +61,7 @@ Route::controller(App\Http\Controllers\EspecieController::class)->group(function
 
 /*******asentamientos routes********/
 Route::controller(App\Http\Controllers\AsentamientoController::class)->group(function () {
-    Route::get('/asentamientos/index', 'index')->name('asentamientos.index');
+    Route::get('/asentamientos/index/{orden?}/{tipo?}', 'index')->name('asentamientos.index');
     Route::get('/asentamientos/create', 'create')->name('asentamiento.create');
     Route::post('/asentamientos/store', 'store')->name('asentamiento.store');
     Route::get('/asentamientos/{id}/edit', 'edit')->name('asentamiento.edit');
@@ -72,7 +72,7 @@ Route::controller(App\Http\Controllers\AsentamientoController::class)->group(fun
 
 /*******lugares routes********/
 Route::controller(App\Http\Controllers\LugaresController::class)->group(function () {
-    Route::get('/lugares/index', 'index')->name('lugares.index');
+    Route::get('/lugares/index/{orden?}/{tipo?}', 'index')->name('lugares.index');
     Route::get('/lugares/create', 'create')->name('lugar.create');
     Route::post('/lugares/store', 'store')->name('lugar.store');
     Route::get('/lugares/{id}/edit', 'edit')->name('lugar.edit');
@@ -83,7 +83,7 @@ Route::controller(App\Http\Controllers\LugaresController::class)->group(function
 
 /*******conflictos routes********/
 Route::controller(App\Http\Controllers\ConflictoController::class)->group(function () {
-    Route::get('/conflictos/index', 'index')->name('conflictos.index');
+    Route::get('/conflictos/index/{orden?}/{tipo?}', 'index')->name('conflictos.index');
     Route::get('/conflictos/create', 'create')->name('conflicto.create');
     Route::post('/conflictos/store', 'store')->name('conflicto.store');
     Route::get('/conflictos/{id}/edit', 'edit')->name('conflicto.edit');

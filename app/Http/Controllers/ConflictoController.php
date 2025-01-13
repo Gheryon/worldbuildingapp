@@ -16,20 +16,36 @@ class ConflictoController extends Controller
   /**
    * Display a listing of the resource.
    */
-  public function index()
+  public function index($orden='asc', $tipo='0')
   {
-    try {
-      $conflictos=DB::table('conflicto')
-      ->leftjoin('tipo_conflicto', 'conflicto.id_tipo_conflicto', '=', 'tipo_conflicto.id')
-      ->select('conflicto.id', 'conflicto.nombre', 'descripcion', 'tipo_conflicto.nombre AS tipo')
-      ->orderBy('nombre', 'asc')->get();
-      
+    try{
+      if($tipo!=0){
+        $conflictos=DB::table('conflicto')
+        ->leftjoin('tipo_conflicto', 'conflicto.id_tipo_conflicto', '=', 'tipo_conflicto.id')
+        ->select('conflicto.id', 'conflicto.nombre', 'descripcion', 'tipo_conflicto.nombre AS tipo')
+        ->where('conflicto.id_tipo_conflicto', '=', $tipo)
+        ->orderBy('nombre', $orden)->get();
+      }else{
+        $conflictos=DB::table('conflicto')
+        ->leftjoin('tipo_conflicto', 'conflicto.id_tipo_conflicto', '=', 'tipo_conflicto.id')
+        ->select('conflicto.id', 'conflicto.nombre', 'descripcion', 'tipo_conflicto.nombre AS tipo')
+        ->orderBy('nombre', $orden)->get();
+      }
     } catch(\Illuminate\Database\QueryException $excepcion){
       $conflictos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     }catch(Exception $excepcion){
       $conflictos=['error' => ['error' => $excepcion->getMessage()]];
     }
-    return view('conflictos.index', ['conflictos' => $conflictos]);
+
+    try{
+      $tipos=tipo_conflicto::orderBy('nombre', 'asc')->get();
+    }catch (\Illuminate\Database\QueryException $excepcion) {
+      $tipos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $tipos=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    return view('conflictos.index', ['conflictos' => $conflictos, 'tipos'=>$tipos, 'orden'=>$orden, 'tipo_o'=>$tipo]);
   }
 
   /**

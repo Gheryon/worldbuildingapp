@@ -16,21 +16,36 @@ class PersonajeController extends Controller
   /**
    * Display a listing of the resource.
    */
-  public function index()
+  public function index($orden='asc', $tipo='0')
   {
     try{
-      $personajes=DB::table('personaje')
-        ->leftjoin('especies', 'personaje.id_foranea_especie', '=', 'especies.id')
-        ->select('personaje.id', 'personaje.Nombre', 'Retrato', 'Sexo', 'id_foranea_especie', 'DescripcionShort', 'especies.nombre AS especie')
-        ->where('personaje.id', '!=', 0)
-        ->orderBy('personaje.Nombre', 'asc')->get();
-
+      if($tipo!=0){
+        $personajes=DB::table('personaje')
+          ->leftjoin('especies', 'personaje.id_foranea_especie', '=', 'especies.id')
+          ->select('personaje.id', 'personaje.Nombre', 'Retrato', 'Sexo', 'id_foranea_especie', 'DescripcionShort', 'especies.nombre AS especie')
+          ->where('personaje.id', '!=', 0)
+          ->where('personaje.id_foranea_especie', '=', $tipo)
+          ->orderBy('personaje.Nombre', $orden)->get();
+      }else{
+        $personajes=DB::table('personaje')
+          ->leftjoin('especies', 'personaje.id_foranea_especie', '=', 'especies.id')
+          ->select('personaje.id', 'personaje.Nombre', 'Retrato', 'Sexo', 'id_foranea_especie', 'DescripcionShort', 'especies.nombre AS especie')
+          ->where('personaje.id', '!=', 0)
+          ->orderBy('personaje.Nombre', $orden)->get();
+      }
     }catch(\Illuminate\Database\QueryException $excepcion){
       $personajes=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     }catch(Exception $excepcion){
       $personajes=['error' => ['error' => $excepcion->getMessage()]];
     }
-    return view('personajes.index', ['personajes' => $personajes]);
+    try{
+      $especies=DB::table('especies')->select('id', 'nombre')->orderBy('nombre', 'asc')->get();
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $especies=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $especies=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    return view('personajes.index', ['personajes' => $personajes, 'tipos'=>$especies, 'orden'=>$orden, 'tipo_o'=>$tipo]);
   }
 
   /**

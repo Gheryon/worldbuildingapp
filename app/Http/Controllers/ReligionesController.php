@@ -14,12 +14,12 @@ class ReligionesController extends Controller
   /**
    * Display a listing of the resource.
    */
-  public function index()
+  public function index($orden='asc')
   {
     try{
       $religiones=DB::table('religiones')
         ->select('id', 'nombre', 'descripcion')
-        ->orderBy('nombre', 'asc')->get();
+        ->orderBy('nombre', $orden)->get();
 
     }catch(\Illuminate\Database\QueryException $excepcion){
       $religiones=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
@@ -27,7 +27,7 @@ class ReligionesController extends Controller
       $religiones=['error' => ['error' => $excepcion->getMessage()]];
     }
 
-    return view('religiones.index', ['religiones' => $religiones]);
+    return view('religiones.index', ['religiones' => $religiones, 'orden'=>$orden]);
   }
 
   /**

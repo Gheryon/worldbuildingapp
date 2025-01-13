@@ -8,6 +8,18 @@
 
 @section('navbar-buttons')
 <a href="{{route('personaje.create')}}" class="btn btn-dark">Nuevo personaje</a>
+<select id="filter_tipo" class="form-select ml-2" name="filter_tipo">
+<option selected disabled value="0">Filtrar especie</option>
+<option value="0">Todas</option>
+@foreach($tipos as $tipo)
+<option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
+@endforeach
+</select>
+<select id="order" class="form-select ml-2" name="order">
+  <option selected disabled value="ASC">Orden</option>
+  <option value="asc">Ascendente</option>
+  <option value="desc">Descendente</option>
+</select>
 @endsection
 
 @section('navbar-search')
@@ -107,6 +119,28 @@
 @section('specific-scripts')
 <!-- articulos javascript -->
 <script src="{{asset('dist/js/personajes.js')}}"></script>
+<script>
+  $(function() {
+
+    $(document).on('change', '#order', function(){
+      orden=this.value;
+      tipo="{{$tipo_o}}";
+      let url = "{{ route('personajes.index', ['orden'=>'_orden', 'tipo'=>'_tipo']) }}";
+      url = url.replace('_orden', orden);
+      url = url.replace('_tipo', tipo);
+      document.location.href=url;
+    });
+
+    $(document).on('change', '#filter_tipo', function(){
+      tipo=this.value;
+      orden="{{$orden}}";
+      let url = "{{ route('personajes.index', ['orden'=>'_orden', 'tipo'=>'_tipo']) }}";
+      url = url.replace('_orden', orden);
+      url = url.replace('_tipo', tipo);
+      document.location.href=url;
+    });
+  });
+</script>
 <script>
   @if(Session::has('message'))
   toastr.options =
