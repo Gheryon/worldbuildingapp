@@ -137,7 +137,7 @@
             <h3>Enlaces</h3>
           </div>
           <div class="icon">
-            <i class="fa-solid fa-pencil"></i>
+            <i class="fas fa-file"></i>
           </div>
           <a href="{{route('enlaces.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
         </div>

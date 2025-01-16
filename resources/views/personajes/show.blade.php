@@ -30,6 +30,11 @@
         <p class="ml-2 mr-2">{!!$vista->Descripcion!!}</p>
         @endif
 
+        @if (isset($vista->salud))
+        <h3>Enfermedades, heridas o problemas de salud</h3>
+        <p class="ml-2 mr-2">{!!$vista->salud!!}</p>
+        @endif
+
         @if (isset($vista->Personalidad))
         <h3>Personalidad</h3>
         <p class="ml-2 mr-2">{!!$vista->Personalidad!!}</p>

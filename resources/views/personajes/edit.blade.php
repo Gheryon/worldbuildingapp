@@ -149,6 +149,9 @@
     <label for="descripcion" class="form-label">Descripción física</label>
     <textarea name="descripcion" class="form-control summernote-lite" id="descripcion" rows="4" aria-label="With textarea">{!!$personaje->Descripcion!!}</textarea>
 
+    <label for="salud" class="form-label">Enfermedades, heridas o problemas de salud</label>
+    <textarea name="salud" class="form-control summernote-lite" id="salud" rows="4" aria-label="With textarea">{!!$personaje->salud!!}</textarea>
+
     <label for="personalidad" class="form-label">Personalidad</label>
     <textarea name="personalidad" class="form-control summernote-lite" id="personalidad" rows="4" aria-label="With textarea">{!!$personaje->Personalidad!!}</textarea>
 

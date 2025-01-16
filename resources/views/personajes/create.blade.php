@@ -145,6 +145,9 @@
     <label for="descripcion" class="form-label">Descripción física</label>
     <textarea name="descripcion" class="form-control summernote-lite" id="descripcion" rows="4" aria-label="With textarea"></textarea>
 
+    <label for="salud" class="form-label">Enfermedades, heridas o problemas de salud</label>
+    <textarea name="salud" class="form-control summernote-lite" id="salud" rows="4" aria-label="With textarea"></textarea>
+
     <label for="personalidad" class="form-label">Personalidad</label>
     <textarea name="personalidad" class="form-control summernote-lite" id="personalidad" rows="4" aria-label="With textarea"></textarea>
     
@@ -163,7 +166,7 @@
     <label for="religion" class="form-label">Religión</label>
     <textarea name="religion" class="form-control summernote-lite" id="religion" rows="4" aria-label="With textarea"></textarea>
     
-    <label for="familia" class="form-label">Familia y riqueza</label>
+    <label for="familia" class="form-label">Familia</label>
     <textarea name="familia" class="form-control summernote-lite" id="familia" rows="4" aria-label="With textarea"></textarea>
     
     <label for="politica" class="form-label">Política y títulos</label>

@@ -94,40 +94,43 @@ class PersonajeController extends Controller
       $personaje->causa_fallecimiento=$request->causa_fallecimiento;
     }
     if($request->filled('descripcion')){
-      $personaje->Descripcion=app(ImagenController::class)->update_for_summernote($request->descripcion, "personajes", $id);
+      $personaje->Descripcion=app(ImagenController::class)->store_for_summernote($request->descripcion, "personajes", $id);
     }
     if($request->filled('DescripcionShort')){
-      $personaje->DescripcionShort=app(ImagenController::class)->update_for_summernote($request->DescripcionShort, "personajes", $id);
+      $personaje->DescripcionShort=app(ImagenController::class)->store_for_summernote($request->DescripcionShort, "personajes", $id);
+    }
+    if($request->filled('salud')){
+      $personaje->salud=app(ImagenController::class)->store_for_summernote($request->salud, "personajes", $id);
     }
     if($request->filled('personalidad')){
-      $personaje->Personalidad=app(ImagenController::class)->update_for_summernote($request->personalidad, "personajes", $id);
+      $personaje->Personalidad=app(ImagenController::class)->store_for_summernote($request->personalidad, "personajes", $id);
     }
     if($request->filled('deseos')){
-      $personaje->Deseos=app(ImagenController::class)->update_for_summernote($request->deseos, "personajes", $id);
+      $personaje->Deseos=app(ImagenController::class)->store_for_summernote($request->deseos, "personajes", $id);
     }
     if($request->filled('miedos')){
-      $personaje->Miedos=app(ImagenController::class)->update_for_summernote($request->miedos, "personajes", $id);
+      $personaje->Miedos=app(ImagenController::class)->store_for_summernote($request->miedos, "personajes", $id);
     }
     if($request->filled('magia')){
-      $personaje->Magia=app(ImagenController::class)->update_for_summernote($request->magia, "personajes", $id);
+      $personaje->Magia=app(ImagenController::class)->store_for_summernote($request->magia, "personajes", $id);
     }
     if($request->filled('educacion')){
-      $personaje->educacion=app(ImagenController::class)->update_for_summernote($request->educacion, "personajes", $id);
+      $personaje->educacion=app(ImagenController::class)->store_for_summernote($request->educacion, "personajes", $id);
     }
     if($request->filled('historia')){
-      $personaje->Historia=app(ImagenController::class)->update_for_summernote($request->historia, "personajes", $id);
+      $personaje->Historia=app(ImagenController::class)->store_for_summernote($request->historia, "personajes", $id);
     }
     if($request->filled('religion')){
-      $personaje->Religion=app(ImagenController::class)->update_for_summernote($request->religion, "personajes", $id);
+      $personaje->Religion=app(ImagenController::class)->store_for_summernote($request->religion, "personajes", $id);
     }
     if($request->filled('familia')){
-      $personaje->Familia=app(ImagenController::class)->update_for_summernote($request->familia, "personajes", $id);;
+      $personaje->Familia=app(ImagenController::class)->store_for_summernote($request->familia, "personajes", $id);;
     }
     if($request->filled('politica')){
-      $personaje->Politica=app(ImagenController::class)->update_for_summernote($request->politica, "personajes", $id);;
+      $personaje->Politica=app(ImagenController::class)->store_for_summernote($request->politica, "personajes", $id);;
     }
     if($request->filled('otros')){
-      $personaje->otros=app(ImagenController::class)->update_for_summernote($request->otros, "personajes", $id);
+      $personaje->otros=app(ImagenController::class)->store_for_summernote($request->otros, "personajes", $id);
     }
 
     $personaje->id_foranea_especie=$request->select_especie;
@@ -243,6 +246,9 @@ class PersonajeController extends Controller
     }
     if($request->filled('personalidad')){
       $personaje->Personalidad=app(ImagenController::class)->update_for_summernote($request->personalidad, "personajes", $request->id);
+    }
+    if($request->filled('salud')){
+      $personaje->salud=app(ImagenController::class)->update_for_summernote($request->salud, "personajes", $request->id);
     }
     if($request->filled('deseos')){
       $personaje->Deseos=app(ImagenController::class)->update_for_summernote($request->deseos, "personajes", $request->id);

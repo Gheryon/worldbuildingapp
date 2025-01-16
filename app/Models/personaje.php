@@ -24,6 +24,7 @@ class personaje extends Model
         'Descripcion',
         'DescripcionShort',
         'Personalidad',
+        'salud',
         'Deseos',
         'Miedos',
         'Magia',
