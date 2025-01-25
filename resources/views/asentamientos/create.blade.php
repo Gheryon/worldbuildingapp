@@ -67,6 +67,9 @@
           <div class="col-2">
             <label for="poblacion" class="form-label">Población</label>
             <input type="text" name="poblacion" class="form-control" id="poblacion" placeholder="Ej: 5000">
+            @error('poblacion')
+            <small style="color: red">{{$message}}</small>
+            @enderror
           </div>
           <div class="col">
             <label for="fundacion" class="form-label">Fundación</label>

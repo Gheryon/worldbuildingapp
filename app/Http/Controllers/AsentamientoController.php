@@ -22,11 +22,13 @@ class AsentamientoController extends Controller
         $asentamientos=DB::table('asentamientos')
           ->select('id', 'nombre')
           ->where('id_tipo_asentamiento', '=', $tipo)
+          ->where('id', '!=', 0)
           ->orderBy('nombre', $orden)->get();
       }
       else{
         $asentamientos=DB::table('asentamientos')
           ->select('id', 'nombre')
+          ->where('id', '!=', 0)
           ->orderBy('nombre', $orden)->get();
       }
     }catch(\Illuminate\Database\QueryException $excepcion){
@@ -194,7 +196,7 @@ class AsentamientoController extends Controller
     $request->validate([
       'nombre'=>'required|max:128',
       'select_tipo'=>'required',
-      'poblacion'=>'numeric',
+      'poblacion'=>'numeric|nullable',
     ]);
 
     try {
@@ -288,38 +290,42 @@ class AsentamientoController extends Controller
      */
     public function destroy(Request $request)
     {
-      try{
-        $fundacion=DB::scalar("SELECT fundacion FROM asentamientos where id = ?", [$request->id_borrar]);
-        $disolucion=DB::scalar("SELECT disolucion FROM asentamientos where id = ?", [$request->id_borrar]);
-
-        //si fundacion/disolucion != 0, la organizacion tiene fecha establecida, hay que borrar
-        if($fundacion!=0){
-          Fecha::destroy($fundacion);
-        }
-        if($disolucion!=0){
-          Fecha::destroy($disolucion);
-        }
-
-        //borrado de las imagenes que pueda haber de summernote
-        $imagenes = DB::table('imagenes')
-          ->select('id', 'nombre')
-          ->where('table_owner', '=', 'asentamientos')
-          ->where('owner', '=', $request->id_borrar)->get();
-        
-        foreach ($imagenes as $imagen) {
-          if (file_exists(public_path("/storage/imagenes/" . $imagen->nombre))) {
-          unlink(public_path("/storage/imagenes/" . $imagen->nombre));
-          //Storage::delete(asset($imagen->nombre));
-          }
-          imagen::destroy($imagen->id);
-        }
-        Asentamiento::destroy($request->id_borrar);
-        return redirect()->route('asentamientos.index')->with('message',$request->nombre_borrado.' borrado correctamente.');
+      if($request->id_borrar!=0){
+        try{
+          $fundacion=DB::scalar("SELECT fundacion FROM asentamientos where id = ?", [$request->id_borrar]);
+          $disolucion=DB::scalar("SELECT disolucion FROM asentamientos where id = ?", [$request->id_borrar]);
   
-      }catch(\Illuminate\Database\QueryException $excepcion){
-        return redirect()->route('asentamientos.index')->with('error','Se produjo un problema en la base de datos, no se pudo borrar.');
-      }catch(Exception $excepcion){
-        return redirect()->route('asentamientos.index')->with('error',$excepcion->getMessage());
+          //si fundacion/disolucion != 0, la organizacion tiene fecha establecida, hay que borrar
+          if($fundacion!=0){
+            Fecha::destroy($fundacion);
+          }
+          if($disolucion!=0){
+            Fecha::destroy($disolucion);
+          }
+  
+          //borrado de las imagenes que pueda haber de summernote
+          $imagenes = DB::table('imagenes')
+            ->select('id', 'nombre')
+            ->where('table_owner', '=', 'asentamientos')
+            ->where('owner', '=', $request->id_borrar)->get();
+          
+          foreach ($imagenes as $imagen) {
+            if (file_exists(public_path("/storage/imagenes/" . $imagen->nombre))) {
+            unlink(public_path("/storage/imagenes/" . $imagen->nombre));
+            //Storage::delete(asset($imagen->nombre));
+            }
+            imagen::destroy($imagen->id);
+          }
+          Asentamiento::destroy($request->id_borrar);
+          return redirect()->route('asentamientos.index')->with('message',$request->nombre_borrado.' borrado correctamente.');
+    
+        }catch(\Illuminate\Database\QueryException $excepcion){
+          return redirect()->route('asentamientos.index')->with('error','Se produjo un problema en la base de datos, no se pudo borrar.');
+        }catch(Exception $excepcion){
+          return redirect()->route('asentamientos.index')->with('error',$excepcion->getMessage());
+        }
+      }else{
+        return redirect()->route('asentamientos.index')->with('error','Error no se pudo borrar.');
       }
     }
 
