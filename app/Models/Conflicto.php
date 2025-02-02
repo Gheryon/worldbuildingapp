@@ -25,7 +25,6 @@ class Conflicto extends Model
     'tipo_localizacion',
     'id_conflicto_padre',
     'fecha_inicio',
-    'clima',
     'fecha_fin',
   ];
 }

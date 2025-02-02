@@ -8,12 +8,12 @@
 
 @section('navbar-buttons')
 <button type="button" title="Nuevo evento" class="nuevo btn btn-dark btn-sm" data-toggle="modal" data-target="#nuevo-evento">Nuevo evento</button>
-<select id="filter_timeline" class="form-select ml-2" name="filter_timeline">
+<!--<select id="filter_timeline" class="form-select ml-2" name="filter_timeline">
 <option selected disabled value="0">Filtrar edad</option>
 @foreach($timelines as $timeline)
 <option value="{{$timeline->id}}">{{$timeline->nombre}}</option>
 @endforeach
-</select>
+</select>-->
 <select id="order_timeline" class="form-select ml-2" name="order_timeline">
   <option selected disabled value="ASC">Orden</option>
   <option value="asc">Ascendente</option>
@@ -22,8 +22,6 @@
 @endsection
 
 @section('content')
-<h1>Línea cronológica: {{$cronologia}}</h1>
-
 <div class="modal fade" id="eliminar-evento" tabindex="-1" role="dialog" aria-labelledby="eliminar-evento" aria-hidden="true">
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
@@ -115,30 +113,82 @@
 <div class="row">
   <div class="col-md-12">
     <!-- The time line -->
-    <div class="timeline">
-@foreach($eventos as $evento)
-      <!-- timeline time label -->
-      <div class="time-label">
-        <span class="bg-dark">{{$evento->anno}}</span>
-      </div>
-      <!-- /.timeline-label -->
-      <!-- timeline item -->
-      <div>
-        <i class="fas fa-envelope bg-blue"></i>
-        <div class="timeline-item">
-          <h3 class="timeline-header">{{$evento->nombre}}</h3>
-
+    <div class="timeline">  
+@if (Arr::has($eventos, 'error.error'))
+<div class="text-center">No se encontraron eventos.</div>
+{{Arr::get($eventos, 'error.error')}}</div>
+@else
+  @foreach($eventos as $evento)
+    <!-- timeline time label -->
+    <div class="time-label">
+      @if($evento->dia==0&&$evento->mes==0)
+      <span class="bg-dark">{{$evento->anno}}</span>
+      @else
+      <span class="bg-dark">{{$evento->dia}}/{{$evento->mes}}/{{$evento->anno}}</span>
+      @endif
+    </div>
+    <!-- /.timeline-label -->
+    <!-- timeline item -->
+    <div>
+      <i class="fas fa-envelope bg-blue"></i>
+      <div class="timeline-item">
+        @switch($evento->tipo)
+          @case('nace_personaje')
+          <h3 class="timeline-header">Nacimiento de <a href="{{route('personaje.show',$evento->id)}}" type="button" title="Ver {{$evento->nombre}}" class=""><b>{{$evento->nombre}}</b></a></h3>
+              @break
+      
+          @case('muere_personaje')
+          <h3 class="timeline-header">Muerte de <a href="{{route('personaje.show',$evento->id)}}" type="button" title="Ver {{$evento->nombre}}" class=""><b>{{$evento->nombre}}</b></a></h3>
+              @break
+      
+          @case('ini_conflicto')
+          <h3 class="timeline-header">Comienzo de <a href="{{route('conflicto.show',$evento->id)}}" type="button" title="Ver {{$evento->nombre}}" class=""><b>{{$evento->nombre}}</b></a></h3>
           <div class="timeline-body">
             {!!$evento->descripcion!!}
           </div>
-          <div class="timeline-footer">
-            <button id="{{$evento->id}}" type="button" class="editar btn btn-primary btn-sm" data-toggle="modal" data-target="#nuevo-evento">Editar</button>
-            <button id="{{$evento->id}}" nombre="{{$evento->nombre}}" class="borrar btn btn-danger btn-sm" data-toggle="modal" data-target="#eliminar-evento">Eliminar</button>
+              @break
+
+          @case('fin_conflicto')
+          <h3 class="timeline-header">Finalización de <a href="{{route('conflicto.show',$evento->id)}}" type="button" title="Ver {{$evento->nombre}}" class=""><b>{{$evento->nombre}}</b></a></h3>
+          <div class="timeline-body">
+            {!!$evento->descripcion!!}
           </div>
+              @break
+
+          @case('ini_asentamiento')
+          <h3 class="timeline-header">Fundación de <a href="{{route('asentamiento.show',$evento->id)}}" type="button" title="Ver {{$evento->nombre}}" class=""><b>{{$evento->nombre}}</b></a></h3>
+              @break
+
+          @case('fin_asentamiento')
+          <h3 class="timeline-header">Destrucción de <a href="{{route('asentamiento.show',$evento->id)}}" type="button" title="Ver {{$evento->nombre}}" class=""><b>{{$evento->nombre}}</b></a></h3>
+              @break
+
+          @case('ini_organizacion')
+          <h3 class="timeline-header">Fundación de <a href="{{route('organizacion.show',$evento->id)}}" type="button" title="Ver {{$evento->nombre}}" class=""><b>{{$evento->nombre}}</b></a></h3>
+              @break
+
+              @case('fin_organizacion')
+          <h3 class="timeline-header">Destrucción de <a href="{{route('organizacion.show',$evento->id)}}" type="button" title="Ver {{$evento->nombre}}" class=""><b>{{$evento->nombre}}</b></a></h3>
+              @break
+
+          @default
+          <h3 class="timeline-header">{{$evento->nombre}}</h3>
+          <div class="timeline-body">
+            {!!$evento->descripcion!!}
+          </div>
+        @endswitch
+        
+        @if ($evento->tipo=='BUTTONS')
+        <div class="timeline-footer">
+          <button id="{{$evento->id}}" type="button" class="editar btn btn-primary btn-sm" data-toggle="modal" data-target="#nuevo-evento">Editar</button>
+          <button id="{{$evento->id}}" nombre="{{$evento->nombre}}" class="borrar btn btn-danger btn-sm" data-toggle="modal" data-target="#eliminar-evento">Eliminar</button>
         </div>
+        @endif
       </div>
-      <!-- END timeline item -->
-@endforeach
+    </div>
+    <!-- END timeline item -->
+  @endforeach
+@endif
       <div>
         <i class="fas fa-clock bg-gray"></i>
       </div>

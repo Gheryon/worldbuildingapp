@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\timeline;
+use App\Models\lineas_temporales;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -14,21 +15,149 @@ class TimelineController extends Controller
    */
   public function index($orden='desc', $cronologia='0')
   {
+    try {
+      $nacimientos=DB::table('personaje')
+          ->select('personaje.id', 'fechas.dia', 'fechas.mes', 'fechas.anno')
+          ->selectRaw("CONCAT(' ', ' ') AS descripcion")
+          ->selectRaw(" personaje.Nombre AS nombre, CONCAT('nace_personaje') AS tipo")
+          ->where('personaje.id', '!=', 0)
+          ->where('personaje.nacimiento', '!=', 0)
+          ->leftjoin('fechas', 'personaje.nacimiento', '=', 'fechas.id');
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $nacimientos=['error' => ['error' => 'Se produjo un problema en la base de datos.'.$excepcion->getMessage()]];
+    } catch (Exception $excepcion) {
+      $nacimientos=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try {
+      $defunciones=DB::table('personaje')
+          ->select('personaje.id', 'fechas.dia', 'fechas.mes', 'fechas.anno')
+          ->selectRaw(" CONCAT(' ', ' ') AS descripcion")
+          ->selectRaw("personaje.Nombre AS nombre, CONCAT('muere_personaje') AS tipo")
+          ->where('personaje.id', '!=', 0)
+          ->where('personaje.fallecimiento', '!=', 0)
+          ->leftjoin('fechas', 'personaje.fallecimiento', '=', 'fechas.id');
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $defunciones=['error' => ['error' => 'Se produjo un problema en la base de datos.'.$excepcion->getMessage()]];
+    } catch (Exception $excepcion) {
+      $defunciones=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try {
+      $conflictos_ini=DB::table('conflicto')
+          ->select('conflicto.id', 'fechas.dia', 'fechas.mes', 'fechas.anno', 'conflicto.descripcion')
+          ->selectRaw("conflicto.nombre AS nombre, CONCAT('ini_conflicto') AS tipo")
+          ->where('conflicto.id', '!=', 0)
+          ->where('conflicto.fecha_inicio', '!=', 0)
+          ->leftjoin('fechas', 'conflicto.fecha_inicio', '=', 'fechas.id');
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $conflictos_ini=['error' => ['error' => 'Se produjo un problema en la base de datos.'.$excepcion->getMessage()]];
+    } catch (Exception $excepcion) {
+      $conflictos_ini=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try {
+      $conflictos_fin=DB::table('conflicto')
+          ->select('conflicto.id', 'fechas.dia', 'fechas.mes', 'fechas.anno', 'conflicto.descripcion')
+          ->selectRaw("conflicto.nombre AS nombre, CONCAT('fin_conflicto') AS tipo")
+          ->where('conflicto.id', '!=', 0)
+          ->where('conflicto.fecha_fin', '!=', 0)
+          ->leftjoin('fechas', 'conflicto.fecha_fin', '=', 'fechas.id');
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $conflictos_fin=['error' => ['error' => 'Se produjo un problema en la base de datos.'.$excepcion->getMessage()]];
+    } catch (Exception $excepcion) {
+      $conflictos_fin=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try {
+      $asentamientos_ini=DB::table('asentamientos')
+          ->select('asentamientos.id', 'fechas.dia', 'fechas.mes', 'fechas.anno')
+          ->selectRaw(" CONCAT(' ', ' ') AS descripcion")
+          ->selectRaw("asentamientos.nombre AS nombre, CONCAT('ini_asentamiento') AS tipo")
+          ->where('asentamientos.id', '!=', 0)
+          ->where('asentamientos.fundacion', '!=', 0)
+          ->leftjoin('fechas', 'asentamientos.fundacion', '=', 'fechas.id');
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $asentamientos_ini=['error' => ['error' => 'Se produjo un problema en la base de datos.'.$excepcion->getMessage()]];
+    } catch (Exception $excepcion) {
+      $asentamientos_ini=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try {
+      $asentamientos_fin=DB::table('asentamientos')
+      ->select('asentamientos.id', 'fechas.dia', 'fechas.mes', 'fechas.anno')
+      ->selectRaw(" CONCAT(' ', ' ') AS descripcion")
+      ->selectRaw("asentamientos.nombre AS nombre, CONCAT('fin_asentamiento') AS tipo")
+      ->where('asentamientos.id', '!=', 0)
+      ->where('asentamientos.disolucion', '!=', 0)
+      ->leftjoin('fechas', 'asentamientos.disolucion', '=', 'fechas.id');
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $asentamientos_fin=['error' => ['error' => 'Se produjo un problema en la base de datos.'.$excepcion->getMessage()]];
+    } catch (Exception $excepcion) {
+      $asentamientos_fin=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try {
+      $organizaciones_ini=DB::table('organizaciones')
+      ->select('organizaciones.id_organizacion AS id', 'fechas.dia', 'fechas.mes', 'fechas.anno')
+      ->selectRaw(" CONCAT(' ', ' ') AS descripcion")
+      ->selectRaw("organizaciones.nombre AS nombre, CONCAT('ini_organizacion') AS tipo")
+      ->where('organizaciones.id_organizacion', '!=', 0)
+      ->where('organizaciones.fundacion', '!=', 0)
+      ->leftjoin('fechas', 'organizaciones.fundacion', '=', 'fechas.id');
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $organizaciones_ini=['error' => ['error' => 'Se produjo un problema en la base de datos.'.$excepcion->getMessage()]];
+    } catch (Exception $excepcion) {
+      $organizaciones_ini=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try {
+      $organizaciones_fin=DB::table('organizaciones')
+      ->select('organizaciones.id_organizacion AS id', 'fechas.dia', 'fechas.mes', 'fechas.anno')
+      ->selectRaw(" CONCAT(' ', ' ') AS descripcion")
+      ->selectRaw("organizaciones.nombre AS nombre, CONCAT('fin_organizacion') AS tipo")
+      ->where('organizaciones.id_organizacion', '!=', 0)
+      ->where('organizaciones.disolucion', '!=', 0)
+      ->leftjoin('fechas', 'organizaciones.disolucion', '=', 'fechas.id');
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $organizaciones_fin=['error' => ['error' => 'Se produjo un problema en la base de datos.'.$excepcion->getMessage()]];
+    } catch (Exception $excepcion) {
+      $organizaciones_fin=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    
     try{
-      $eventos=timeline::orderBy('anno', $orden)->get();
+      $eventos=DB::table('timelines')
+        ->select('id', 'dia', 'mes', 'anno', 'descripcion', 'nombre')
+        ->selectRaw("CONCAT('BUTTONS') AS tipo")
+        ->unionAll($nacimientos)
+        ->unionAll($defunciones)
+        ->unionAll($conflictos_ini)
+        ->unionAll($conflictos_fin)
+        ->unionAll($asentamientos_ini)
+        ->unionAll($asentamientos_fin)
+        ->unionAll($organizaciones_ini)
+        ->unionAll($organizaciones_fin)
+        ->orderBy('anno', $orden)
+        ->get();
       if($cronologia!=0){
-        $eventos=$eventos->whereIn('id_linea_temporal', [1, $cronologia]);
+        //$eventos=$eventos->whereIn('id_linea_temporal', [1, $cronologia]);
 //                          ->orWhere('id_linea_temporal', '1');
       }
-      $timelines=DB::select('select id, nombre from lineas_temporales');
-      return view('timelines.index', ['eventos' => $eventos, 'timelines'=>$timelines, 'orden'=>$orden, 'cronologia'=>$cronologia]);
-
     }catch(\Illuminate\Database\QueryException $excepcion){
-      return view('timelines.index')->with('error', 'Se produjo un problema en la base de datos.');
+      $eventos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     }catch(Exception $excepcion){
-      $timelines=DB::select('select id, nombre from lineas_temporales');
-      return view('timelines.index', ['timelines'=>$timelines, 'orden'=>$orden, 'cronologia'=>$cronologia])->with('error', $excepcion->getMessage());
+      $eventos=['error' => ['error' => $excepcion->getMessage()]];
     }
+
+    try {
+      $lineas_temporales=lineas_temporales::orderBy('nombre', 'asc')->get();
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $lineas_temporales=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $lineas_temporales=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    return view('timelines.index', ['eventos' => $eventos, 'aux'=>$organizaciones_ini, 'timelines'=>$lineas_temporales, 'orden'=>$orden, 'cronologia'=>$cronologia]);
   }
 
   /**
@@ -47,8 +176,8 @@ class TimelineController extends Controller
     $request->validate([
       'nombre'=>'required|max:128',
       'select_timeline'=>'integer',
-      //'dia'=>'integer',
-      //'mes'=>'integer',
+      'dia'=>'nullable|numeric|integer',
+      'mes'=>'nullable|numeric|integer',
       'anno'=>'required|integer',
       'descripcion'=>'required',
     ]);
@@ -68,7 +197,6 @@ class TimelineController extends Controller
       $evento->anno=$request->input('anno', 0);
       $evento->descripcion=$request->input('descripcion');
       $evento->id_linea_temporal=$request->input('select_timeline');
-      $evento->id_tipo_evento=1;
 
       $evento->save();
       return redirect()->route('timelines.index')->with('message',$mensaje);

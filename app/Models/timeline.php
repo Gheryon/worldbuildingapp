@@ -19,7 +19,6 @@ class timeline extends Model
         'anno',
         'nombre',
         'descripcion',
-        'id_linea_temporal',
-        'id_tipo_evento'
+        'id_linea_temporal'
     ];
 }
