@@ -24,7 +24,10 @@
         <h3 class="mt-3">Descripción breve</h3>
         <p class="ml-2 mr-2">{!!$vista->DescripcionShort!!}</p>
 
+        @if (isset($vista->Descripcion)||isset($vista->salud)||isset($vista->Personalidad)||isset($vista->Deseos)||isset($vista->Miedos)||isset($vista->Magia)||isset($vista->Educacion))
         <h2 class="mb-3">Descripción</h2>
+        @endif
+        
         @if (isset($vista->Descripcion))
         <h3>Descripción física</h3>
         <p class="ml-2 mr-2">{!!$vista->Descripcion!!}</p>
@@ -55,11 +58,16 @@
         <h3>Educación</h3>
         <p class="ml-2 mr-2">{!!$vista->educacion!!}</br></p>
         @endif
+
         @if (isset($vista->Historia))
         <h2>Historia</h2>
         <p class="ml-2 mr-2">{!!$vista->Historia!!}</p>
         @endif
+
+        @if (isset($vista->Religion)||isset($vista->Familia)||isset($vista->Politica))
         <h2 class="mb-3">Aspectos sociales</h2>
+        @endif
+        
         @if (isset($vista->Religion))
         <h3>Religión</h3>
         <p class="ml-2 mr-2">{!!$vista->Religion!!}</p>
@@ -72,6 +80,7 @@
         <h3>Política</h3>
         <p class="ml-2 mr-2">{!!$vista->Politica!!}</p>
         @endif
+        
         @if (isset($vista->otros))
         <h2>Otros</h2>
         <p class="ml-2 mr-2">{!!$vista->otros!!}</p>
@@ -90,7 +99,6 @@
             <h3>Sexo</h3>
             <p class="ml-2 mr-2">{{$vista->Sexo}}</p>
 
-            
             @if (isset($vista->lugarNacimiento))
             <h3>Lugar de nacimiento</h3>
             <p class="ml-2 mr-2">{{$vista->lugarNacimiento}}</p>
