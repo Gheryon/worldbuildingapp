@@ -10,6 +10,7 @@ use App\Models\Conflicto;
 use App\Models\Religion;
 use App\Models\Especie;
 use App\Models\Asentamiento;
+use App\Models\Construccion;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -285,6 +286,75 @@ class VistaController extends Controller
       $fecha_fin=['error' => ['error' => $excepcion->getMessage()]];
     }
     return view('conflictos.show', ['vista'=>$conflicto, 'tipo'=>$tipo[0]->nombre, 'atacantes'=>$atacantes, 'defensores'=>$defensores, 'inicio'=>$fecha_inicio, 'fin'=>$fecha_fin]);
+  }
+
+  public function show_construccion($id)
+  {
+    $meses=array("Semana año nuevo", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+    
+    try{
+      $construccion=Construccion::findorfail($id);
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('construcciones.index')->with('error','Error, no pudo encontrarse el asentamiento.');
+    }catch(Exception $excepcion){
+      return redirect()->route('construcciones.index')->with('error','Error, '.$excepcion->getMessage());
+    }
+
+    try{
+      $tipo = DB::select('select nombre from tipo_construccion where id = ?', [$construccion->tipo]);
+    }catch(\Illuminate\Database\Eloquent\ModelNotFoundException $excepcion){
+      $tipo=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $tipo=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    if($construccion->ubicacion!=0){
+      try{
+        $ownerb=DB::select('select nombre, id from asentamientos where id = ?', [$construccion->ubicacion]);
+        $owner=$ownerb[0];
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $owner=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $owner=['error' => ['error' => $excepcion->getMessage()]];
+      }
+    }else{
+      $owner=0;
+    }
+
+    if ($construccion->construccion != 0) {
+      try{
+        $fecha=Fecha::findorfail($construccion->construccion);
+        if($fecha->dia==0&&$fecha->mes==0){
+          $construccion_ini=$fecha->anno;
+        }else{
+          $construccion_ini=$fecha->dia."/".$meses[$fecha->mes]."/".$fecha->anno;
+        }
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $construccion_ini=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $construccion_ini=['error' => ['error' => $excepcion->getMessage()]];
+      }
+    } else {
+      $construccion_ini="Desconocido";
+    }
+ 
+    if($construccion->destruccion!=0){
+      try{
+        $fecha=Fecha::findorfail($construccion->destruccion);
+        if($fecha->dia==0&&$fecha->mes==0){
+          $construccion_fin=$fecha->anno;
+        }else{
+          $construccion_fin=$fecha->dia."/".$meses[$fecha->mes]."/".$fecha->anno;
+        }
+      }catch(\Illuminate\Database\QueryException $excepcion){
+        $construccion_fin=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+      }catch(Exception $excepcion){
+        $construccion_fin=['error' => ['error' => $excepcion->getMessage()]];
+      }
+    }else{
+      $construccion_fin="Desconocido";
+    }
+    return view('construcciones.show', ['vista'=>$construccion, 'construccion'=>$construccion_ini, 'destruccion'=>$construccion_fin, 'tipo'=>$tipo[0]->nombre, 'ubicacion'=>$owner]);
   }
 
   public function show_religion($id)

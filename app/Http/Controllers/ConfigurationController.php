@@ -6,6 +6,7 @@ use App\Models\Nombres;
 use App\Models\configuration;
 use App\Models\tipo_asentamiento;
 use App\Models\tipo_conflicto;
+use App\Models\tipo_construccion;
 use App\Models\tipo_lugar;
 use App\Models\tipo_organizacion;
 use App\Models\lineas_temporales;
@@ -21,7 +22,7 @@ class ConfigurationController extends Controller
    */
   public function index()
   {
-    try{//el nombre del mundo se guarda en la fila con el tipo Nombre_mundo
+    try{//el nombre del mundo se guarda en la fila con el tipo Nombre_mundo de la tabla nombres
       $nombre_mundo=DB::table('nombres')->select('lista')->where('tipo', '=', 'Nombre_mundo')->get();
     }catch (\Illuminate\Database\QueryException $excepcion) {
       $nombre_mundo=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
@@ -54,6 +55,14 @@ class ConfigurationController extends Controller
     }
 
     try{
+      $tipos_construccion=tipo_construccion::orderBy('nombre', 'asc')->get();
+    }catch (\Illuminate\Database\QueryException $excepcion) {
+      $tipos_construccion=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $tipos_construccion=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try{
       $tipos_lugar=tipo_lugar::orderBy('nombre', 'asc')->get();
     }catch (\Illuminate\Database\QueryException $excepcion) {
       $tipos_lugar=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
@@ -76,7 +85,7 @@ class ConfigurationController extends Controller
     } catch (Exception $excepcion) {
       $lineas_temporales=['error' => ['error' => $excepcion->getMessage()]];
     }
-    return view('config.index', ['tipos_asentamiento'=>$tipos_asentamiento, 'tipos_conflicto'=>$tipos_conflicto, 'tipos_lugar'=>$tipos_lugar, 'tipos_organizaciones'=>$tipos_organizacion, 'lineas_temporales'=>$lineas_temporales, 'Nombre_mundo'=>$nombre_mundo[0]->lista, 'fecha'=>$fecha[0]]);
+    return view('config.index', ['tipos_asentamiento'=>$tipos_asentamiento, 'tipos_conflicto'=>$tipos_conflicto, 'tipos_construccion'=>$tipos_construccion, 'tipos_lugar'=>$tipos_lugar, 'tipos_organizaciones'=>$tipos_organizacion, 'lineas_temporales'=>$lineas_temporales, 'Nombre_mundo'=>$nombre_mundo[0]->lista, 'fecha'=>$fecha[0]]);
   }
 
   /**
@@ -117,6 +126,19 @@ class ConfigurationController extends Controller
 
     $nuevo=new tipo_conflicto();
     $nuevo->nombre=$request->input('nuevo_tipo_conflicto');
+    $nuevo->save();
+
+    return redirect()->route('config.index')->with('message', $nuevo->nombre.' añadido correctamente.');
+  }
+
+  public function store_tipo_construccion(Request $request)
+  {
+    $request->validate([
+      'nuevo_tipo_construccion'=>'required|max:128',
+    ]);
+
+    $nuevo=new tipo_construccion();
+    $nuevo->nombre=$request->input('nuevo_tipo_construccion');
     $nuevo->save();
 
     return redirect()->route('config.index')->with('message', $nuevo->nombre.' añadido correctamente.');
@@ -246,6 +268,9 @@ class ConfigurationController extends Controller
       }
       if($request->tipo_editar=='conflicto'){
         $tipo_editar=tipo_conflicto::findorfail($request->id_editar);
+      }
+      if($request->tipo_editar=='construccion'){
+        $tipo_editar=tipo_construccion::findorfail($request->id_editar);
       }
       if($request->tipo_editar=='lugar'){
         $tipo_editar=tipo_lugar::findorfail($request->id_editar);

@@ -20,50 +20,22 @@
 
   <link rel="stylesheet" href="{{asset('dist/css/styles.css')}}"/>
 </head>
-<body class="hold-transition sidebar-mini" id="_body_">
+<body class="hold-transition sidebar-mini layout-fixed" id="_body_">
 <div class="wrapper">
-
   <!-- Navbar -->
-  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     @yield('navbar')
-  </nav>
   <!-- /.navbar -->
 
   <!-- Main Sidebar Container -->
-  <aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <!-- Brand Logo -->
-    <a href="{{url('/')}}" class="brand-link">
-      <span class="brand-text text-center font-weight-light">Inicio</span>
-    </a>
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <!-- Sidebar Menu -->
-      <nav class="mt-2">
-        @yield('menu')
-      </nav>
-      <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
+    @yield('menu')
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
-    <div class="container">
-        @yield('content')
-      </div>
+    <div class="container overflow-auto">
+      @yield('content')
+    </div>
   </div>
   <!-- /.content-wrapper -->
-
-  <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-    <div class="p-3">
-      <h5>Title</h5>
-      <p>Sidebar content</p>
-    </div>
-  </aside>
-  <!-- /.control-sidebar -->
 
   <!-- Main Footer -->
   <footer class="main-footer">

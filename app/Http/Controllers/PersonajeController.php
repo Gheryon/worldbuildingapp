@@ -393,6 +393,13 @@ class PersonajeController extends Controller
     }catch(Exception $excepcion){
       $personajes=['error' => ['error' => $excepcion->getMessage()]];
     }
-    return view('personajes.index', ['personajes' => $personajes]);
+    try{
+      $especies=DB::table('especies')->select('id', 'nombre')->orderBy('nombre', 'asc')->get();
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $especies=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $especies=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    return view('personajes.index', ['personajes' => $personajes, 'tipos'=>$especies, 'orden'=>'asc', 'tipo_o'=>0]);
   }
 }

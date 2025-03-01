@@ -438,7 +438,16 @@ class ConflictoController extends Controller
     }catch(Exception $excepcion){
       $conflictos=['error' => ['error' => $excepcion->getMessage()]];
     }
-    return view('conflictos.index', ['conflictos' => $conflictos]);
+
+    try{
+      $tipos=tipo_conflicto::orderBy('nombre', 'asc')->get();
+    }catch (\Illuminate\Database\QueryException $excepcion) {
+      $tipos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $tipos=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    return view('conflictos.index', ['conflictos' => $conflictos, 'tipos'=>$tipos, 'orden'=>'asc', 'tipo_o'=>0]);
   }
 
 }

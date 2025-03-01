@@ -52,7 +52,7 @@
             <!-- /.card-header -->
             <div class="card-body">
               <label for="contenido" class="form-label">Contenido</label>
-              <textarea class="form-control summernote" id="contenido" name="contenido" rows="8" aria-label="With textarea"></textarea>
+              <textarea class="form-control summernote" id="contenido" name="contenido" rows="8" aria-label="With textarea" required></textarea>
                 @error('contenido')
                 <small style="color: red">{{$message}}</small>
                 @enderror

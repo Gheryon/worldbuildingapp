@@ -79,9 +79,9 @@ class LugaresController extends Controller
   
       $id_lugar=DB::scalar("SELECT MAX(id) as id FROM lugares");
     }catch(\Illuminate\Database\QueryException $excepcion){
-      return view('lugares.index')->with('error', 'Se produjo un problema en la base de datos.');
+      return redirect()->route('lugares.index')->with('error', 'Se produjo un problema en la base de datos.');
     }catch(Exception $excepcion){
-      return view('lugares.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('lugares.index')->with('error', $excepcion->getMessage());
     }
 
     if($request->filled('nombre')){
@@ -261,6 +261,15 @@ class LugaresController extends Controller
     }catch(Exception $excepcion){
       $lugares=['error' => ['error' => $excepcion->getMessage()]];
     }
-    return view('lugares.index', ['lugares' => $lugares]);
+
+    try{
+      $tipos=tipo_lugar::orderBy('nombre', 'asc')->get();
+    }catch (\Illuminate\Database\QueryException $excepcion) {
+      $tipos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $tipos=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    
+    return view('lugares.index', ['lugares' => $lugares, 'tipos'=>$tipos, 'orden'=>'asc', 'tipo_o'=>0]);
   }
 }

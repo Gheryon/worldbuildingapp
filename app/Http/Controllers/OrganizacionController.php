@@ -431,6 +431,13 @@ class OrganizacionController extends Controller
     }catch(Exception $excepcion){
       $organizaciones=['error' => ['error' => $excepcion->getMessage()]];
     }
-    return view('organizaciones.index', ['organizaciones' => $organizaciones]);
+    try{
+      $tipos_organizacion=tipo_organizacion::orderBy('nombre', 'asc')->get();
+    }catch (\Illuminate\Database\QueryException $excepcion) {
+      $tipos_organizacion=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $tipos_organizacion=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    return view('organizaciones.index', ['organizaciones' => $organizaciones, 'tipos'=>$tipos_organizacion, 'orden'=>'asc', 'tipo_o'=>0]);
   }
 }

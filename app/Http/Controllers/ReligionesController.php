@@ -314,6 +314,6 @@ class ReligionesController extends Controller
     }catch(Exception $excepcion){
       $religiones=['error' => ['error' => $excepcion->getMessage()]];
     }
-    return view('religiones.index', ['religiones' => $religiones]);
+    return view('religiones.index', ['religiones' => $religiones, 'orden'=>'asc']);
   }
 }

@@ -89,66 +89,66 @@
   <!--<div class="row">
     <button id="back_up" class="btn btn-primary backup_button">Copia de seguridad</button>
   </div>-->
-  
+
   <div class="row">
     <div class="col-4">
-    <form id="form-edit-nombre_mundo" class="form-inline" action="{{route('config.update_nombre_mundo')}}" method="POST">
-      @csrf
-      <div class="form-group mb-2">
-        <label for="nombre_mundo" class="sr-only">Nombre del mundo</label>
-        <input type="text" readonly class="form-control-plaintext" id="nombre_mundo" value="Nombre del mundo">
-      </div>
-      <div class="form-group mx-sm-3 mb-2">
-        <label for="nuevo_nombre_mundo" class="sr-only">Nombre del mundo</label>
-        <input type="text" value="{{$Nombre_mundo}}" name="nuevo_nombre_mundo" class="form-control" id="nuevo_nombre_mundo" placeholder="Ej: Córdoba">
-        @error('nuevo_nombre_mundo')
-        <small style="color: red">{{$message}}</small>
-        @enderror
-        <button type="submit" class="btn btn-primary">Cambiar</button>
-      </div>
-      <input type="hidden" name="id" id="id" value="Nombre_mundo">
-    </form>
+      <form id="form-edit-nombre_mundo" class="form-inline" action="{{route('config.update_nombre_mundo')}}" method="POST">
+        @csrf
+        <div class="form-group mb-2">
+          <label for="nombre_mundo" class="sr-only">Nombre del mundo</label>
+          <input type="text" readonly class="form-control-plaintext" id="nombre_mundo" value="Nombre del mundo">
+        </div>
+        <div class="form-group mx-sm-3 mb-2">
+          <label for="nuevo_nombre_mundo" class="sr-only">Nombre del mundo</label>
+          <input type="text" value="{{$Nombre_mundo}}" name="nuevo_nombre_mundo" class="form-control" id="nuevo_nombre_mundo" placeholder="Ej: Córdoba">
+          @error('nuevo_nombre_mundo')
+          <small style="color: red">{{$message}}</small>
+          @enderror
+          <button type="submit" class="btn btn-primary">Cambiar</button>
+        </div>
+        <input type="hidden" name="id" id="id" value="Nombre_mundo">
+      </form>
 
     </div>
     <div class="col-8">
-    <form id="form-edit-fecha_mundo" class="form-inline" action="{{route('config.update_fecha_mundo')}}" method="POST">
-      @csrf
-      <div class="form-group mb-2">
-        <label for="nombre_mundo" class="sr-only">Fecha actual</label>
-        <input type="text" readonly class="form-control-plaintext" id="nombre_mundo" value="Fecha actual">
-      </div>
-      <div class="form-group mx-sm-3 mb-2">
-        <input type="text" id="dia" name="dia" class="form-control col-2" placeholder="Día">
-        @error('dia')
-        <small style="color: red">{{$message}}</small>
-        @enderror
-        <select class="form-select form-control col-4" type="number" id="mes" name="mes">
-          <option selected disabled value="">Mes</option>
-          <option value="0">Semana de año nuevo</option>
-          <option value="1">Enero</option>
-          <option value="2">Febrero</option>
-          <option value="3">Marzo</option>
-          <option value="4">Abril</option>
-          <option value="5">Mayo</option>
-          <option value="6">Junio</option>
-          <option value="7">Julio</option>
-          <option value="8">Agosto</option>
-          <option value="9">Septiembre</option>
-          <option value="10">Octubre</option>
-          <option value="11">Noviembre</option>
-          <option value="12">Diciembre</option>
-        </select>
-        @error('mes')
-        <small style="color: red">{{$message}}</small>
-        @enderror
-        <input type="text" id="anno" name="anno" class="form-control col-2" placeholder="Año">
-        @error('anno')
-        <small style="color: red">{{$message}}</small>
-        @enderror
-        <button type="submit" class="btn btn-primary">Cambiar</button>
-      </div>
-    </form>
-      
+      <form id="form-edit-fecha_mundo" class="form-inline" action="{{route('config.update_fecha_mundo')}}" method="POST">
+        @csrf
+        <div class="form-group mb-2">
+          <label for="nombre_mundo" class="sr-only">Fecha actual</label>
+          <input type="text" readonly class="form-control-plaintext" id="nombre_mundo" value="Fecha actual">
+        </div>
+        <div class="form-group mx-sm-3 mb-2">
+          <input type="text" id="dia" name="dia" class="form-control col-2" placeholder="Día">
+          @error('dia')
+          <small style="color: red">{{$message}}</small>
+          @enderror
+          <select class="form-select form-control col-4" type="number" id="mes" name="mes">
+            <option selected disabled value="">Mes</option>
+            <option value="0">Semana de año nuevo</option>
+            <option value="1">Enero</option>
+            <option value="2">Febrero</option>
+            <option value="3">Marzo</option>
+            <option value="4">Abril</option>
+            <option value="5">Mayo</option>
+            <option value="6">Junio</option>
+            <option value="7">Julio</option>
+            <option value="8">Agosto</option>
+            <option value="9">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+          </select>
+          @error('mes')
+          <small style="color: red">{{$message}}</small>
+          @enderror
+          <input type="text" id="anno" name="anno" class="form-control col-2" placeholder="Año">
+          @error('anno')
+          <small style="color: red">{{$message}}</small>
+          @enderror
+          <button type="submit" class="btn btn-primary">Cambiar</button>
+        </div>
+      </form>
+
     </div>
 
   </div>
@@ -265,6 +265,63 @@
 
     <div class="card col ml-1">
       <div class="card-header">
+        <h5 class="card-title">Tipos de construcciones</h5>
+      </div>
+      <div class="card-body overflow-auto" style="height: 300px;">
+        <table class="table table-sm table-hover table-striped table-dark">
+          @if (Arr::has($tipos_construccion, 'error.error'))
+          <thead class="bg-dark">
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                {{Arr::get($tipos_construccion, 'error.error')}}
+              </td>
+            </tr>
+          </tbody>
+          @else
+          <thead class="bg-dark">
+            <tr>
+              <th>Nombre</th>
+              <th>Opciones</th>
+            </tr>
+          </thead>
+          <tbody id="tipos_construccion_tabla">
+            @foreach($tipos_construccion as $tipo_construccion)
+            <tr>
+              <td>{{$tipo_construccion->nombre}}</td>
+              <td>
+                <button id="{{$tipo_construccion->id}}" nombre="{{$tipo_construccion->nombre}}" tipo="construccion" title="Editar" class="editar-tipo btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombre"><i class="fas fa-pencil-alt"></i></button>
+                <button id="{{$tipo_construccion->id}}" nombre="{{$tipo_construccion->nombre}}" tipo="construccion" title="Borrar" class="borrar-tipo btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
+              </td>
+            </tr>
+            @endforeach
+          </tbody>
+          @endif
+        </table>
+      </div>
+      <div class="card-footer">
+        <label for="nuevoTimeline" class="form-label">Añadir nuevo</label>
+        <form id="form-add-tipo-construccion" class="row" action="{{route('config.store_tipo_construccion')}}" method="POST">
+          @csrf
+          <div class="col">
+            <input type="text" value="{{old('nuevo_tipo_construccion')}}" name="nuevo_tipo_construccion" class="form-control" id="nuevo_tipo_construccion" placeholder="Ej: Torre">
+            @error('nuevo_tipo_construccion')
+            <small style="color: red">{{$message}}</small>
+            @enderror
+          </div>
+          <div class="col-3 align-bottom">
+            <button type="submit" class="btn btn-primary">Añadir</button>
+          </div>
+        </form>
+      </div>
+    </div><!--card -->
+  </div>
+
+  <div class="row">
+
+    <div class="card col ml-1">
+      <div class="card-header">
         <h5 class="card-title">Tipos de lugares</h5>
       </div>
       <div class="card-body overflow-auto" style="height: 300px;">
@@ -316,9 +373,6 @@
         </form>
       </div>
     </div><!--card -->
-  </div>
-
-  <div class="row">
 
     <div class="card col ml-1">
       <div class="card-header">
