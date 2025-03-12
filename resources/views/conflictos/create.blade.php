@@ -25,7 +25,6 @@
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
         <button type="submit" id="submit-crear-button" class="btn btn-success">Guardar</button>
-        <a class="btn btn-primary" type="button" id="volver-crear-button" href="{{route('conflictos.index')}}" style="display:none">Volver</a>
       </div>
     </div>
     <div class="row mt-3 mb-3 justify-content-md-center border">
@@ -38,28 +37,6 @@
             <small style="color: red">{{$message}}</small>
             @enderror
           </div>
-          <div class="col-md-3">
-            <label for="select_tipo" class="form-label">Tipo de conflicto</label>
-            <select class="form-select form-control" name="select_tipo" id="select_tipo" required>
-              <option selected disabled value="">Elegir</option>
-                @foreach($tipo_conflicto as $tipo)
-                <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
-                @endforeach
-            </select>
-          </div>
-						<div class="col-md-3">
-							<label for="tipo_localizacion" class="form-label">Tipo de localización</label>
-							<select class="form-select form-control" name="tipo_localizacion" id="tipo_localizacion">
-								<option selected disabled value="">Elegir</option>
-								<option>Aéreo</option>
-								<option>Marítimo</option>
-								<option>Mixto</option>
-								<option>Terrestre</option>
-								<option>Urbano</option>
-							</select>
-						</div>
-        </div>
-        <div class="row mt-2">
           <div class="col">
             <label for="id_inicio" class="form-label">Fecha de inicio</label>
             <div class="input-group">
@@ -85,7 +62,7 @@
             </div>
           </div>
           <div class="col">
-              <label for="id_fin" class="form-label">Fecha de finalización</label>
+            <label for="id_fin" class="form-label">Fecha de finalización</label>
             <div class="input-group">
               <input id="id_fin" type="hidden" name="id_fin" value="0">
               <input type="number" id="dfin" name="dfin" class="form-control" placeholder="Día">
@@ -108,7 +85,60 @@
               <input type="number" id="afin" name="afin" class="form-control" placeholder="Año">
             </div>
           </div>
-          
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-4">
+            <label for="select_tipo" class="form-label">Tipo de conflicto</label>
+            <select class="form-select form-control" name="select_tipo" id="select_tipo" required>
+              <option selected disabled value="">Elegir</option>
+              @foreach($tipo_conflicto as $tipo)
+              <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="col-md">
+            <label for="select_padre" class="form-label">Conflicto padre</label>
+            <select class="form-select form-control" name="select_padre" id="select_padre">
+              <option selected disabled value="">Elegir</option>
+              @foreach($conflictos as $conf)
+              <option value="{{$conf->id}}">{{$conf->nombre}}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="tipo_localizacion" class="form-label">Tipo de localización</label>
+            <select class="form-select form-control" name="tipo_localizacion" id="tipo_localizacion" required>
+            @error('tipo_localizacion')
+            <small style="color: red">{{$message}}</small>
+            @enderror
+              <option selected disabled value="">Elegir</option>
+              <option>Aéreo</option>
+              <option>Marítimo</option>
+              <option>Mixto</option>
+              <option>Terrestre</option>
+              <option>Urbano</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-3">
+            <label for="atacantesp" class="form-label">Personajes atacantes</label>
+            <select class="form-select form-control" multiple="multiple" data-placeholder="Atacantesp" name="atacantesp[]" id="atacantesp" style="width: 100%;">
+              <option selected disabled value="">Elegir</option>
+              @foreach($personajes as $persona)
+              <option value="{{$persona->id}}">{{$persona->Nombre}}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="defensoresp" class="form-label">Personajes defensores</label>
+            <select class="form-select form-control" multiple="multiple" data-placeholder="Atacantesp" name="defensoresp[]" id="defensoresp" style="width: 100%;">
+              <option selected disabled value="">Elegir</option>
+              @foreach($personajes as $persona)
+              <option value="{{$persona->id}}">{{$persona->Nombre}}</option>
+              @endforeach
+            </select>
+          </div>
           <div class="col-md-3">
             <label for="atacantes" class="form-label">Atacantes</label>
             <select class="form-select form-control" multiple="multiple" data-placeholder="Atacantes" name="atacantes[]" id="atacantes" style="width: 100%;">
@@ -133,8 +163,8 @@
 
     <div class="row mt-2 mb-3">
       <div class="col">
-      <label for="descripcion" class="form-label">Descripción</label>
-      <textarea name="descripcion" class="form-control summernote" id="descripcion" rows="2" aria-label="With textarea"></textarea>
+        <label for="descripcion" class="form-label">Descripción</label>
+        <textarea name="descripcion" class="form-control summernote" id="descripcion" rows="2" aria-label="With textarea"></textarea>
       </div>
     </div>
     <!----------------------------------------------->
@@ -143,10 +173,10 @@
 
     <label for="desarrollo" class="form-label">Desarrollo</label>
     <textarea name="desarrollo" class="form-control summernote" id="desarrollo" rows="4" aria-label="With textarea"></textarea>
-    
+
     <label for="resultado" class="form-label">resultado</label>
     <textarea name="resultado" class="form-control summernote" id="resultado" rows="4" aria-label="With textarea"></textarea>
-    
+
     <label for="consecuencias" class="form-label">Consecuencias</label>
     <textarea name="consecuencias" class="form-control summernote" id="consecuencias" rows="4" aria-label="With textarea"></textarea>
 

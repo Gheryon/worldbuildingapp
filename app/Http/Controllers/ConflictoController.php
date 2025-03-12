@@ -60,12 +60,21 @@ class ConflictoController extends Controller
     }catch(Exception $excepcion){
       $tipo_conflicto=['error' => ['error' => $excepcion->getMessage()]];
     }
+
     try{
       $paises=DB::table('organizaciones')->select('id_organizacion', 'nombre')->where('id_organizacion','!=', 0)->orderBy('nombre', 'asc')->get();
     }catch(\Illuminate\Database\QueryException $excepcion){
       $paises=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     }catch(Exception $excepcion){
       $paises=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try{
+      $conflictos=DB::table('conflicto')->select('id', 'nombre')->where('id','!=', 0)->orderBy('nombre', 'asc')->get();
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $conflictos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $conflictos=['error' => ['error' => $excepcion->getMessage()]];
     }
 
     try{
@@ -76,7 +85,7 @@ class ConflictoController extends Controller
       $personajes=['error' => ['error' => $excepcion->getMessage()]];
     }
 
-    return view('conflictos.create', ['tipo_conflicto'=>$tipo_conflicto, 'paises'=>$paises, 'personajes'=>$personajes]);
+    return view('conflictos.create', ['tipo_conflicto'=>$tipo_conflicto, 'paises'=>$paises, 'personajes'=>$personajes, 'conflictos'=>$conflictos]);
   }
 
   /**
@@ -85,7 +94,7 @@ class ConflictoController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'nombre'=>'required|max:128',
+      'nombre'=>'required|max:256',
       'select_tipo'=>'required',
       'tipo_localizacion'=>'required',
     ]);
@@ -113,6 +122,40 @@ class ConflictoController extends Controller
     }
     if($request->filled('otros')){
       $conflicto->otros=app(ImagenController::class)->store_for_summernote($request->otros, "conflictos", $id_conflicto);
+    }
+
+    if($request->filled('atacantesp')){
+      $atacantes=$request->input('atacantesp');
+      try{
+        foreach ($atacantes as $atacante) {
+          DB::table('conflicto_personajes')->insert([
+            'id_conflicto' => $id_conflicto,
+            'id_personaje' => $atacante,
+            'rol' => 'atacante'
+          ]);
+        }
+      }catch(\Illuminate\Database\QueryException $excepcion){
+
+      }catch(Exception $excepcion){
+        
+      }
+    }
+
+    if($request->filled('defensoresp')){
+      $defensores=$request->input('defensoresp');
+      try{
+        foreach ($defensores as $defensor) {
+          DB::table('conflicto_personajes')->insert([
+            'id_conflicto' => $id_conflicto,
+            'id_personaje' => $defensor,
+            'rol' => 'defensor'
+          ]);
+        }
+      }catch(\Illuminate\Database\QueryException $excepcion){
+
+      }catch(Exception $excepcion){
+        
+      }
     }
 
     if($request->filled('atacantes')){
@@ -151,6 +194,7 @@ class ConflictoController extends Controller
 
     $conflicto->tipo_localizacion=$request->input('tipo_localizacion');
     $conflicto->id_tipo_conflicto=$request->select_tipo;
+    $conflicto->id_conflicto_padre=$request->select_padre;
 
     try{
       //------------fechas----------//
@@ -184,10 +228,10 @@ class ConflictoController extends Controller
 
     try{
       $conflicto=Conflicto::findorfail($id);
-    }catch(\Illuminate\Database\QueryException $excepcion){
-      $conflicto=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    }catch(Exception $excepcion){
-      $conflicto=['error' => ['error' => $excepcion->getMessage()]];
+    }catch (\Illuminate\Database\QueryException $excepcion) {
+      return redirect()->route('conflictos.index')->with('error', 'Error, no pudo encontrarse el conflicto.');
+    } catch (Exception $excepcion) {
+      return redirect()->route('conflictos.index')->with('error', 'Error, ' . $excepcion->getMessage());
     }
 
     try{
@@ -215,7 +259,14 @@ class ConflictoController extends Controller
     }
 
     try{
-      //$atacantes=DB::select('SELECT *, organizaciones.nombre as nombre FROM conflicto_beligerantes JOIN organizaciones ON conflicto_beligerantes.id_organizacion=organizaciones.id_organizacion WHERE lado = "atacante" AND id_conflicto = ?', [$id]);
+      $conflictos=DB::table('conflicto')->select('id', 'nombre')->where('id','!=', 0)->orderBy('nombre', 'asc')->get();
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $conflictos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $conflictos=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try{
       $atacantes=DB::table('conflicto_beligerantes')->select('id_organizacion')->where('id_conflicto', '=', $id)->where('lado', '=', 'atacante')->get();
     }catch(\Illuminate\Database\QueryException $excepcion){
       $atacantes=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
@@ -224,12 +275,27 @@ class ConflictoController extends Controller
     }
 
     try{
-      //$defensores=DB::select('SELECT *, organizaciones.nombre as nombre FROM conflicto_beligerantes JOIN organizaciones ON conflicto_beligerantes.id_organizacion=organizaciones.id_organizacion WHERE lado = "defensor" AND id_conflicto = ?', [$id]);
       $defensores=DB::table('conflicto_beligerantes')->select('id_organizacion')->where('id_conflicto', '=', $id)->where('lado', '=', 'defensor')->get();
     }catch(\Illuminate\Database\QueryException $excepcion){
       $defensores=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     }catch(Exception $excepcion){
       $defensores=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try{
+      $atacantesp=DB::table('conflicto_personajes')->select('id_personaje')->where('id_conflicto', '=', $id)->where('rol', '=', 'atacante')->get();
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $atacantesp=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $atacantesp=['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try{
+      $defensoresp=DB::table('conflicto_personajes')->select('id_personaje')->where('id_conflicto', '=', $id)->where('rol', '=', 'defensor')->get();
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $defensoresp=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $defensoresp=['error' => ['error' => $excepcion->getMessage()]];
     }
 
     if($conflicto->fecha_inicio!=0){
@@ -244,7 +310,7 @@ class ConflictoController extends Controller
       $fecha_fin=Fecha::find(0);
     }
     
-    return view('conflictos.edit', ['conflicto'=>$conflicto, 'inicio'=>$fecha_inicio, 'fin'=>$fecha_fin, 'tipo_conflicto'=>$tipo_conflicto, 'personajes'=>$personajes, 'paises'=>$paises->toArray(), 'atacantes'=>$atacantes, 'defensores'=>$defensores]);
+    return view('conflictos.edit', ['conflicto'=>$conflicto, 'inicio'=>$fecha_inicio, 'fin'=>$fecha_fin, 'tipo_conflicto'=>$tipo_conflicto, 'personajes'=>$personajes, 'conflictos'=>$conflictos, 'paises'=>$paises->toArray(), 'atacantes'=>$atacantes, 'defensores'=>$defensores, 'atacantesp' => $atacantesp, 'defensoresp' => $defensoresp]);
   }
 
   /**
@@ -253,7 +319,7 @@ class ConflictoController extends Controller
   public function update(Request $request, Conflicto $conflicto)
   {
     $request->validate([
-    'nombre'=>'required|max:128',
+    'nombre'=>'required|max:256',
     'select_tipo'=>'required',
     'tipo_localizacion'=>'required',
     ]);
@@ -269,6 +335,7 @@ class ConflictoController extends Controller
     $conflicto->nombre=$request->nombre;
     $conflicto->tipo_localizacion=$request->input('tipo_localizacion');
     $conflicto->id_tipo_conflicto=$request->select_tipo;
+    $conflicto->id_conflicto_padre=$request->select_padre;
 
     if($request->filled('descripcion')){
       $conflicto->descripcion=app(ImagenController::class)->update_for_summernote($request->descripcion, "conflictos", $request->id);
@@ -291,14 +358,7 @@ class ConflictoController extends Controller
 
     //para actualizar los atacantes y defensores, se borran todos los antiguos y se vuelven a añadir
     if($request->filled('atacantes')){
-      $beligerantes = DB::table('conflicto_beligerantes')
-      ->select('id')
-      ->where('lado', '=', 'atacante')
-      ->where('id_conflicto', '=', $request->id)->get();
-
-      foreach ($beligerantes as $beligerante) {
-        $deleted = DB::table('conflicto_beligerantes')->where('id', '=', $beligerante->id)->delete();
-      }
+      DB::table('conflicto_beligerantes')->where('lado','=', 'atacante')->where('id_conflicto', '=', $request->id)->delete();
       $atacantes=$request->input('atacantes');
       try{
         foreach ($atacantes as $atacante) {
@@ -316,14 +376,7 @@ class ConflictoController extends Controller
     }
 
     if($request->filled('defensores')){
-      $beligerantes = DB::table('conflicto_beligerantes')
-      ->select('id')
-      ->where('lado', '=', 'defensor')
-      ->where('id_conflicto', '=', $request->id)->get();
-
-      foreach ($beligerantes as $beligerante) {
-        $deleted = DB::table('conflicto_beligerantes')->where('id', '=', $beligerante->id)->delete();
-      }
+      DB::table('conflicto_beligerantes')->where('lado','=', 'defensor')->where('id_conflicto', '=', $request->id)->delete();
       $defensores=$request->input('defensores');
       try{
         foreach ($defensores as $defensor) {
@@ -331,6 +384,43 @@ class ConflictoController extends Controller
             'id_conflicto' => $request->id,
             'id_organizacion' => $defensor,
             'lado' => 'defensor'
+          ]);
+        }
+      }catch(\Illuminate\Database\QueryException $excepcion){
+
+      }catch(Exception $excepcion){
+        
+      }
+    }
+
+    //para actualizar los personajes atacantes y defensores, se borran todos los antiguos y se vuelven a añadir
+    if($request->filled('atacantesp')){
+      DB::table('conflicto_personajes')->where('rol','=', 'atacante')->where('id_conflicto', '=', $request->id)->delete();
+      $atacantes=$request->input('atacantesp');
+      try{
+        foreach ($atacantes as $atacante) {
+          DB::table('conflicto_personajes')->insert([
+            'id_conflicto' => $request->id,
+            'id_personaje' => $atacante,
+            'rol' => 'atacante'
+          ]);
+        }
+      }catch(\Illuminate\Database\QueryException $excepcion){
+
+      }catch(Exception $excepcion){
+        
+      }
+    }
+
+    if($request->filled('defensoresp')){
+      DB::table('conflicto_personajes')->where('rol','=', 'defensor')->where('id_conflicto', '=', $request->id)->delete();
+      $defensores=$request->input('defensoresp');
+      try{
+        foreach ($defensores as $defensor) {
+          DB::table('conflicto_personajes')->insert([
+            'id_conflicto' => $request->id,
+            'id_personaje' => $defensor,
+            'rol' => 'defensor'
           ]);
         }
       }catch(\Illuminate\Database\QueryException $excepcion){
@@ -402,13 +492,10 @@ class ConflictoController extends Controller
       imagen::destroy($imagen->id);
     }
     //borrado de los registros que pueda haber de beligerantes (atacantes y defensores)
-    $beligerantes = DB::table('conflicto_beligerantes')
-    ->select('id')
-    ->where('id_conflicto', '=', $request->id_borrar)->get();
+    DB::table('conflicto_beligerantes')->where('id_conflicto', '=', $request->id_borrar)->delete();
 
-    foreach ($beligerantes as $beligerante) {
-      $deleted = DB::table('conflicto_beligerantes')->where('id_conflicto', '=', $beligerante->id)->delete();
-    }
+    //borrado de los registros que pueda haber de personajes (atacantes y defensores)
+    DB::table('conflicto_personajes')->where('id_conflicto', '=', $request->id_borrar)->delete();
 
     Conflicto::destroy($request->id_borrar);
     return redirect()->route('conflictos.index')->with('message',$request->nombre_borrado.' borrado correctamente.');
