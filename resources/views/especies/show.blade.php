@@ -39,7 +39,7 @@
           <h3>Distribución y hábitats</h3>
           <p class="ml-2 mr-2">{!!$vista->distribucion!!}</p>
         @endif
-        @if (isset($vista->hablidades))
+        @if (isset($vista->habilidades))
           <h3>Habilidades</h3>
           <p class="ml-2 mr-2">{!!$vista->habilidades!!}</p>
         @endif
