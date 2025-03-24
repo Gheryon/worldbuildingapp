@@ -31,16 +31,9 @@
           <p class="ml-2 mr-2">{!!$vista->historia!!}</p>
         @endif
 
-        @if (isset($vista->estructura)||isset($vista->frontera)||isset($vista->politicaExteriorInterior)||isset($vista->militar))
-          <h2 class="mb-3">Política</h2>
-        @endif
         @if (isset($vista->estructura))
-          <h3>Estructura</h3>
+          <h3>Estructura política</h3>
           <p class="ml-2 mr-2">{!!$vista->estructura!!}</p>
-        @endif
-        @if (isset($vista->frontera))
-          <h3>Frontera</h3>
-          <p class="ml-2 mr-2">{!!$vista->frontera!!}</p>
         @endif
         @if (isset($vista->politicaExteriorInterior))
           <h3>Política exterior e interior</h3>
@@ -50,13 +43,14 @@
           <h3>Militar</h3>
           <p class="ml-2 mr-2">{!!$vista->militar!!}</p>
         @endif
-
-        @if (isset($vista->demografia)||isset($vista->religion)||isset($vista->educacion)||isset($vista->cultura))
-          <h2 class="mb-3">Aspectos sociales</h2>
+        @if (isset($vista->frontera))
+          <h3>Frontera</h3>
+          <p class="ml-2 mr-2">{!!$vista->frontera!!}</p>
         @endif
+
         @if (isset($vista->demografia))
           <h3>Demografía</h3>
-          <p class="ml-2 mr-2">{{$vista->demografia}}</p>
+          <p class="ml-2 mr-2">{!!$vista->demografia!!}</p>
         @endif
         @if (isset($vista->religion))
           <h3>Religión</h3>
