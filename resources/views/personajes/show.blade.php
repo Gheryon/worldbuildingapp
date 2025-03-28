@@ -77,7 +77,7 @@
         <p class="ml-2 mr-2">{!!$vista->Familia!!}</p>
         @endif
         @if (isset($vista->Politica))
-        <h3>Política</h3>
+        <h3>Política y títulos</h3>
         <p class="ml-2 mr-2">{!!$vista->Politica!!}</p>
         @endif
         

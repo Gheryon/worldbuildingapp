@@ -170,7 +170,7 @@
     <label for="religion" class="form-label">Religión</label>
     <textarea name="religion" class="form-control summernote-lite" id="religion" rows="4" aria-label="With textarea">{!!$personaje->Religion!!}</textarea>
 
-    <label for="familia" class="form-label">Familia y riqueza</label>
+    <label for="familia" class="form-label">Familia</label>
     <textarea name="familia" class="form-control summernote-lite" id="familia" rows="4" aria-label="With textarea">{!!$personaje->Familia!!}</textarea>
 
     <label for="politica" class="form-label">Política y títulos</label>
