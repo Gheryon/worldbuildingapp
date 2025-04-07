@@ -15,16 +15,21 @@ class ArticuloController extends Controller
   /**
    * Display a listing of the resource.
    */
-  public function index()
+  public function index($orden='asc', $filtro='all')
   {
     try {
-      $articulos = articulo::orderBy('nombre', 'asc')->get();
+      //si filtro==all se obtienen todos, si filtro
+      if($filtro=='all'){
+        $articulos = articulo::orderBy('nombre', $orden)->get();
+      }else{
+        $articulos = articulo::where('tipo', '=', $filtro)->orderBy('nombre', $orden)->get();
+      }
     } catch (\Illuminate\Database\QueryException $excepcion) {
       $articulos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     } catch (Exception $excepcion) {
       $articulos = ['error' => ['error' => $excepcion->getMessage()]];
     }
-    return view('articulos.index', ['articulos' => $articulos]);
+    return view('articulos.index', ['articulos' => $articulos, 'orden'=>$orden, 'filtro_o'=>$filtro]);
   }
 
   /**
@@ -49,16 +54,22 @@ class ArticuloController extends Controller
     $articulo = new articulo();
     $articulo->nombre = $request->nombre;
     $articulo->tipo = $request->tipo;
-
-    $articulo->save();
-    $id_articulo = DB::scalar("SELECT MAX(id_articulo) as id FROM articulosgenericos");
-
     $content = $request->contenido;
-    $articulo->contenido = app(ImagenController::class)->store_for_summernote($content, "articulos", $id_articulo);
 
-    $articulo->save();
-
-    return redirect()->route('articulos');
+    //return redirect()->route('articulos');
+    try{
+      $articulo->save();
+      $id_articulo = DB::scalar("SELECT MAX(id_articulo) as id FROM articulosgenericos");
+  
+      $articulo->contenido = app(ImagenController::class)->store_for_summernote($content, "articulos", $id_articulo);
+  
+      $articulo->save();
+      return redirect()->route('articulos')->with('message','Artículo '.$articulo->nombre.' añadido correctamente.');
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      return redirect()->route('articulos')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
+    }catch(Exception $excepcion){
+      return redirect()->route('articulos')->with('error', $excepcion->getMessage());
+    }
   }
 
   /**

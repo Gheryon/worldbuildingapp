@@ -18,7 +18,7 @@
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-edit" action="{{url('/articulos', $articulo->id_articulo)}}" method="post">
+  <form id="form-edit"  action="{{route('articulos.update', $articulo->id_articulo )}}" method="post">
     @csrf
     @method('PUT')
     <div class="row mb-3 justify-content-center">
@@ -79,7 +79,6 @@
     })
 
     $('#tipo').val('{{$articulo->tipo}}');
-    $('#contenido').summernote('code','{{$articulo->contenido}}');
   });
 </script>
 @endsection

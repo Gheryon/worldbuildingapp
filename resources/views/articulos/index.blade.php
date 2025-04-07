@@ -8,6 +8,18 @@
 
 @section('navbar-buttons')
 <a href="{{route('articulos.create')}}" class="btn btn-dark">Nuevo articulo</a>
+<select id="filtro" class="form-select ml-2" name="filtro">
+  <option selected disabled value="ASC">Filtro</option>
+  <option value="all">Todos</option>
+  <option value="Referencia">Referencia</option>
+  <option value="Canon">Canon</option>
+  <option value="Crónica">Crónica</option>
+</select>
+<select id="order" class="form-select ml-2" name="order">
+  <option selected disabled value="ASC">Orden</option>
+  <option value="asc">Ascendente</option>
+  <option value="desc">Descendente</option>
+</select>
 @endsection
 
 @section('navbar-search')
@@ -110,6 +122,26 @@
 @section('specific-scripts')
 <!-- articulos javascript -->
 <script src="{{asset('dist/js/config.js')}}"></script>
+<script>
+  $(function() {
+    $(document).on('change', '#filtro', function(){
+      filtro=this.value;
+      orden="{{$orden}}";
+      let url = "{{ route('articulos', ['orden'=>'_orden', 'filtro'=>'_filtro']) }}";
+      url = url.replace('_filtro', filtro);
+      url = url.replace('_orden', orden);
+      document.location.href=url;
+    });
+    $(document).on('change', '#order', function(){
+      orden=this.value;
+      filtro="{{$filtro_o}}";
+      let url = "{{ route('articulos', ['orden'=>'_orden', 'filtro'=>'_filtro']) }}";
+      url = url.replace('_orden', orden);
+      url = url.replace('_filtro', filtro);
+      document.location.href=url;
+    });
+  });
+</script>
 <script>
   @if(Session::has('message'))
   toastr.options = {
