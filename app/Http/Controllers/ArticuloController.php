@@ -46,7 +46,7 @@ class ArticuloController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:128',
+      'nombre' => 'required|max:256',
       'tipo' => 'required',
       'contenido' => 'required'
     ]);
@@ -102,7 +102,7 @@ class ArticuloController extends Controller
   public function update(Request $request, $id)
   {
     $request->validate([
-      'nombre' => 'required',
+      'nombre' => 'required|max:256',
       'contenido' => 'required',
       'tipo' => 'required'
     ]);
