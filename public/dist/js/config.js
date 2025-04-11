@@ -39,8 +39,11 @@ $(document).ready(function () {
   //lleva el id a borrar al modal de confirmacion
   $(document).on('click', '.borrar', (e) => {
     const elemento=$(this)[0].activeElement;
-    let id=$(elemento).attr('id');
-    const nombre = $(elemento).attr('nombre');
+    const nombre = elemento.getAttribute('data-nombre');
+    const id = elemento.getAttribute('data-id');
+    console.log(elemento);
+    console.log(nombre);
+    console.log(id);
 
     $('#id_borrar').val(id);
     $('#nombre-borrar').html(nombre);

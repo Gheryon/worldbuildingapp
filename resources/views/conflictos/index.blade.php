@@ -7,42 +7,40 @@
 @endsection
 
 @section('navbar-buttons')
-<a href="{{route('conflicto.create')}}" class="btn btn-dark">Nuevo conflicto</a>
-<select id="filter_tipo" class="form-select ml-2" name="filter_tipo">
-<option selected disabled value="0">Filtrar tipo</option>
-<option value="0">Todos</option>
-@foreach($tipos as $tipo)
-<option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
-@endforeach
-</select>
-<select id="order" class="form-select ml-2" name="order">
-  <option selected disabled value="ASC">Orden</option>
-  <option value="asc">Ascendente</option>
-  <option value="desc">Descendente</option>
-</select>
+<li class="nav-item ml-2">
+  <a href="{{route('conflicto.create')}}" class="btn btn-dark">Nuevo conflicto</a>
+</li>
+<li class="nav-item ml-2">
+  <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
+    <option selected disabled value="0">Filtrar tipo</option>
+    <option value="0">Todos</option>
+    @foreach($tipos as $tipo)
+    <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
+    @endforeach
+  </select>
+</li>
+<li class="nav-item ml-2">
+  <select id="order" class="form-control ml-2" name="order">
+    <option selected disabled value="ASC">Orden</option>
+    <option value="asc">Ascendente</option>
+    <option value="desc">Descendente</option>
+  </select>
+</li>
 @endsection
 
 @section('navbar-search')
-  <li class="nav-item">
-    <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-      <i class="fas fa-search"></i>
-    </a>
-    <div class="navbar-search-block">
-      <form class="form-inline" action="{{route('conflictos.search')}}" method="GET">
-        <div class="input-group input-group-sm">
-          <input class="form-control form-control-navbar" type="search" placeholder="Nombre del conflicto a buscar" name="search" id="search" aria-label="Search">
-          <div class="input-group-append">
-            <button class="btn btn-navbar" type="submit">
-              <i class="fas fa-search"></i>
-            </button>
-            <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        </div>
-      </form>
+<li class="nav-item">
+  <form class="form-inline ml-2" action="{{route('conflictos.search')}}" method="GET">
+    <div class="input-group">
+      <input type="search" name="search" class="form-control" placeholder="Buscar">
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-default">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
     </div>
-  </li>
+  </form>
+</li>
 @endsection
 
 @section('content')
@@ -85,36 +83,37 @@
 </div>
 
 <div class="row">
-@if (Arr::has($conflictos, 'error.error'))
-<div class="text-center">No se encontraron conflictos.
-{{Arr::get($conflictos, 'error.error')}}</div>
-@else
-@foreach($conflictos as $conflicto)
-<div class="col col-sm-12 col-md-4 col-lg-4">
-  <div class="card card-dark card-outline">
-    <div class="card-body box-profile">
-      <h3 class="profile-username text-center">{{$conflicto->nombre}}</h3>
-      <ul class="list-group list-group-unbordered mb-3">
-        <li class="list-group-item">
-          <b>Tipo:</b> {{$conflicto->tipo}}
-        </li>
-        <li class="list-group-item">
-          <b>Descripción breve: </b>{!!$conflicto->descripcion!!}
-        </li>
-      </ul>
-    </div>
-    <!-- /.card-body -->
-    <div class="card-footer">
-      <div class="row text-right">
-        <a href="{{route('conflicto.show',$conflicto->id)}}" type="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-        <a href="{{route('conflicto.edit',$conflicto->id)}}" type="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-        <button id="{{$conflicto->id}}" nombre="{{$conflicto->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-conflicto"><i class="fas fa-trash mr-1"></i></button>
+  @if (Arr::has($conflictos, 'error.error'))
+  <div class="text-center">No se encontraron conflictos.
+    {{Arr::get($conflictos, 'error.error')}}
+  </div>
+  @else
+  @foreach($conflictos as $conflicto)
+  <div class="col col-sm-12 col-md-4 col-lg-4">
+    <div class="card card-dark card-outline">
+      <div class="card-body box-profile">
+        <h3 class="profile-username text-center">{{$conflicto->nombre}}</h3>
+        <ul class="list-group list-group-unbordered mb-3">
+          <li class="list-group-item">
+            <b>Tipo:</b> {{$conflicto->tipo}}
+          </li>
+          <li class="list-group-item">
+            <b>Descripción breve: </b>{!!$conflicto->descripcion!!}
+          </li>
+        </ul>
+      </div>
+      <!-- /.card-body -->
+      <div class="card-footer">
+        <div class="row text-right">
+          <a href="{{route('conflicto.show',$conflicto->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+          <a href="{{route('conflicto.edit',$conflicto->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+          <button data-id="{{$conflicto->id}}" data-nombre="{{$conflicto->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-conflicto"><i class="fas fa-trash mr-1"></i></button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-@endforeach
-@endif
+  @endforeach
+  @endif
 </div>
 @endsection
 
@@ -123,22 +122,22 @@
 <script>
   $(function() {
 
-    $(document).on('change', '#order', function(){
-      orden=this.value;
-      tipo="{{$tipo_o}}";
+    $(document).on('change', '#order', function() {
+      orden = this.value;
+      tipo = "{{$tipo_o}}";
       let url = "{{ route('conflictos.index', ['orden'=>'_orden', 'tipo'=>'_tipo']) }}";
       url = url.replace('_orden', orden);
       url = url.replace('_tipo', tipo);
-      document.location.href=url;
+      document.location.href = url;
     });
 
-    $(document).on('change', '#filter_tipo', function(){
-      tipo=this.value;
-      orden="{{$orden}}";
+    $(document).on('change', '#filter_tipo', function() {
+      tipo = this.value;
+      orden = "{{$orden}}";
       let url = "{{ route('conflictos.index', ['orden'=>'_orden', 'tipo'=>'_tipo']) }}";
       url = url.replace('_orden', orden);
       url = url.replace('_tipo', tipo);
-      document.location.href=url;
+      document.location.href = url;
     });
   });
 </script>

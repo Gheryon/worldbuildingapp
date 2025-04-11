@@ -7,35 +7,31 @@
 @endsection
 
 @section('navbar-buttons')
-<a href="{{route('religion.create')}}" class="btn btn-dark">Nueva religion</a>
-<select id="order" class="form-select ml-2" name="order">
-  <option selected disabled value="ASC">Orden</option>
-  <option value="asc">Ascendente</option>
-  <option value="desc">Descendente</option>
-</select>
+<li class="nav-item ml-2">
+  <a href="{{route('religion.create')}}" class="btn btn-dark">Nueva religion</a>
+</li>
+<li class="nav-item ml-2">
+  <select id="order" class="form-control ml-2" name="order">
+    <option selected disabled value="ASC">Orden</option>
+    <option value="asc">Ascendente</option>
+    <option value="desc">Descendente</option>
+  </select>
+</li>
 @endsection
 
 @section('navbar-search')
-  <li class="nav-item">
-    <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-      <i class="fas fa-search"></i>
-    </a>
-    <div class="navbar-search-block">
-      <form class="form-inline" action="{{route('religiones.search')}}" method="GET">
-        <div class="input-group input-group-sm">
-          <input class="form-control form-control-navbar" type="search" placeholder="Nombre a buscar" name="search" id="search" aria-label="Search">
-          <div class="input-group-append">
-            <button class="btn btn-navbar" type="submit">
-              <i class="fas fa-search"></i>
-            </button>
-            <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        </div>
-      </form>
+<li class="nav-item">
+  <form class="form-inline ml-2" action="{{route('religiones.search')}}" method="GET">
+    <div class="input-group">
+      <input type="search" name="search" class="form-control" placeholder="Religión a buscar">
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-default">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
     </div>
-  </li>
+  </form>
+</li>
 @endsection
 @section('content')
 <div class="row">
@@ -77,10 +73,11 @@
 </div>
 
 <div class="row">
-@if (Arr::has($religiones, 'error.error'))
-<div class="text-center">No se encontraron religiones.
-{{Arr::get($religiones, 'error.error')}}</div>
-@else
+  @if (Arr::has($religiones, 'error.error'))
+  <div class="text-center">No se encontraron religiones.
+    {{Arr::get($religiones, 'error.error')}}
+  </div>
+  @else
   @foreach($religiones as $religion)
   <div class="col-6 col-sm-6 col-md-6 col-lg-6">
     <div class="card card-dark card-outline">
@@ -90,15 +87,15 @@
       <!-- /.card-body -->
       <div class="card-footer">
         <div class="row text-right">
-          <a href="{{route('religion.show',$religion->id)}}" type="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-          <a href="{{route('religion.edit',$religion->id)}}" type="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-          <button id="{{$religion->id}}" nombre="{{$religion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-religion"><i class="fas fa-trash mr-1"></i></button>
+          <a href="{{route('religion.show',$religion->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+          <a href="{{route('religion.edit',$religion->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+          <button data-id="{{$religion->id}}" data-nombre="{{$religion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-religion"><i class="fas fa-trash mr-1"></i></button>
         </div>
       </div>
     </div>
   </div>
   @endforeach
-@endif
+  @endif
 
 </div>
 @endsection
@@ -108,11 +105,11 @@
 <script>
   $(function() {
 
-    $(document).on('change', '#order', function(){
-      orden=this.value;
+    $(document).on('change', '#order', function() {
+      orden = this.value;
       let url = "{{ route('religiones.index', ['orden'=>'_orden']) }}";
       url = url.replace('_orden', orden);
-      document.location.href=url;
+      document.location.href = url;
     });
   });
 </script>

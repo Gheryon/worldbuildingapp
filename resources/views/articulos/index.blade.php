@@ -7,41 +7,39 @@
 @endsection
 
 @section('navbar-buttons')
-<a href="{{route('articulos.create')}}" class="btn btn-dark">Nuevo articulo</a>
-<select id="filtro" class="form-select ml-2" name="filtro">
-  <option selected disabled value="ASC">Filtro</option>
-  <option value="all">Todos</option>
-  <option value="Referencia">Referencia</option>
-  <option value="Canon">Canon</option>
-  <option value="Crónica">Crónica</option>
-</select>
-<select id="order" class="form-select ml-2" name="order">
-  <option selected disabled value="ASC">Orden</option>
-  <option value="asc">Ascendente</option>
-  <option value="desc">Descendente</option>
-</select>
+<li class="nav-item">
+  <a href="{{route('articulos.create')}}" class="btn btn-dark">Nuevo articulo</a>
+</li>
+<li class="nav-item">
+  <select id="filtro" class="form-control ml-2" name="filtro">
+    <option selected disabled value="ASC">Filtro</option>
+    <option value="all">Todos</option>
+    <option value="Referencia">Referencia</option>
+    <option value="Canon">Canon</option>
+    <option value="Crónica">Crónica</option>
+  </select>
+</li>
+<li class="nav-item ml-2">
+  <select id="order" class="form-control ml-2" name="order">
+    <option selected disabled value="ASC">Orden</option>
+    <option value="asc">Ascendente</option>
+    <option value="desc">Descendente</option>
+  </select>
+</li>
 @endsection
 
 @section('navbar-search')
 <li class="nav-item">
-  <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-    <i class="fas fa-search"></i>
-  </a>
-  <div class="navbar-search-block">
-    <form class="form-inline" action="{{route('articulos.search')}}" method="GET">
-      <div class="input-group input-group-sm">
-        <input class="form-control form-control-navbar" type="search" placeholder="Nombre a buscar" name="search" id="search" aria-label="Search">
-        <div class="input-group-append">
-          <button class="btn btn-navbar" type="submit">
-            <i class="fas fa-search"></i>
-          </button>
-          <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
+  <form class="form-inline ml-2" action="{{route('articulos.search')}}" method="GET">
+    <div class="input-group">
+      <input type="search" name="search" class="form-control" placeholder="Nombre a buscar">
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-default">
+          <i class="fa fa-search"></i>
+        </button>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 </li>
 @endsection
 
@@ -97,13 +95,13 @@
         <tr>
           <td>{{$articulo->nombre}}</td>
           <td>{{$articulo->tipo}}</td>
-          <td style="text-align:center" artId="{{$articulo->id_articulo}}" artNombre="{{$articulo->nombre}}">
+          <td style="text-align:center">
             <div class="btn-group" role="group" aria-label="Basic example">
-              <a href="{{route('articulos.show',$articulo->id_articulo)}}" type="button" title="Ver" class="btn btn-info detalles">
+              <a href="{{route('articulos.show',$articulo->id_articulo)}}" role="button" title="Ver" class="btn btn-info detalles">
                 <i class="fas fa-id-card mr-1"></i>
               </a>
-              <a href="{{route('articulos.edit',$articulo->id_articulo)}}" type="button" title="Editar" class="btn btn-success"><i class="fas fa-pencil-alt"></i></a>
-              <button id="{{$articulo->id_articulo}}" nombre="{{$articulo->nombre}}" type="button" title="borrar" class="borrar btn btn-danger" data-toggle="modal" data-target="#eliminar-articulo"><i class="fas fa-trash"></i></button>
+              <a href="{{route('articulos.edit',$articulo->id_articulo)}}" role="button" title="Editar" class="btn btn-success"><i class="fas fa-pencil-alt"></i></a>
+              <button data-id="{{$articulo->id_articulo}}" data-nombre="{{$articulo->nombre}}" type="button" title="borrar" class="borrar btn btn-danger" data-toggle="modal" data-target="#eliminar-articulo"><i class="fas fa-trash"></i></button>
             </div>
           </td>
         </tr>
@@ -124,21 +122,21 @@
 <script src="{{asset('dist/js/config.js')}}"></script>
 <script>
   $(function() {
-    $(document).on('change', '#filtro', function(){
-      filtro=this.value;
-      orden="{{$orden}}";
+    $(document).on('change', '#filtro', function() {
+      filtro = this.value;
+      orden = "{{$orden}}";
       let url = "{{ route('articulos', ['orden'=>'_orden', 'filtro'=>'_filtro']) }}";
       url = url.replace('_filtro', filtro);
       url = url.replace('_orden', orden);
-      document.location.href=url;
+      document.location.href = url;
     });
-    $(document).on('change', '#order', function(){
-      orden=this.value;
-      filtro="{{$filtro_o}}";
+    $(document).on('change', '#order', function() {
+      orden = this.value;
+      filtro = "{{$filtro_o}}";
       let url = "{{ route('articulos', ['orden'=>'_orden', 'filtro'=>'_filtro']) }}";
       url = url.replace('_orden', orden);
       url = url.replace('_filtro', filtro);
-      document.location.href=url;
+      document.location.href = url;
     });
   });
 </script>

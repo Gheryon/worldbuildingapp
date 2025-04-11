@@ -7,42 +7,40 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('personaje.create')}}" class="btn btn-dark">Nuevo personaje</a>
-<select id="filter_tipo" class="form-select ml-2" name="filter_tipo">
+</li>
+<li class="nav-item ml-2">
+<select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
 <option selected disabled value="0">Filtrar especie</option>
 <option value="0">Todas</option>
 @foreach($tipos as $tipo)
 <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
 @endforeach
 </select>
-<select id="order" class="form-select ml-2" name="order">
+</li>
+<li class="nav-item ml-2">
+<select id="order" class="form-control ml-2" name="order">
   <option selected disabled value="ASC">Orden</option>
   <option value="asc">Ascendente</option>
   <option value="desc">Descendente</option>
 </select>
+</li>
 @endsection
 
 @section('navbar-search')
-  <li class="nav-item">
-    <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-      <i class="fas fa-search"></i>
-    </a>
-    <div class="navbar-search-block">
-      <form class="form-inline" action="{{route('personajes.search')}}" method="GET">
-        <div class="input-group input-group-sm">
-          <input class="form-control form-control-navbar" type="search" placeholder="Nombre a buscar" name="search" id="search" aria-label="Search">
-          <div class="input-group-append">
-            <button class="btn btn-navbar" type="submit">
-              <i class="fas fa-search"></i>
-            </button>
-            <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        </div>
-      </form>
+<li class="nav-item">
+  <form class="form-inline ml-2" action="{{route('personajes.search')}}" method="GET">
+    <div class="input-group">
+      <input type="search" name="search" class="form-control" placeholder="Nombre a buscar">
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-default">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
     </div>
-  </li>
+  </form>
+</li>
 @endsection
 
 @section('content')
@@ -63,8 +61,9 @@
           @method('DELETE')
           <div class="card-body">
             <div class="input-group mb-3">
-              <p> ¿Borrar personaje: <span id="nombre-personaje-borrar"> </span>?</p>
-              <input type="hidden" id="id_personaje" name="id_personaje">
+              <p> ¿Borrar personaje: <span id="nombre-borrar"> </span>?</p>
+              <input type="hidden" id="id_borrar" name="id_borrar">
+              <input type="hidden" name="nombre_borrado" id="nombre_borrado">
             </div>
           </div>
           <div class="card-footer text-right">
@@ -90,7 +89,7 @@
         <img class="profile-user-img img-fluid img-circle" src="{{asset("storage/retratos/{$personaje->Retrato}")}}" alt="User profile picture">
       </div>
       <h3 class="profile-username text-center">{{$personaje->Nombre}}</h3>
-      <p class="text-muted">{!!$personaje->DescripcionShort!!}</p>
+      
       <ul class="list-group list-group-unbordered">
         <li class="list-group-item">
           <b><i class="fa-solid fa-dna"></i> Especie</b> <a class="float-right">{{$personaje->especie}}</a>
@@ -103,9 +102,9 @@
     <!-- /.card-body -->
     <div class="card-footer">
       <div class="row text-right">
-        <a href="{{route('personaje.show',$personaje->id)}}" type="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-        <a href="{{route('personaje.edit',$personaje->id)}}" type="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-        <button id="{{$personaje->id}}" nombre="{{$personaje->Nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-personaje"><i class="fas fa-trash mr-1"></i></button>
+        <a href="{{route('personaje.show',$personaje->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+        <a href="{{route('personaje.edit',$personaje->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+        <button data-id="{{$personaje->id}}" data-nombre="{{$personaje->Nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-personaje"><i class="fas fa-trash mr-1"></i></button>
       </div>
     </div>
   </div>
@@ -118,7 +117,7 @@
 
 @section('specific-scripts')
 <!-- articulos javascript -->
-<script src="{{asset('dist/js/personajes.js')}}"></script>
+<script src="{{asset('dist/js/config.js')}}"></script>
 <script>
   $(function() {
 

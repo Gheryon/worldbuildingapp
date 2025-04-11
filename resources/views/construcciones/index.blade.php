@@ -7,41 +7,39 @@
 @endsection
 
 @section('navbar-buttons')
-<a href="{{route('construccion.create')}}" class="btn btn-dark">Nueva construcción</a>
-<select id="filter_tipo" class="form-select ml-2" name="filter_tipo">
-  <option selected disabled value="0">Filtrar tipo</option>
-  <option value="0">Todos</option>
-  @foreach($tipos as $tipo)
-  <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
-  @endforeach
-</select>
-<select id="order" class="form-select ml-2" name="order">
-  <option selected disabled value="ASC">Orden</option>
-  <option value="asc">Ascendente</option>
-  <option value="desc">Descendente</option>
-</select>
+<li class="nav-item ml-2">
+  <a href="{{route('construccion.create')}}" class="btn btn-dark">Nueva construcción</a>
+</li>
+<li class="nav-item ml-2">
+  <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
+    <option selected disabled value="0">Filtrar tipo</option>
+    <option value="0">Todos</option>
+    @foreach($tipos as $tipo)
+    <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
+    @endforeach
+  </select>
+</li>
+<li class="nav-item ml-2">
+  <select id="order" class="form-control ml-2" name="order">
+    <option selected disabled value="ASC">Orden</option>
+    <option value="asc">Ascendente</option>
+    <option value="desc">Descendente</option>
+  </select>
+</li>
 @endsection
 
 @section('navbar-search')
 <li class="nav-item">
-  <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-    <i class="fas fa-search"></i>
-  </a>
-  <div class="navbar-search-block">
-    <form class="form-inline" action="{{route('construcciones.search')}}" method="GET">
-      <div class="input-group input-group-sm">
-        <input class="form-control form-control-navbar" type="search" placeholder="Nombre a buscar" name="search" id="search" aria-label="Search">
-        <div class="input-group-append">
-          <button class="btn btn-navbar" type="submit">
-            <i class="fas fa-search"></i>
-          </button>
-          <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
+  <form class="form-inline ml-2" action="{{route('construcciones.search')}}" method="GET">
+    <div class="input-group">
+      <input type="search" name="search" class="form-control" placeholder="Nombre a buscar">
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-default">
+          <i class="fa fa-search"></i>
+        </button>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 </li>
 @endsection
 
@@ -103,9 +101,9 @@
       <!-- /.card-body -->
       <div class="card-footer">
         <div class="row text-right">
-          <a href="{{route('construccion.show',$construccion->id)}}" type="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-          <a href="{{route('construccion.edit',$construccion->id)}}" type="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-          <button id="{{$construccion->id}}" nombre="{{$construccion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-construccion"><i class="fas fa-trash mr-1"></i></button>
+          <a href="{{route('construccion.show',$construccion->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+          <a href="{{route('construccion.edit',$construccion->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+          <button data-id="{{$construccion->id}}" data-nombre="{{$construccion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-construccion"><i class="fas fa-trash mr-1"></i></button>
         </div>
       </div>
     </div>

@@ -173,6 +173,6 @@ class ArticuloController extends Controller
     } catch (Exception $excepcion) {
       $articulos = ['error' => ['error' => $excepcion->getMessage()]];
     }
-    return view('articulos.index', ['articulos' => $articulos]);
+    return view('articulos.index', ['articulos' => $articulos, 'orden' => 'asc', 'filtro_o' => 0]);
   }
 }

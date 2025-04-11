@@ -7,42 +7,40 @@
 @endsection
 
 @section('navbar-buttons')
-<a href="{{route('organizacion.create')}}" class="btn btn-dark">Nueva organización</a>
-<select id="filter_tipo" class="form-select ml-2" name="filter_tipo">
-<option selected disabled value="0">Filtrar tipo</option>
-<option value="0">Todos</option>
-@foreach($tipos as $tipo)
-<option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
-@endforeach
-</select>
-<select id="order" class="form-select ml-2" name="order">
-  <option selected disabled value="ASC">Orden</option>
-  <option value="asc">Ascendente</option>
-  <option value="desc">Descendente</option>
-</select>
+<li class="nav-item ml-2">
+  <a href="{{route('organizacion.create')}}" class="btn btn-dark">Nueva organización</a>
+</li>
+<li class="nav-item ml-2">
+  <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
+    <option selected disabled value="0">Filtrar tipo</option>
+    <option value="0">Todos</option>
+    @foreach($tipos as $tipo)
+    <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
+    @endforeach
+  </select>
+</li>
+<li class="nav-item ml-2">
+  <select id="order" class="form-control ml-2" name="order">
+    <option selected disabled value="ASC">Orden</option>
+    <option value="asc">Ascendente</option>
+    <option value="desc">Descendente</option>
+  </select>
+</li>
 @endsection
 
 @section('navbar-search')
-  <li class="nav-item">
-    <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-      <i class="fas fa-search"></i>
-    </a>
-    <div class="navbar-search-block">
-      <form class="form-inline" action="{{route('organizaciones.search')}}" method="GET">
-        <div class="input-group input-group-sm">
-          <input class="form-control form-control-navbar" type="search" placeholder="Nombre a buscar" name="search" id="search" aria-label="Search">
-          <div class="input-group-append">
-            <button class="btn btn-navbar" type="submit">
-              <i class="fas fa-search"></i>
-            </button>
-            <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        </div>
-      </form>
+<li class="nav-item">
+  <form class="form-inline ml-2" action="{{route('organizaciones.search')}}" method="GET">
+    <div class="input-group">
+      <input type="search" name="search" class="form-control" placeholder="Nombre a buscar">
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-default">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
     </div>
-  </li>
+  </form>
+</li>
 @endsection
 
 @section('content')
@@ -72,11 +70,9 @@
             @csrf
             @method('DELETE')
             <input type="hidden" name="id_borrar" id="id_borrar">
-            <input type="hidden" name="tipo" id="tipo">
             <input type="hidden" name="nombre_borrado" id="nombre_borrado">
             <button type="button" id="cancelar-borrar-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
             <button type="submit" id="confirmar-borrar-button" class="btn btn-danger">Eliminar</button>
-            <button type="button" id="cerrar-borrar-button" class="btn btn-primary" data-dismiss="modal" style="display:none">Cerrar</button>
           </form>
         </div>
       </div>
@@ -85,40 +81,38 @@
 </div>
 
 <div class="row">
-@if (Arr::has($organizaciones, 'error.error'))
-<div class="text-center">No se encontraron resultados.
-{{Arr::get($organizaciones, 'error.error')}}</div>
-@else
-@foreach($organizaciones as $organizacion)
-<div class="col col-sm-6 col-md-4 col-lg-3">
-  <div class="card card-dark card-outline">
-    <div class="card-body box-profile">
-      
-      <div class="text-center">
-      <h2 class="lead"><b>{{$organizacion->nombre}}</b></h2>
-        <img class="img-fluid" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" alt="Escudo">
+  @if (Arr::has($organizaciones, 'error.error'))
+  <div class="text-center">No se encontraron resultados.
+    {{Arr::get($organizaciones, 'error.error')}}
+  </div>
+  @else
+  @foreach($organizaciones as $organizacion)
+  <div class="col col-sm-6 col-md-4 col-lg-3">
+    <div class="card card-dark card-outline">
+      <div class="card-body box-profile">
+
+        <div class="text-center">
+          <h2 class="lead"><b>{{$organizacion->nombre}}</b></h2>
+          <img class="img-fluid" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" alt="Escudo">
+        </div>
+        <ul class="list-group list-group-unbordered mb-3">
+          <li class="list-group-item">
+            <b>Tipo:</b> {{$organizacion->tipo}}
+          </li>
+        </ul>
       </div>
-      <ul class="list-group list-group-unbordered mb-3">
-        <li class="list-group-item">
-          <b>Tipo:</b> {{$organizacion->tipo}}
-        </li>
-        <li class="list-group-item">
-          <b>Descripción breve: </b>{!!$organizacion->descripcionBreve!!}
-        </li>
-      </ul>
-    </div>
-    <!-- /.card-body -->
-    <div class="card-footer">
-      <div class="row text-right">
-        <a href="{{route('organizacion.show',$organizacion->id_organizacion)}}" type="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-        <a href="{{route('organizacion.edit',$organizacion->id_organizacion)}}" type="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-        <button id="{{$organizacion->id_organizacion}}" nombre="{{$organizacion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-organizacion"><i class="fas fa-trash mr-1"></i></button>
+      <!-- /.card-body -->
+      <div class="card-footer">
+        <div class="row text-right">
+          <a href="{{route('organizacion.show',$organizacion->id_organizacion)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+          <a href="{{route('organizacion.edit',$organizacion->id_organizacion)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+          <button data-id="{{$organizacion->id_organizacion}}" data-nombre="{{$organizacion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-organizacion"><i class="fas fa-trash mr-1"></i></button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-@endforeach
-@endif
+  @endforeach
+  @endif
 </div>
 @endsection
 
@@ -127,22 +121,22 @@
 <script>
   $(function() {
 
-    $(document).on('change', '#order', function(){
-      orden=this.value;
-      tipo="{{$tipo_o}}";
+    $(document).on('change', '#order', function() {
+      orden = this.value;
+      tipo = "{{$tipo_o}}";
       let url = "{{ route('organizaciones.index', ['orden'=>'_orden', 'tipo'=>'_tipo']) }}";
       url = url.replace('_orden', orden);
       url = url.replace('_tipo', tipo);
-      document.location.href=url;
+      document.location.href = url;
     });
 
-    $(document).on('change', '#filter_tipo', function(){
-      tipo=this.value;
-      orden="{{$orden}}";
+    $(document).on('change', '#filter_tipo', function() {
+      tipo = this.value;
+      orden = "{{$orden}}";
       let url = "{{ route('organizaciones.index', ['orden'=>'_orden', 'tipo'=>'_tipo']) }}";
       url = url.replace('_orden', orden);
       url = url.replace('_tipo', tipo);
-      document.location.href=url;
+      document.location.href = url;
     });
   });
 </script>

@@ -7,42 +7,40 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('lugar.create')}}" class="btn btn-dark">Nuevo lugar</a>
-<select id="filter_tipo" class="form-select ml-2" name="filter_tipo">
+</li>
+<li class="nav-item ml-2">
+<select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
 <option selected disabled value="0">Filtrar tipo</option>
-<option value="0">Todos</option>
+<option value="0">Tipo</option>
 @foreach($tipos as $tipo)
 <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
 @endforeach
 </select>
-<select id="order" class="form-select ml-2" name="order">
+</li>
+<li class="nav-item ml-2">
+<select id="order" class="form-control ml-2" name="order">
   <option selected disabled value="ASC">Orden</option>
   <option value="asc">Ascendente</option>
   <option value="desc">Descendente</option>
 </select>
+</li>
 @endsection
 
 @section('navbar-search')
-  <li class="nav-item">
-    <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-      <i class="fas fa-search"></i>
-    </a>
-    <div class="navbar-search-block">
-      <form class="form-inline" action="{{route('lugares.search')}}" method="GET">
-        <div class="input-group input-group-sm">
-          <input class="form-control form-control-navbar" type="search" placeholder="Nombre a buscar" name="search" id="search" aria-label="Search">
-          <div class="input-group-append">
-            <button class="btn btn-navbar" type="submit">
-              <i class="fas fa-search"></i>
-            </button>
-            <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        </div>
-      </form>
+<li class="nav-item">
+  <form class="form-inline ml-2" action="{{route('lugares.search')}}" method="GET">
+    <div class="input-group">
+      <input type="search" name="search" class="form-control" placeholder="Buscar">
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-default">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
     </div>
-  </li>
+  </form>
+</li>
 @endsection
 
 @section('content')
@@ -106,9 +104,9 @@
     <!-- /.card-body -->
     <div class="card-footer">
       <div class="row text-right">
-        <a href="{{route('lugar.show',$lugar->id)}}" type="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-        <a href="{{route('lugar.edit',$lugar->id)}}" type="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-        <button id="{{$lugar->id}}" nombre="{{$lugar->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-lugar"><i class="fas fa-trash mr-1"></i></button>
+        <a href="{{route('lugar.show',$lugar->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+        <a href="{{route('lugar.edit',$lugar->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+        <button data-id="{{$lugar->id}}" data-nombre="{{$lugar->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-lugar"><i class="fas fa-trash mr-1"></i></button>
       </div>
     </div>
   </div>

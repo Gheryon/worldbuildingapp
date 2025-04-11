@@ -2,10 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
     @yield('title')
-  <!--<title id="title">Worldbuilding app</title>-->
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -18,7 +17,7 @@
   <!-- Toastr -->
   <link rel="stylesheet" href="{{asset('dist/css/toastr.min.css')}}">
 
-  <link rel="stylesheet" href="{{asset('dist/css/styles.css')}}"/>
+  <link rel="stylesheet" href="{{asset('dist/css/styles.css')}}">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed" id="_body_">
 <div class="wrapper">

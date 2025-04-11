@@ -7,12 +7,16 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('especie.create')}}" class="btn btn-dark">Nueva especie</a>
-<select id="order" class="form-select ml-2" name="order">
+</li>
+<li class="nav-item ml-2">
+<select id="order" class="form-control ml-2" name="order">
   <option selected disabled value="ASC">Orden</option>
   <option value="asc">Ascendente</option>
   <option value="desc">Descendente</option>
 </select>
+</li>
 @endsection
 
 @section('content')
@@ -64,9 +68,9 @@
     <!-- /.card-body -->
     <div class="card-footer">
       <div class="row text-right">
-        <a href="{{route('especie.show',$especie->id)}}" type="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-        <a href="{{route('especie.edit',$especie->id)}}" type="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-        <button id="{{$especie->id}}" nombre="{{$especie->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-especie"><i class="fas fa-trash mr-1"></i></button>
+        <a href="{{route('especie.show',$especie->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+        <a href="{{route('especie.edit',$especie->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+        <button data-id="{{$especie->id}}" data-nombre="{{$especie->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-especie"><i class="fas fa-trash mr-1"></i></button>
       </div>
     </div>
   </div>
