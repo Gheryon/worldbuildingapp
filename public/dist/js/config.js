@@ -41,9 +41,6 @@ $(document).ready(function () {
     const elemento=$(this)[0].activeElement;
     const nombre = elemento.getAttribute('data-nombre');
     const id = elemento.getAttribute('data-id');
-    console.log(elemento);
-    console.log(nombre);
-    console.log(id);
 
     $('#id_borrar').val(id);
     $('#nombre-borrar').html(nombre);
