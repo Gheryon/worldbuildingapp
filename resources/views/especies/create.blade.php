@@ -7,7 +7,9 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('lugares.index')}}" class="btn btn-dark">Cancelar</a>
+</li>
 @endsection
 
 @section('content')

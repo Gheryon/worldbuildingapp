@@ -7,8 +7,12 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('construcciones.index')}}" class="btn btn-dark">Volver</a>
+</li>
+<li class="nav-item ml-2">
 <a href="{{route('construccion.edit', ['id'=> $vista->id] )}}" class="btn btn-dark ml-2">Editar</a>
+</li>
 @endsection
 
 @section('content')

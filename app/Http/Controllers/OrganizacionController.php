@@ -87,8 +87,11 @@ class OrganizacionController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:128',
+      'nombre' => 'required|max:255',
       'select_tipo' => 'required',
+      'lema' => 'nullable|max:512',
+      'gentilicio' => 'nullable|max:128',
+      'capital' => 'nullable|max:128',
       'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
     ]);
 
@@ -250,8 +253,11 @@ class OrganizacionController extends Controller
   public function update(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:128',
+      'nombre' => 'required|max:255',
       'select_tipo' => 'required',
+      'lema' => 'nullable|max:512',
+      'gentilicio' => 'nullable|max:128',
+      'capital' => 'nullable|max:128',
       'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
     ]);
 

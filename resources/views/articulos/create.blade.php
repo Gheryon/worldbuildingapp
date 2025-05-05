@@ -7,7 +7,9 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('articulos')}}" class="btn btn-dark">Cancelar</a>
+</li>
 @endsection
 
 @section('content')
@@ -18,12 +20,10 @@
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-create" action="{{url('/articulos/articulos')}}" method="post">
+  <form id="form-create" action="{{route('articulos.store')}}" method="post">
     @csrf
     <div class="row mb-3 justify-content-center">
-      <a type="button" class="btn btn-danger mr-1" id="cancelar" href="{{url('/articulos/index')}}">Cancelar</a>
       <button type="submit" class="btn btn-success ml-1" id="guardar">Guardar</button>
-      <a class="btn btn-primary" type="button" id="volver-editar-button" href="cronicas.php" style="display:none">Volver</a>
     </div>
     <div class="container-fluid">
       <div class="row">
@@ -41,8 +41,9 @@
                 </div>
                 <div class="col-4">
                   <label for="tipo" class="form-label">Tipo</label>
-                  <select class="form-select form-control" name="tipo" id="tipo">
-                    <option selected>Referencia</option>
+                  <select class="form-control" name="tipo" id="tipo" required>
+                    <option selected disabled value="">Elegir</option>
+                    <option>Referencia</option>
                     <option>Canon</option>
                     <option>Crónica</option>
                   </select>

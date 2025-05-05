@@ -7,7 +7,9 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('asentamientos.index')}}" class="btn btn-dark">Cancelar</a>
+</li>
 @endsection
 
 @section('content')
@@ -66,17 +68,17 @@
         <div class="row mt-2">
           <div class="col-2">
             <label for="poblacion" class="form-label">Población</label>
-            <input type="text" name="poblacion" class="form-control" id="poblacion" placeholder="Ej: 5000">
+            <input type="number" name="poblacion" class="form-control" id="poblacion" placeholder="Ej: 5000">
             @error('poblacion')
             <small style="color: red">{{$message}}</small>
             @enderror
           </div>
           <div class="col">
-            <label for="fundacion" class="form-label">Fundación</label>
+            <label for="afundacion" class="form-label">Fundación</label>
             <div class="input-group">
               <input id="id_fundacion" type="hidden" name="id_fundacion" value="0">
               <input type="text" id="dfundacion" name="dfundacion" class="form-control" placeholder="Día">
-              <select class="form-select form-control" type="number" id="mfundacion" name="mfundacion">
+              <select class="form-control" id="mfundacion" name="mfundacion">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
                 <option value="1">Enero</option>
@@ -96,11 +98,11 @@
             </div>
           </div>
           <div class="col">
-            <label for="disolucion" class="form-label">Disolución</label>
+            <label for="adisolucion" class="form-label">Disolución</label>
             <div class="input-group">
               <input id="id_disolucion" type="hidden" name="id_disolucion" value="0">
               <input type="text" id="ddisolucion" name="ddisolucion" class="form-control" placeholder="Día">
-              <select class="form-select form-control" type="number" id="mdisolucion" name="mdisolucion">
+              <select class="form-control" id="mdisolucion" name="mdisolucion">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
                 <option value="1">Enero</option>

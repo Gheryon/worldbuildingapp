@@ -7,8 +7,10 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('religiones.index')}}" class="btn btn-dark">Volver</a>
 <a href="{{route('religion.edit', ['id'=> $vista->id] )}}" class="btn btn-dark ml-2">Editar</a>
+</li>
 @endsection
 
 @section('content')

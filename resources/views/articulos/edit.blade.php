@@ -7,7 +7,9 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('articulos')}}" class="btn btn-dark">Cancelar</a>
+</li>
 @endsection
 
 @section('content')
@@ -22,9 +24,7 @@
     @csrf
     @method('PUT')
     <div class="row mb-3 justify-content-center">
-      <a type="button" class="btn btn-danger mr-1" id="cancelar-button" href="{{url('/articulos/index')}}">Cancelar</a>
       <button type="submit" class="btn btn-success ml-1" id="guardar-button">Guardar</button>
-      <a type="button" class="btn btn-primary" id="volver-editar-button" href="{{url('/articulos/index')}}" style="display:none">Volver</a>
     </div>
     <div class="container-fluid">
       <div class="row">
@@ -41,7 +41,8 @@
                 </div>
                 <div class="col-4">
                   <label for="tipo">Tipo</label>
-                  <select class="form-select form-control" name="tipo" id="tipo">
+                  <select class="form-control" name="tipo" id="tipo" required>
+                    <option selected disabled value="">Elegir</option>
                     <option>Referencia</option>
                     <option>Canon</option>
                     <option>Crónica</option>

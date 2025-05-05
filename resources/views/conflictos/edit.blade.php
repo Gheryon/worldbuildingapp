@@ -7,7 +7,9 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('conflictos.index')}}" class="btn btn-dark">Cancelar</a>
+</li>
 @endsection
 
 @section('content')
@@ -26,7 +28,6 @@
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
         <button type="submit" id="submit-crear-button" class="btn btn-success">Guardar</button>
-        <a class="btn btn-primary" type="button" id="volver-crear-button" href="{{route('conflictos.index')}}" style="display:none">Volver</a>
       </div>
     </div>
     <div class="row mt-3 mb-3 justify-content-md-center border">
@@ -40,7 +41,7 @@
             @enderror
           </div>
           <div class="col">
-            <label for="id_inicio" class="form-label">Fecha de inicio</label>
+            <label for="ainicio" class="form-label">Fecha de inicio</label>
             <div class="input-group">
               <input id="id_inicio" type="hidden" name="id_inicio" value="0">
               <input type="number" id="dinicio" name="dinicio" class="form-select form-control" placeholder="Día">
@@ -64,11 +65,11 @@
             </div>
           </div>
           <div class="col">
-            <label for="id_fin" class="form-label">Fecha de finalización</label>
+            <label for="afin" class="form-label">Fecha de finalización</label>
             <div class="input-group">
               <input id="id_fin" type="hidden" name="id_fin" value="0">
               <input type="number" id="dfin" name="dfin" class="form-control" placeholder="Día">
-              <select id="mfin" name="mfin" class="form-select form-control" placeholder="Mes">
+              <select id="mfin" name="mfin" class="form-control">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
                 <option value="1">Enero</option>

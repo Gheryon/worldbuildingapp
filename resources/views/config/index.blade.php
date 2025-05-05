@@ -16,12 +16,12 @@
 <hr>
 
 <!-- Modal -->
-<div class="modal fade" id="confirmar_eliminacion" tabindex="-1" role="dialog" aria-labelledby="Confirmar eliminacion" aria-hidden="true">
+<div class="modal fade" id="confirmar_eliminacion" tabindex="-1" role="dialog" aria-labelledby="confirmar_eliminacion_t" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="card card-danger">
         <div class="card-header">
-          <h5 class="card-title" id="confirmar_eliminacion">Confirmar eliminación</h5>
+          <h5 class="card-title" id="confirmar_eliminacion_t">Confirmar eliminación</h5>
           <button data-dismiss="modal" aria-label="close" class="close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -40,7 +40,6 @@
             <input type="hidden" name="nombre_borrado" id="nombre_borrado">
             <button type="button" id="cancelar-borrar-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
             <button type="submit" id="confirmar-borrar-button" class="btn btn-danger">Eliminar</button>
-            <button type="button" id="cerrar-borrar-button" class="btn btn-primary" data-dismiss="modal" style="display:none">Cerrar</button>
           </form>
         </div>
       </div>
@@ -48,18 +47,18 @@
   </div>
 </div>
 
-<div class="modal fade" id="editar_nombre" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="Editar nombre" aria-hidden="true">
+<div class="modal fade" id="editar_nombre" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="editarNombreLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="card card-dark">
         <div class="card-header">
-          <h5 class="card-title" id="nuevoEventoLabel">Editar</h5>
+          <h5 class="card-title" id="editarNombreLabel">Editar</h5>
           <button data-dismiss="modal" aria-label="close" class="close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="card-body">
-          <form id="form-editar-nombre" class="col-md-auto" action="{{route('config.update')}}" method="POST">
+        <form id="form-editar-nombre" class="col-md-auto" action="{{route('config.update')}}" method="POST">
+          <div class="card-body">
             @csrf
             @method('PUT')
             <input type="hidden" name="id_editar" id="id_editar">
@@ -73,12 +72,11 @@
                 </div>
               </div>
             </div>
-        </div>
-        <div class="card-footer">
-          <button type="button" id="cancelar-editar-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
-          <button type="submit" id="submit-editar-button" class="btn btn-success">Guardar</button>
-          <button type="button" id="cerrar-editar-button" class="btn btn-primary" data-dismiss="modal" style="display:none">Cerrar</button>
-        </div>
+          </div>
+          <div class="card-footer">
+            <button type="button" id="cancelar-editar-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" id="submit-editar-button" class="btn btn-success">Guardar</button>
+          </div>
         </form>
       </div>
     </div>
@@ -114,15 +112,15 @@
       <form id="form-edit-fecha_mundo" class="form-inline" action="{{route('config.update_fecha_mundo')}}" method="POST">
         @csrf
         <div class="form-group mb-2">
-          <label for="nombre_mundo" class="sr-only">Fecha actual</label>
-          <input type="text" readonly class="form-control-plaintext" id="nombre_mundo" value="Fecha actual">
+          <label for="fecha_actual" class="sr-only">Fecha actual</label>
+          <input type="text" readonly class="form-control-plaintext" id="fecha_actual" value="Fecha actual">
         </div>
         <div class="form-group mx-sm-3 mb-2">
           <input type="text" id="dia" name="dia" class="form-control col-2" placeholder="Día">
           @error('dia')
           <small style="color: red">{{$message}}</small>
           @enderror
-          <select class="form-select form-control col-4" type="number" id="mes" name="mes">
+          <select class="form-control col-4" id="mes" name="mes">
             <option selected disabled value="">Mes</option>
             <option value="0">Semana de año nuevo</option>
             <option value="1">Enero</option>
@@ -183,8 +181,8 @@
             <tr>
               <td>{{$tipo_asentamiento->nombre}}</td>
               <td>
-                <button id="{{$tipo_asentamiento->id}}" nombre="{{$tipo_asentamiento->nombre}}" tipo="asentamiento" title="Editar" class="editar-tipo btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombre"><i class="fas fa-pencil-alt"></i></button>
-                <button id="{{$tipo_asentamiento->id}}" nombre="{{$tipo_asentamiento->nombre}}" tipo="asentamiento" title="Borrar" class="borrar-tipo btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
+                <button data-id="{{$tipo_asentamiento->id}}" data-nombre="{{$tipo_asentamiento->nombre}}" data-tipo="asentamiento" title="Editar" class="editar-tipo btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombre"><i class="fas fa-pencil-alt"></i></button>
+                <button data-id="{{$tipo_asentamiento->id}}" data-nombre="{{$tipo_asentamiento->nombre}}" data-tipo="asentamiento" title="Borrar" class="borrar-tipo btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
               </td>
             </tr>
             @endforeach
@@ -193,7 +191,7 @@
         </table>
       </div>
       <div class="card-footer">
-        <label for="nuevoTimeline" class="form-label">Añadir nuevo</label>
+        <label for="nuevo_tipo_asentamiento" class="form-label">Añadir nuevo</label>
         <form id="form-add-tipo-asentamiento" class="row" action="{{route('config.store_tipo_asentamiento')}}" method="POST">
           @csrf
           <div class="col">
@@ -237,8 +235,8 @@
             <tr>
               <td>{{$tipo_conflicto->nombre}}</td>
               <td>
-                <button id="{{$tipo_conflicto->id}}" nombre="{{$tipo_conflicto->nombre}}" tipo="conflicto" title="Editar" class="editar-tipo btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombre"><i class="fas fa-pencil-alt"></i></button>
-                <button id="{{$tipo_conflicto->id}}" nombre="{{$tipo_conflicto->nombre}}" tipo="conflicto" title="Borrar" class="borrar-tipo btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
+                <button data-id="{{$tipo_conflicto->id}}" data-nombre="{{$tipo_conflicto->nombre}}" data-tipo="conflicto" title="Editar" class="editar-tipo btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombre"><i class="fas fa-pencil-alt"></i></button>
+                <button data-id="{{$tipo_conflicto->id}}" data-nombre="{{$tipo_conflicto->nombre}}" data-tipo="conflicto" title="Borrar" class="borrar-tipo btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
               </td>
             </tr>
             @endforeach
@@ -247,7 +245,7 @@
         </table>
       </div>
       <div class="card-footer">
-        <label for="nuevoTimeline" class="form-label">Añadir nuevo</label>
+        <label for="nuevo_tipo_conflicto" class="form-label">Añadir nuevo</label>
         <form id="form-add-tipo-conflicto" class="row" action="{{route('config.store_tipo_conflicto')}}" method="POST">
           @csrf
           <div class="col">
@@ -291,8 +289,8 @@
             <tr>
               <td>{{$tipo_construccion->nombre}}</td>
               <td>
-                <button id="{{$tipo_construccion->id}}" nombre="{{$tipo_construccion->nombre}}" tipo="construccion" title="Editar" class="editar-tipo btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombre"><i class="fas fa-pencil-alt"></i></button>
-                <button id="{{$tipo_construccion->id}}" nombre="{{$tipo_construccion->nombre}}" tipo="construccion" title="Borrar" class="borrar-tipo btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
+                <button data-id="{{$tipo_construccion->id}}" data-nombre="{{$tipo_construccion->nombre}}" data-tipo="construccion" title="Editar" class="editar-tipo btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombre"><i class="fas fa-pencil-alt"></i></button>
+                <button data-id="{{$tipo_construccion->id}}" data-nombre="{{$tipo_construccion->nombre}}" data-tipo="construccion" title="Borrar" class="borrar-tipo btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
               </td>
             </tr>
             @endforeach
@@ -301,7 +299,7 @@
         </table>
       </div>
       <div class="card-footer">
-        <label for="nuevoTimeline" class="form-label">Añadir nuevo</label>
+        <label for="nuevo_tipo_construccion" class="form-label">Añadir nuevo</label>
         <form id="form-add-tipo-construccion" class="row" action="{{route('config.store_tipo_construccion')}}" method="POST">
           @csrf
           <div class="col">
@@ -348,8 +346,8 @@
             <tr>
               <td>{{$tipo_lugar->nombre}}</td>
               <td>
-                <button id="{{$tipo_lugar->id}}" nombre="{{$tipo_lugar->nombre}}" tipo="lugar" title="Editar" class="editar-tipo btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombre"><i class="fas fa-pencil-alt"></i></button>
-                <button id="{{$tipo_lugar->id}}" nombre="{{$tipo_lugar->nombre}}" tipo="lugar" title="Borrar" class="borrar-tipo btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
+                <button data-id="{{$tipo_lugar->id}}" data-nombre="{{$tipo_lugar->nombre}}" data-tipo="lugar" title="Editar" class="editar-tipo btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombre"><i class="fas fa-pencil-alt"></i></button>
+                <button data-id="{{$tipo_lugar->id}}" data-nombre="{{$tipo_lugar->nombre}}" data-tipo="lugar" title="Borrar" class="borrar-tipo btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
               </td>
             </tr>
             @endforeach
@@ -358,7 +356,7 @@
         </table>
       </div>
       <div class="card-footer">
-        <label for="nuevoTimeline" class="form-label">Añadir nuevo</label>
+        <label for="nuevo_tipo_lugar" class="form-label">Añadir nuevo</label>
         <form id="form-add-tipo-lugar" class="row" action="{{route('config.store_tipo_lugar')}}" method="POST">
           @csrf
           <div class="col">
@@ -402,8 +400,8 @@
             <tr>
               <td>{{$tipo_organizacion->nombre}}</td>
               <td>
-                <button id="{{$tipo_organizacion->id}}" nombre="{{$tipo_organizacion->nombre}}" tipo="organizacion" title="Editar" class="editar-tipo btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombre"><i class="fas fa-pencil-alt"></i></button>
-                <button id="{{$tipo_organizacion->id}}" nombre="{{$tipo_organizacion->nombre}}" tipo="organizacion" title="Borrar" class="borrar-tipo btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
+                <button data-id="{{$tipo_organizacion->id}}" data-nombre="{{$tipo_organizacion->nombre}}" data-tipo="organizacion" title="Editar" class="editar-tipo btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombre"><i class="fas fa-pencil-alt"></i></button>
+                <button data-id="{{$tipo_organizacion->id}}" data-nombre="{{$tipo_organizacion->nombre}}" data-tipo="organizacion" title="Borrar" class="borrar-tipo btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
               </td>
             </tr>
             @endforeach
@@ -412,7 +410,7 @@
         </table>
       </div>
       <div class="card-footer">
-        <label for="nuevoTimeline" class="form-label">Añadir nuevo</label>
+        <label for="nuevo_tipo_organizacion" class="form-label">Añadir nuevo</label>
         <form id="form-add-tipo-organizacion" class="row" action="{{route('config.store_tipo_organizacion')}}" method="POST">
           @csrf
           <div class="col">
@@ -456,8 +454,8 @@
             <tr>
               <td>{{$linea_temporal->nombre}}</td>
               <td>
-                <button id="{{$linea_temporal->id}}" nombre="{{$linea_temporal->nombre}}" tipo="linea_temporal" title="Editar" class="editar-tipo btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombre"><i class="fas fa-pencil-alt"></i></button>
-                <button id="{{$linea_temporal->id}}" nombre="{{$linea_temporal->nombre}}" tipo="linea_temporal" title="Borrar" class="borrar-tipo btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
+                <button data-id="{{$linea_temporal->id}}" data-nombre="{{$linea_temporal->nombre}}" data-tipo="linea_temporal" title="Editar" class="editar-tipo btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombre"><i class="fas fa-pencil-alt"></i></button>
+                <button data-id="{{$linea_temporal->id}}" data-nombre="{{$linea_temporal->nombre}}" data-tipo="linea_temporal" title="Borrar" class="borrar-tipo btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
               </td>
             </tr>
             @endforeach
@@ -466,7 +464,7 @@
         </table>
       </div>
       <div class="card-footer">
-        <label for="nuevoTimeline" class="form-label">Añadir nuevo</label>
+        <label for="nueva_linea_temporal" class="form-label">Añadir nuevo</label>
         <form id="form-add-linea-temporal" class="row" action="{{route('config.store_linea_temporal')}}" method="POST">
           @csrf
           <div class="col">

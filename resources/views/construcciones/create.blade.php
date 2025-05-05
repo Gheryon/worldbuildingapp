@@ -7,7 +7,9 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('construcciones.index')}}" class="btn btn-dark">Cancelar</a>
+</li>
 @endsection
 
 @section('content')
@@ -39,7 +41,7 @@
           </div>
           <div class="col-md">
           <label for="select_ubicacion" class="form-label">Ubicación</label>
-            <select class="form-select form-control" name="select_ubicacion" id="select_ubicacion">
+            <select class="form-control" name="select_ubicacion" id="select_ubicacion">
               <option selected disabled value="">Elegir</option>
                 @foreach($ubicaciones as $ubicacion)
                 <option value="{{$ubicacion->id}}">{{$ubicacion->nombre}}</option>
@@ -48,7 +50,7 @@
           </div>
           <div class="col-md-3">
             <label for="select_tipo" class="form-label">Tipo de construccion</label>
-            <select class="form-select form-control" name="select_tipo" id="select_tipo" required>
+            <select class="form-control" name="select_tipo" id="select_tipo" required>
               <option selected disabled value="">Elegir</option>
                 @foreach($tipos as $tipo)
                 <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
@@ -62,11 +64,11 @@
         
         <div class="row">
           <div class="col">
-            <label for="construccion" class="form-label">Construcción</label>
+            <label for="aconstruccion" class="form-label">Construcción</label>
             <div class="input-group">
               <input id="id_construccion" type="hidden" name="id_construccion" value="0">
               <input type="text" id="dconstruccion" name="dconstruccion" class="form-control" placeholder="Día">
-              <select class="form-select form-control" type="number" id="mconstruccion" name="mconstruccion">
+              <select class="form-control" id="mconstruccion" name="mconstruccion">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
                 <option value="1">Enero</option>
@@ -86,11 +88,11 @@
             </div>
           </div>
           <div class="col">
-            <label for="destruccion" class="form-label">Destrucción</label>
+            <label for="adestruccion" class="form-label">Destrucción</label>
             <div class="input-group">
               <input id="id_destruccion" type="hidden" name="id_destruccion" value="0">
               <input type="text" id="ddestruccion" name="ddestruccion" class="form-control" placeholder="Día">
-              <select class="form-select form-control" type="number" id="mdestruccion" name="mdestruccion">
+              <select class="form-control" id="mdestruccion" name="mdestruccion">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
                 <option value="1">Enero</option>

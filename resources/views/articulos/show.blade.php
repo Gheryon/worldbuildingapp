@@ -7,8 +7,12 @@
 @endsection
 
 @section('navbar-buttons')
-<a type="button" title="Volver" href="{{route('articulos')}}" class="nuevo btn btn-dark">Volver</a>
-<a href="{{route('articulos.edit',$articulo->id_articulo)}}" type="button" title="Editar" class="btn ml-1 btn-dark"><i class="fas fa-pencil-alt mr-2"></i>Editar</a>
+<li class="nav-item ml-2">
+<a role="button" title="Volver" href="{{route('articulos')}}" class="nuevo btn btn-dark">Volver</a>
+</li>
+<li class="nav-item ml-2">
+<a href="{{route('articulos.edit',$articulo->id_articulo)}}" role="button" title="Editar" class="btn ml-1 btn-dark"><i class="fas fa-pencil-alt mr-2"></i>Editar</a>
+</li>
 @endsection
 
 @section('content')

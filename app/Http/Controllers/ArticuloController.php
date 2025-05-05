@@ -56,7 +56,6 @@ class ArticuloController extends Controller
     $articulo->tipo = $request->tipo;
     $content = $request->contenido;
 
-    //return redirect()->route('articulos');
     try{
       $articulo->save();
       $id_articulo = DB::scalar("SELECT MAX(id_articulo) as id FROM articulosgenericos");

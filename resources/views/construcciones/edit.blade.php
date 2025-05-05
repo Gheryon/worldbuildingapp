@@ -7,7 +7,9 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('construcciones.index')}}" class="btn btn-dark">Cancelar</a>
+</li>
 @endsection
 
 @section('content')
@@ -63,11 +65,11 @@
         
         <div class="row">
           <div class="col">
-            <label for="construccion" class="form-label">Construcción</label>
+            <label for="aconstruccion" class="form-label">Construcción</label>
             <div class="input-group">
               <input id="id_construccion" type="hidden" name="id_construccion" value="0">
               <input type="text" id="dconstruccion" name="dconstruccion" class="form-control" placeholder="Día">
-              <select class="form-select form-control" type="number" id="mconstruccion" name="mconstruccion">
+              <select class="form-control" id="mconstruccion" name="mconstruccion">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
                 <option value="1">Enero</option>
@@ -87,11 +89,11 @@
             </div>
           </div>
           <div class="col">
-            <label for="destruccion" class="form-label">Destrucción</label>
+            <label for="adestruccion" class="form-label">Destrucción</label>
             <div class="input-group">
               <input id="id_destruccion" type="hidden" name="id_destruccion" value="0">
               <input type="text" id="ddestruccion" name="ddestruccion" class="form-control" placeholder="Día">
-              <select class="form-select form-control" type="number" id="mdestruccion" name="mdestruccion">
+              <select class="form-control" id="mdestruccion" name="mdestruccion">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
                 <option value="1">Enero</option>

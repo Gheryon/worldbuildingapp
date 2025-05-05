@@ -7,13 +7,15 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('personajes.index')}}" class="btn btn-dark">Volver</a>
+</li>
+<li class="nav-item ml-2">
 <a href="{{route('personaje.edit', ['id'=> $vista->id] )}}" class="btn btn-dark ml-2">Editar</a>
+</li>
 @endsection
 
 @section('content')
-<h1>{{$vista->Nombre}}</h1>
-
 <section class="content">
   <div class="container margin-top-20 mt-5 page">
     <div class="row article-content">

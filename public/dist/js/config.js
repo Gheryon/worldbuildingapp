@@ -5,11 +5,13 @@ $(document).ready(function () {
     }
   });
 
+  //usado en la vista de config
   $(document).on('click', '.editar-tipo',(e)=>{
     const elemento=$(this)[0].activeElement;
-    let id=$(elemento).attr('id');
-    const nombre = $(elemento).attr('nombre');
-    const tipo = $(elemento).attr('tipo');
+    
+    const nombre = elemento.getAttribute('data-nombre');
+    const id = elemento.getAttribute('data-id');
+    const tipo = elemento.getAttribute('data-tipo');
     
     $('#id_editar').val(id);
     $('#nombre_editar').val(nombre);
@@ -50,10 +52,11 @@ $(document).ready(function () {
   //lleva datos al modal editar enlace
   $(document).on('click', '.editar-enlace', (e) => {
     const elemento=$(this)[0].activeElement;
-    let id=$(elemento).attr('id');
-    const nombre = $(elemento).attr('nombre');
-    const tipo = $(elemento).attr('tipo');
-    const url = $(elemento).attr('url');
+
+    const nombre = elemento.getAttribute('data-nombre');
+    const id = elemento.getAttribute('data-id');
+    const tipo = elemento.getAttribute('data-tipo');
+    const url = elemento.getAttribute('data-url');
 
     $('#id_editar').val(id);
     $('#nombre-borrar').html(nombre);

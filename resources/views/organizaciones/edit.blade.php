@@ -7,7 +7,9 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('organizaciones.index')}}" class="btn btn-dark">Cancelar</a>
+</li>
 @endsection
 
 @section('content')
@@ -26,7 +28,6 @@
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
         <button type="submit" id="submit-crear-button" class="btn btn-success">Guardar</button>
-        <a class="btn btn-primary" type="button" id="volver-crear-button" href="{{route('organizaciones.index')}}" style="display:none">Volver</a>
       </div>
     </div>
     <div class="row mt-3 mb-3 justify-content-md-center border">
@@ -79,7 +80,7 @@
         </div>
         <div class="row mt-2">
           <div class="col-md">
-            <label for="id_fundacion" class="form-label">Fecha de fundación</label>
+            <label for="afundacion" class="form-label">Fecha de fundación</label>
             <div class="input-group">
               <input id="id_fundacion" type="hidden" name="id_fundacion" value="0">
               <input type="number" id="dfundacion" name="dfundacion" class="form-select form-control" placeholder="Día">
@@ -103,11 +104,11 @@
             </div>
           </div>
           <div class="col-md">
-              <label for="id_disolucion" class="form-label">Fecha de disolución</label>
+              <label for="adisolucion" class="form-label">Fecha de disolución</label>
             <div class="input-group">
               <input id="id_disolucion" type="hidden" name="id_disolucion" value="0">
               <input type="number" id="ddisolucion" name="ddisolucion" class="form-control" placeholder="Día">
-              <select id="mdisolucion" name="mdisolucion" class="form-select form-control" placeholder="Mes">
+              <select id="mdisolucion" name="mdisolucion" class="form-select form-control">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
                 <option value="1">Enero</option>
@@ -137,7 +138,7 @@
       <div class="col-md-3 mt-2 mb-2">
         <label for="escudo" class="form-label">Escudo</label>
         <img alt="escudo" id="escudo-img" src="{{asset("storage/escudos/$organizacion->escudo")}}" class="img-fluid" width="185" height="180">
-        <input type="file" name="escudo" class="form-control" id="escudo" value="{{$organizacion->escudo}}">
+        <input type="file" name="escudo" class="form-control" id="escudo">
       </div>
     </div>
 

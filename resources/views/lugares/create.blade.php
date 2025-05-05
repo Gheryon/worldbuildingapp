@@ -7,7 +7,9 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('lugares.index')}}" class="btn btn-dark">Cancelar</a>
+</li>
 @endsection
 
 @section('content')
@@ -20,12 +22,11 @@
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-create-lugar" class="position-relative needs-validation" action="{{url('/lugares/store')}}" method="post" enctype="multipart/form-data">
+  <form id="form-create-lugar" class="position-relative needs-validation" action="{{route('lugar.store')}}" method="post" enctype="multipart/form-data">
     @csrf
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
         <button type="submit" id="submit-crear-button" class="btn btn-success">Guardar</button>
-        <a class="btn btn-primary" type="button" id="volver-crear-button" href="{{route('lugares.index')}}" style="display:none">Volver</a>
       </div>
     </div>
     <div class="row mt-3 mb-3 justify-content-md-center border">
@@ -44,12 +45,15 @@
           </div>
           <div class="col-md-3">
             <label for="select_tipo" class="form-label">Tipo de lugar</label>
-            <select class="form-select form-control" name="select_tipo" id="select_tipo" required>
+            <select class="form-control" name="select_tipo" id="select_tipo" required>
               <option selected disabled value="">Elegir</option>
                 @foreach($tipos as $tipo)
                 <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
                 @endforeach
             </select>
+            @error('select_tipo')
+            <small style="color: red">{{$message}}</small>
+            @enderror
           </div>
         </div>
       </div>

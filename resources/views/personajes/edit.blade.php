@@ -7,7 +7,9 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <a href="{{route('personajes.index')}}" class="btn btn-dark">Cancelar</a>
+</li>
 @endsection
 
 @section('content')
@@ -29,7 +31,6 @@
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
         <button type="submit" id="submit-crear-button" class="btn btn-success">Guardar</button>
-        <a class="btn btn-primary" type="button" id="volver-crear-button" href="{{route('personajes.index')}}" style="display:none">Volver</a>
       </div>
     </div>
     <div class="row mt-3 mb-3 justify-content-md-center border">
@@ -80,7 +81,7 @@
         </div>
         <div class="row mt-2">
           <div class="col-md-4">
-            <label for="id_nacimiento" class="form-label">Fecha de nacimiento</label>
+            <label for="anacimiento" class="form-label">Fecha de nacimiento</label>
             <div class="input-group">
               <input id="id_nacimiento" type="hidden" name="id_nacimiento" value="0">
               <input type="number" id="dnacimiento" name="dnacimiento" class="form-select form-control" placeholder="Día">
@@ -104,11 +105,11 @@
             </div>
           </div>
           <div class="col-md-4">
-            <label for="id_fallecimiento" class="form-label">Fecha de fallecimiento</label>
+            <label for="afallecimiento" class="form-label">Fecha de fallecimiento</label>
             <div class="input-group">
               <input id="id_fallecimiento" type="hidden" name="id_fallecimiento" value="0">
               <input type="number" id="dfallecimiento" name="dfallecimiento" class="form-control" placeholder="Día">
-              <select id="mfallecimiento" name="mfallecimiento" class="form-select form-control" placeholder="Mes">
+              <select id="mfallecimiento" name="mfallecimiento" class="form-control">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
                 <option value="1">Enero</option>

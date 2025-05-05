@@ -7,7 +7,9 @@
 @endsection
 
 @section('navbar-buttons')
+<li class="nav-item ml-2">
 <button title="Nuevo" class="btn btn-dark" data-toggle="modal" data-target="#nuevo_enlace">Añadir enlace</button>
+</li>
 @endsection
 
 @section('content')
@@ -17,12 +19,12 @@
 <hr>
 
 <!-- Modal -->
-<div class="modal fade" id="confirmar_eliminacion" tabindex="-1" role="dialog" aria-labelledby="Confirmar eliminacion" aria-hidden="true">
+<div class="modal fade" id="confirmar_eliminacion" tabindex="-1" role="dialog" aria-labelledby="confirmarEliminacionLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="card card-danger">
         <div class="card-header">
-          <h5 class="card-title" id="confirmar_eliminacion">Confirmar eliminación</h5>
+          <h5 class="card-title" id="confirmarEliminacionLabel">Confirmar eliminación</h5>
           <button data-dismiss="modal" aria-label="close" class="close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -33,13 +35,12 @@
           </div>
         </div>
         <div class="card-footer">
-          <form id="form-confirmar-borrar" class="col-md-auto" action="{{route('enlace.destroy')}}"  method="POST">
+          <form id="form-confirmar-borrar" class="col-md-auto" action="{{route('enlace.destroy')}}" method="POST">
             @csrf
             @method('DELETE')
             <input type="hidden" name="id_borrar" id="id_borrar">
             <button type="button" id="cancelar-borrar-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
             <button type="submit" id="confirmar-borrar-button" class="btn btn-danger">Eliminar</button>
-            <button type="button" id="cerrar-borrar-button" class="btn btn-primary" data-dismiss="modal" style="display:none">Cerrar</button>
           </form>
         </div>
       </div>
@@ -47,18 +48,18 @@
   </div>
 </div>
 
-<div class="modal fade" id="nuevo_enlace" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="Editar nombre" aria-hidden="true">
+<div class="modal fade" id="nuevo_enlace" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="nuevoEnlaceLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="card card-dark">
         <div class="card-header">
-          <h5 class="card-title" id="nuevoEventoLabel">Nuevo enlace</h5>
+          <h5 class="card-title" id="nuevoEnlaceLabel">Nuevo enlace</h5>
           <button data-dismiss="modal" aria-label="close" class="close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
+        <form id="form-nuevo_enlace" class="col-md-auto" action="{{route('enlace.store')}}" method="POST">
         <div class="card-body">
-          <form id="form-nuevo_enlace" class="col-md-auto" action="{{route('enlace.store')}}" method="POST">
             @csrf
             <label for="nombre" class="form-label">Nombre</label>
             <input type="text" name="nombre" class="form-control" id="nombre" required>
@@ -82,9 +83,8 @@
             </div>
         </div>
         <div class="card-footer">
-          <button type="button" id="cancelar-editar-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
-          <button type="submit" id="submit-editar-button" class="btn btn-success">Guardar</button>
-          <button type="button" id="cerrar-editar-button" class="btn btn-primary" data-dismiss="modal" style="display:none">Cerrar</button>
+          <button type="button" id="cancelar-nuevo-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" id="submit-nuevo-button" class="btn btn-success">Guardar</button>
         </div>
         </form>
       </div>
@@ -92,7 +92,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="editar_enlace" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="Editar nombre" aria-hidden="true">
+<div class="modal fade" id="editar_enlace" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="editarEnlaceLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="card card-dark">
@@ -102,8 +102,8 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
+        <form id="form-editar_enlace" class="col-md-auto" action="{{route('enlace.update')}}" method="POST">
         <div class="card-body">
-          <form id="form-editar_enlace" class="col-md-auto" action="{{route('enlace.update')}}" method="POST">
             @csrf
             @method('PUT')
             <input type="hidden" name="id_editar" id="id_editar">
@@ -131,7 +131,6 @@
         <div class="card-footer">
           <button type="button" id="cancelar-editar-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
           <button type="submit" id="submit-editar-button" class="btn btn-success">Guardar</button>
-          <button type="button" id="cerrar-editar-button" class="btn btn-primary" data-dismiss="modal" style="display:none">Cerrar</button>
         </div>
         </form>
       </div>
@@ -152,8 +151,8 @@
         @else
           @foreach($generadores as $generador)
           <div class="row">
-            <button id="{{$generador->id}}" nombre="{{$generador->nombre}}" tipo="{{$generador->tipo}}" url="{{$generador->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
-            <button id="{{$generador->id}}" nombre="{{$generador->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
+            <button data-id="{{$generador->id}}" data-nombre="{{$generador->nombre}}" data-tipo="{{$generador->tipo}}" data-url="{{$generador->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
+            <button data-id="{{$generador->id}}" data-nombre="{{$generador->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
             <a href="{{$generador->url}}" class="ml-2">{{$generador->nombre}}</a>
           </div>        
           @endforeach
@@ -173,8 +172,8 @@
         @else
           @foreach($criaturas as $criatura)
           <div class="row">
-            <button id="{{$criatura->id}}" nombre="{{$criatura->nombre}}" tipo="{{$criatura->tipo}}" url="{{$criatura->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
-            <button id="{{$criatura->id}}" nombre="{{$criatura->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
+            <button data-id="{{$criatura->id}}" data-nombre="{{$criatura->nombre}}" data-tipo="{{$criatura->tipo}}" data-url="{{$criatura->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
+            <button data-id="{{$criatura->id}}" data-nombre="{{$criatura->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
             <a href="{{$criatura->url}}" class="ml-2">{{$criatura->nombre}}</a>
           </div>
           @endforeach
@@ -194,8 +193,8 @@
         @else
           @foreach($referencias as $referencia)
           <div class="row">
-            <button id="{{$referencia->id}}" nombre="{{$referencia->nombre}}" tipo="{{$referencia->tipo}}" url="{{$referencia->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
-            <button id="{{$referencia->id}}" nombre="{{$referencia->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
+            <button data-id="{{$referencia->id}}" data-nombre="{{$referencia->nombre}}" data-tipo="{{$referencia->tipo}}" data-url="{{$referencia->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
+            <button data-id="{{$referencia->id}}" data-nombre="{{$referencia->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
             <a href="{{$referencia->url}}" class="ml-2">{{$referencia->nombre}}</a>
           </div>        
           @endforeach

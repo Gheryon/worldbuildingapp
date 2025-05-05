@@ -7,7 +7,9 @@
 @endsection
 
 @section('navbar-buttons')
-<a href="{{route('organizaciones.index')}}" class="btn btn-dark">Cancelar</a>
+<li class="nav-item">
+  <a href="{{route('organizaciones.index')}}" class="btn btn-dark">Cancelar</a>
+</li>
 @endsection
 
 @section('content')
@@ -25,7 +27,6 @@
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
         <button type="submit" id="submit-crear-button" class="btn btn-success">Guardar</button>
-        <a class="btn btn-primary" type="button" id="volver-crear-button" href="{{route('organizaciones.index')}}" style="display:none">Volver</a>
       </div>
     </div>
     <div class="row mt-3 mb-3 justify-content-md-center border">
@@ -52,14 +53,14 @@
             <label for="select_tipo" class="form-label">Tipo de organización</label>
             <select class="form-select form-control" name="select_tipo" id="select_tipo" required>
               <option selected disabled value="">Elegir</option>
-                @foreach($tipo_organizacion as $tipo)
-                <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
-                @endforeach
+              @foreach($tipo_organizacion as $tipo)
+              <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
+              @endforeach
             </select>
           </div>
           <div class="col-md">
             <label for="soberano" class="form-label">Soberano</label>
-            <select class="form-select form-control" name="soberano" id="soberano" >
+            <select class="form-select form-control" name="soberano" id="soberano">
               <option selected disabled value="">Elegir</option>
               @foreach($personajes as $personaje)
               <option value="{{$personaje->id}}">{{$personaje->Nombre}}</option>
@@ -68,7 +69,7 @@
           </div>
           <div class="col-md">
             <label for="owner" class="form-label">Controlado por</label>
-            <select class="form-select form-control" name="owner" id="owner" >
+            <select class="form-select form-control" name="owner" id="owner">
               <option selected disabled value="">Elegir</option>
               @foreach($paises as $pais)
               <option value="{{$pais->id_organizacion}}">{{$pais->nombre}}</option>
@@ -78,7 +79,7 @@
         </div>
         <div class="row mt-2">
           <div class="col-md">
-            <label for="id_fundacion" class="form-label">Fecha de fundación</label>
+            <label for="afundacion" class="form-label">Fecha de fundación</label>
             <div class="input-group">
               <input id="id_fundacion" type="hidden" name="id_fundacion" value="0">
               <input type="number" id="dfundacion" name="dfundacion" class="form-select form-control" placeholder="Día">
@@ -102,11 +103,11 @@
             </div>
           </div>
           <div class="col-md">
-              <label for="id_disolucion" class="form-label">Fecha de disolución</label>
+            <label for="adisolucion" class="form-label">Fecha de disolución</label>
             <div class="input-group">
               <input id="id_disolucion" type="hidden" name="id_disolucion" value="0">
               <input type="number" id="ddisolucion" name="ddisolucion" class="form-control" placeholder="Día">
-              <select id="mdisolucion" name="mdisolucion" class="form-select form-control" placeholder="Mes">
+              <select id="mdisolucion" name="mdisolucion" class="form-control">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
                 <option value="1">Enero</option>
@@ -142,8 +143,8 @@
 
     <div class="row mt-2 mb-3">
       <div class="col">
-      <label for="DescripcionShort" class="form-label">Descripción breve</label>
-      <textarea name="DescripcionShort" class="form-control summernote-lite" id="DescripcionShort" rows="2" aria-label="With textarea"></textarea>
+        <label for="DescripcionShort" class="form-label">Descripción breve</label>
+        <textarea name="DescripcionShort" class="form-control summernote-lite" id="DescripcionShort" rows="2" aria-label="With textarea"></textarea>
       </div>
     </div>
     <!----------------------------------------------->
@@ -152,34 +153,34 @@
 
     <label for="politica" class="form-label">Política exterior e interior</label>
     <textarea name="politica" class="form-control summernote-lite" id="politica" rows="4" aria-label="With textarea"></textarea>
-    
+
     <label for="militar" class="form-label">Militar</label>
     <textarea name="militar" class="form-control summernote-lite" id="militar" rows="4" aria-label="With textarea"></textarea>
-    
+
     <label for="estructura" class="form-label">Estructura organizativa</label>
     <textarea name="estructura" class="form-control summernote-lite" id="estructura" rows="4" aria-label="With textarea"></textarea>
-    
+
     <label for="territorio" class="form-label">Territorio</label>
     <textarea name="territorio" class="form-control summernote-lite" id="territorio" rows="4" aria-label="With textarea"></textarea>
-    
+
     <label for="frontera" class="form-label">Fronteras</label>
     <textarea name="frontera" class="form-control summernote-lite" id="frontera" rows="4" aria-label="With textarea"></textarea>
-    
+
     <label for="religion" class="form-label">Religión</label>
     <textarea name="religion" class="form-control summernote-lite" id="religion" rows="4" aria-label="With textarea"></textarea>
-    
+
     <label for="demografia" class="form-label">Demografía</label>
     <textarea name="demografia" class="form-control summernote-lite" id="demografia" rows="4" aria-label="With textarea"></textarea>
-    
+
     <label for="cultura" class="form-label">Aspectos culturales</label>
     <textarea name="cultura" class="form-control summernote-lite" id="cultura" rows="4" aria-label="With textarea"></textarea>
-    
+
     <label for="educacion" class="form-label">Educación</label>
     <textarea name="educacion" class="form-control summernote" id="educacion" rows="4" aria-label="With textarea"></textarea>
 
     <label for="tecnologia" class="form-label">Tecnología y ciencia</label>
     <textarea name="tecnologia" class="form-control summernote" id="tecnologia" rows="4" aria-label="With textarea"></textarea>
-    
+
     <label for="economia" class="form-label">Economía</label>
     <textarea name="economia" class="form-control summernote" id="economia" rows="4" aria-label="With textarea"></textarea>
 
@@ -199,43 +200,12 @@
   $(function() {
     // Summernote
     $('.summernote').summernote({
-      height: 300,
-      callbacks: {
-        onImageUpload: function(files) {
-          sendFile(files[0]);
-        }
-      }
+      height: 300
     })
 
     $('.summernote-lite').summernote({
-      height: 150,
-      callbacks: {
-        onImageUpload: function(files) {
-          sendFile(files[0]);
-        }
-      }
+      height: 150
     })
-    function sendFile(file) {
-      //var url = '{{ route("articulos.get", ":id") }}';
-      //url = url.replace(':id', id);
-
-      data = new FormData();
-      data.append("file", file);
-      $.ajax({
-        data: data,
-        type: "POST",
-        url: "../controlador/imagenesController.php",
-        cache: false,
-        contentType: false,
-        processData: false,
-        success: function(url) {
-          $('.summernote').summernote("insertImage", url, 'filename');
-        },
-        error: function(data) {
-          console.log(data);
-        }
-      });
-    }
   });
 </script>
 @endsection
