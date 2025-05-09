@@ -130,9 +130,6 @@ class OrganizacionController extends Controller
     if ($request->filled('territorio')) {
       $organizacion->territorio = app(ImagenController::class)->store_for_summernote($request->territorio, "organizaciones", $id);
     }
-    if ($request->filled('frontera')) {
-      $organizacion->frontera = app(ImagenController::class)->store_for_summernote($request->frontera, "organizaciones", $id);
-    }
     if ($request->filled('religion')) {
       $organizacion->religion = app(ImagenController::class)->store_for_summernote($request->religion, "organizaciones", $id);
     }
@@ -291,9 +288,6 @@ class OrganizacionController extends Controller
     }
     if ($request->filled('territorio')) {
       $organizacion->territorio = app(ImagenController::class)->update_for_summernote($request->territorio, "organizaciones", $request->id);;
-    }
-    if ($request->filled('frontera')) {
-      $organizacion->frontera = app(ImagenController::class)->update_for_summernote($request->frontera, "organizaciones", $request->id);;
     }
     if ($request->filled('religion')) {
       $organizacion->religion = app(ImagenController::class)->update_for_summernote($request->religion, "organizaciones", $request->id);;

@@ -24,7 +24,6 @@ class organizacion extends Model
         'historia',
         'estructura',
         'politicaExteriorInterior',
-        'frontera',
         'militar',
         'religion',
         'cultura',

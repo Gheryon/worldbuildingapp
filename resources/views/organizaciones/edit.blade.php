@@ -161,11 +161,8 @@
     <label for="estructura" class="form-label">Estructura organizativa</label>
     <textarea name="estructura" class="form-control summernote" id="estructura" rows="4" aria-label="With textarea">{!!$organizacion->estructura!!}</textarea>
     
-    <label for="territorio" class="form-label">Territorio</label>
+    <label for="territorio" class="form-label">Territorio y fronteras</label>
     <textarea name="territorio" class="form-control summernote" id="territorio" rows="4" aria-label="With textarea">{!!$organizacion->territorio!!}</textarea>
-    
-    <label for="frontera" class="form-label">Fronteras</label>
-    <textarea name="frontera" class="form-control summernote" id="frontera" rows="4" aria-label="With textarea">{!!$organizacion->frontera!!}</textarea>
     
     <label for="religion" class="form-label">Religión</label>
     <textarea name="religion" class="form-control summernote" id="religion" rows="4" aria-label="With textarea">{!!$organizacion->religion!!}</textarea>
