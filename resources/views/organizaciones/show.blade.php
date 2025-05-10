@@ -44,6 +44,10 @@
           <h3>Militar</h3>
           <p class="ml-2 mr-2">{!!$vista->militar!!}</p>
         @endif
+        @if (isset($vista->territorio))
+          <h3>Territorio</h3>
+          <p class="ml-2 mr-2">{!!$vista->territorio!!}</p>
+        @endif
 
         @if (isset($vista->demografia))
           <h3>Demografía</h3>
