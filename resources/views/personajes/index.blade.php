@@ -80,7 +80,7 @@
 @if (Arr::has($personajes, 'error.error'))
   {{Arr::get($personajes, 'error.error')}}
 @else
-
+@if($personajes->count()>0)
 @foreach($personajes as $personaje)
 <div class="col-4 col-sm-12 col-md-4 col-lg-3">
   <div class="card card-dark card-outline">
@@ -89,7 +89,6 @@
         <img class="profile-user-img img-fluid img-circle" src="{{asset("storage/retratos/{$personaje->Retrato}")}}" alt="User profile picture">
       </div>
       <h3 class="profile-username text-center">{{$personaje->Nombre}}</h3>
-      
       <ul class="list-group list-group-unbordered">
         <li class="list-group-item">
           <b><i class="fa-solid fa-dna"></i> Especie</b> <a class="float-right">{{$personaje->especie}}</a>
@@ -110,6 +109,15 @@
   </div>
 </div>
 @endforeach
+  @else
+  <div class="col-12">
+    <h5 class="card-title">No hay personajes almacenados</h5>
+  </div>
+  </br>
+  <div class="col-12 mt-3">
+    <a href="{{route('personaje.create')}}" class="btn btn-dark">Crear nuevo personaje</a>
+  </div>
+  @endif
 </div>
 @endif
 

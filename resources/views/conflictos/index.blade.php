@@ -84,10 +84,11 @@
 
 <div class="row">
   @if (Arr::has($conflictos, 'error.error'))
-  <div class="text-center">No se encontraron conflictos.
+  <div class="text-center">
     {{Arr::get($conflictos, 'error.error')}}
   </div>
   @else
+  @if($conflictos->count()>0)
   @foreach($conflictos as $conflicto)
   <div class="col col-sm-12 col-md-4 col-lg-4">
     <div class="card card-dark card-outline">
@@ -113,6 +114,15 @@
     </div>
   </div>
   @endforeach
+  @else
+  <div class="col-12">
+    <h5 class="card-title">No hay artículos almacenados</h5>
+  </div>
+  </br>
+  <div class="col-12 mt-3">
+    <a href="{{route('conflicto.create')}}" class="btn btn-dark">Añadir nuevo conflicto</a>
+  </div>
+  @endif
   @endif
 </div>
 @endsection

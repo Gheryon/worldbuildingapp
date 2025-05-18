@@ -59,23 +59,37 @@
 </div>
 
 <div class="row">
-@foreach($especies as $especie)
-<div class="col-4 col-sm-6 col-md-4 col-lg-3">
-  <div class="card card-dark card-outline">
-    <div class="card-body box-profile">
-      <h3 class="profile-username text-center">{{$especie->nombre}}</h3>
-    </div>
-    <!-- /.card-body -->
-    <div class="card-footer">
-      <div class="row text-right">
-        <a href="{{route('especie.show',$especie->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-        <a href="{{route('especie.edit',$especie->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-        <button data-id="{{$especie->id}}" data-nombre="{{$especie->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-especie"><i class="fas fa-trash mr-1"></i></button>
+@if (Arr::has($especies, 'error.error'))
+  {{Arr::get($especies, 'error.error')}}
+@else
+  @if($especies->count()>0)
+    @foreach($especies as $especie)
+    <div class="col-4 col-sm-6 col-md-4 col-lg-3">
+      <div class="card card-dark card-outline">
+        <div class="card-body box-profile">
+          <h3 class="profile-username text-center">{{$especie->nombre}}</h3>
+        </div>
+        <!-- /.card-body -->
+        <div class="card-footer">
+          <div class="row text-right">
+            <a href="{{route('especie.show',$especie->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+            <a href="{{route('especie.edit',$especie->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+            <button data-id="{{$especie->id}}" data-nombre="{{$especie->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-especie"><i class="fas fa-trash mr-1"></i></button>
+          </div>
+        </div>
       </div>
     </div>
+    @endforeach
+  @else
+  <div class="col-12">
+    <h5 class="card-title">No hay especies almacenadas</h5>
   </div>
-</div>
-@endforeach
+    </br>
+  <div class="col-12 mt-3">
+    <a href="{{route('especie.create')}}" class="btn btn-dark">Añadir nueva especie</a>
+  </div>
+  @endif
+@endif
 </div>
 @endsection
 

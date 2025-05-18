@@ -82,15 +82,15 @@
 
 <div class="row">
   @if (Arr::has($organizaciones, 'error.error'))
-  <div class="text-center">No se encontraron resultados.
+  <div class="text-center">
     {{Arr::get($organizaciones, 'error.error')}}
   </div>
   @else
+  @if($organizaciones->count()>0)
   @foreach($organizaciones as $organizacion)
   <div class="col col-sm-6 col-md-4 col-lg-3">
     <div class="card card-dark card-outline">
       <div class="card-body box-profile">
-
         <div class="text-center">
           <h2 class="lead"><b>{{$organizacion->nombre}}</b></h2>
           <img class="img-fluid" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" alt="Escudo">
@@ -112,6 +112,15 @@
     </div>
   </div>
   @endforeach
+  @else
+  <div class="col-12">
+    <h5 class="card-title">No hay organizaciones almacenados</h5>
+  </div>
+  </br>
+  <div class="col-12 mt-3">
+    <a href="{{route('organizacion.create')}}" class="btn btn-dark">Añadir organización nueva</a>
+  </div>
+  @endif
   @endif
 </div>
 @endsection

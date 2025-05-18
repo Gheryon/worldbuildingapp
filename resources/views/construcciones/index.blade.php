@@ -83,32 +83,42 @@
 
 <div class="row">
   @if (Arr::has($construcciones, 'error.error'))
-  <div class="text-center">No se encontraron resultados.
+  <div class="text-center">
     {{Arr::get($construcciones, 'error.error')}}
   </div>
   @else
-  @foreach($construcciones as $construccion)
-  <div class="col-4 col-sm-6 col-md-4 col-lg-3">
-    <div class="card card-dark card-outline">
-      <div class="card-body box-profile">
-        <h3 class="profile-username text-center">{{$construccion->nombre}}</h3>
-        <ul class="list-group list-group-unbordered mb-3">
-          <li class="list-group-item">
-            <b>Tipo:</b> {{$construccion->tipo}}
-          </li>
-        </ul>
-      </div>
-      <!-- /.card-body -->
-      <div class="card-footer">
-        <div class="row text-right">
-          <a href="{{route('construccion.show',$construccion->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-          <a href="{{route('construccion.edit',$construccion->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-          <button data-id="{{$construccion->id}}" data-nombre="{{$construccion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-construccion"><i class="fas fa-trash mr-1"></i></button>
+    @if($construcciones->count()>0)
+      @foreach($construcciones as $construccion)
+      <div class="col-4 col-sm-6 col-md-4 col-lg-3">
+        <div class="card card-dark card-outline">
+          <div class="card-body box-profile">
+            <h3 class="profile-username text-center">{{$construccion->nombre}}</h3>
+            <ul class="list-group list-group-unbordered mb-3">
+              <li class="list-group-item">
+                <b>Tipo:</b> {{$construccion->tipo}}
+              </li>
+            </ul>
+          </div>
+          <!-- /.card-body -->
+          <div class="card-footer">
+            <div class="row text-right">
+              <a href="{{route('construccion.show',$construccion->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+              <a href="{{route('construccion.edit',$construccion->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+              <button data-id="{{$construccion->id}}" data-nombre="{{$construccion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-construccion"><i class="fas fa-trash mr-1"></i></button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-  @endforeach
+      @endforeach
+    @else
+      <div class="col-12">
+        <h5 class="card-title">No hay construcciones almacenadas</h5>
+      </div>
+      </br>
+      <div class="col-12 mt-3">
+        <a href="{{route('construccion.create')}}" class="btn btn-dark">Añadir nueva construcción</a>
+      </div>
+      @endif
   @endif
 </div>
 @endsection

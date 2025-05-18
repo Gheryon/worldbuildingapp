@@ -74,10 +74,11 @@
 
 <div class="row">
   @if (Arr::has($religiones, 'error.error'))
-  <div class="text-center">No se encontraron religiones.
+  <div class="text-center">
     {{Arr::get($religiones, 'error.error')}}
   </div>
   @else
+  @if($religiones->count()>0)
   @foreach($religiones as $religion)
   <div class="col-6 col-sm-6 col-md-6 col-lg-6">
     <div class="card card-dark card-outline">
@@ -95,8 +96,16 @@
     </div>
   </div>
   @endforeach
+  @else
+  <div class="col-12">
+    <h5 class="card-title">No hay religiones almacenadas</h5>
+  </div>
+  </br>
+  <div class="col-12 mt-3">
+    <a href="{{route('religion.create')}}" class="btn btn-dark">Añadir religión nueva</a>
+  </div>
   @endif
-
+  @endif
 </div>
 @endsection
 

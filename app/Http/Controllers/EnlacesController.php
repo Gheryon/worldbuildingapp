@@ -18,19 +18,31 @@ class EnlacesController extends Controller
       $generadores=DB::table('enlaces')
         ->where('tipo', '=', 'generador')
         ->orderBy('nombre', 'asc')->get();
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $generadores = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $generadores = ['error' => ['error' => $excepcion->getMessage()]];
+    }
+    try{
       $criaturas=DB::table('enlaces')
       ->where('tipo', '=', 'criatura')
       ->orderBy('nombre', 'asc')->get();
+    }catch(\Illuminate\Database\QueryException $excepcion){
+      $criaturas = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    }catch(Exception $excepcion){
+      $criaturas = ['error' => ['error' => $excepcion->getMessage()]];
+    }
+    try{
       $referencias=DB::table('enlaces')
       ->where('tipo', '=', 'referencia')
       ->orderBy('nombre', 'asc')->get();
-      return view('enlaces.index', ['generadores' => $generadores, 'criaturas' => $criaturas, 'referencias' => $referencias]);
-
     }catch(\Illuminate\Database\QueryException $excepcion){
-      return view('enlaces.index')->with('error', 'Se produjo un problema en la base de datos.');
+      $referencias = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     }catch(Exception $excepcion){
-      return view('enlaces.index')->with('error', $excepcion->getMessage());
+      $referencias = ['error' => ['error' => $excepcion->getMessage()]];
     }
+
+      return view('enlaces.index', ['generadores' => $generadores, 'criaturas' => $criaturas, 'referencias' => $referencias]);
   }
 
   /**

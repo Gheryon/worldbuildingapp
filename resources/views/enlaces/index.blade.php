@@ -149,13 +149,19 @@
         @if (Arr::has($generadores, 'error.error'))
           {{Arr::get($generadores, 'error.error')}}
         @else
-          @foreach($generadores as $generador)
-          <div class="row">
-            <button data-id="{{$generador->id}}" data-nombre="{{$generador->nombre}}" data-tipo="{{$generador->tipo}}" data-url="{{$generador->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
-            <button data-id="{{$generador->id}}" data-nombre="{{$generador->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
-            <a href="{{$generador->url}}" class="ml-2">{{$generador->nombre}}</a>
-          </div>        
-          @endforeach
+          @if($generadores->count()>0)
+            @foreach($generadores as $generador)
+            <div class="row">
+              <button data-id="{{$generador->id}}" data-nombre="{{$generador->nombre}}" data-tipo="{{$generador->tipo}}" data-url="{{$generador->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
+              <button data-id="{{$generador->id}}" data-nombre="{{$generador->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
+              <a href="{{$generador->url}}" class="ml-2">{{$generador->nombre}}</a>
+            </div>        
+            @endforeach
+          @else
+            <h5 class="card-title">No hay enlaces almacenados</h5>
+            <br>
+            <button title="Nuevo" class="btn btn-dark mt-3" data-toggle="modal" data-target="#nuevo_enlace">Añadir enlace</button>
+          @endif
         @endif
       </div>
       <div class="card-footer">
@@ -170,13 +176,19 @@
         @if (Arr::has($criaturas, 'error.error'))
           {{Arr::get($criaturas, 'error.error')}}
         @else
-          @foreach($criaturas as $criatura)
-          <div class="row">
-            <button data-id="{{$criatura->id}}" data-nombre="{{$criatura->nombre}}" data-tipo="{{$criatura->tipo}}" data-url="{{$criatura->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
-            <button data-id="{{$criatura->id}}" data-nombre="{{$criatura->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
-            <a href="{{$criatura->url}}" class="ml-2">{{$criatura->nombre}}</a>
-          </div>
-          @endforeach
+          @if($generadores->count()>0)
+            @foreach($criaturas as $criatura)
+            <div class="row">
+              <button data-id="{{$criatura->id}}" data-nombre="{{$criatura->nombre}}" data-tipo="{{$criatura->tipo}}" data-url="{{$criatura->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
+              <button data-id="{{$criatura->id}}" data-nombre="{{$criatura->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
+              <a href="{{$criatura->url}}" class="ml-2">{{$criatura->nombre}}</a>
+            </div>
+            @endforeach
+          @else
+            <h5 class="card-title">No hay enlaces almacenados</h5>
+            <br>
+            <button title="Nuevo" class="btn btn-dark mt-3" data-toggle="modal" data-target="#nuevo_enlace">Añadir enlace</button>
+          @endif
         @endif
       </div>
       <div class="card-footer">
@@ -191,13 +203,19 @@
       @if (Arr::has($referencias, 'error.error'))
           {{Arr::get($referencias, 'error.error')}}
         @else
-          @foreach($referencias as $referencia)
-          <div class="row">
-            <button data-id="{{$referencia->id}}" data-nombre="{{$referencia->nombre}}" data-tipo="{{$referencia->tipo}}" data-url="{{$referencia->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
-            <button data-id="{{$referencia->id}}" data-nombre="{{$referencia->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
-            <a href="{{$referencia->url}}" class="ml-2">{{$referencia->nombre}}</a>
-          </div>        
-          @endforeach
+          @if($generadores->count()>0)
+            @foreach($referencias as $referencia)
+            <div class="row">
+              <button data-id="{{$referencia->id}}" data-nombre="{{$referencia->nombre}}" data-tipo="{{$referencia->tipo}}" data-url="{{$referencia->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
+              <button data-id="{{$referencia->id}}" data-nombre="{{$referencia->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
+              <a href="{{$referencia->url}}" class="ml-2">{{$referencia->nombre}}</a>
+            </div>        
+            @endforeach
+          @else
+            <h5 class="card-title">No hay enlaces almacenados</h5>
+            <br>
+            <button title="Nuevo" class="btn btn-dark mt-3" data-toggle="modal" data-target="#nuevo_enlace">Añadir enlace</button>
+          @endif
         @endif
       </div>
       <div class="card-footer">

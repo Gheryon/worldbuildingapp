@@ -8,7 +8,7 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-<a href="{{route('asentamiento.create')}}" class="btn btn-dark">Nueva asentamiento</a>
+<a href="{{route('asentamiento.create')}}" class="btn btn-dark">Nuevo asentamiento</a>
 </li>
 <li class="nav-item ml-2">
 <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
@@ -88,23 +88,33 @@
     {{Arr::get($asentamientos, 'error.error')}}
   </div>
   @else
-  @foreach($asentamientos as $asentamiento)
-  <div class="col col-sm-6 col-md-4 col-lg-2">
-    <div class="card card-dark card-outline">
-      <div class="card-body box-profile">
-        <h3 class="profile-username text-center">{{$asentamiento->nombre}}</h3>
-      </div>
-      <!-- /.card-body -->
-      <div class="card-footer">
-        <div class="row text-right">
-          <a href="{{route('asentamiento.show',$asentamiento->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col col-sm-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-          <a href="{{route('asentamiento.edit',$asentamiento->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col col-sm-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-          <button data-id="{{$asentamiento->id}}" data-nombre="{{$asentamiento->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col col-sm-4" data-toggle="modal" data-target="#eliminar-asentamiento"><i class="fas fa-trash mr-1"></i></button>
+    @if($asentamientos->count()>0)
+      @foreach($asentamientos as $asentamiento)
+      <div class="col col-sm-6 col-md-4 col-lg-2">
+        <div class="card card-dark card-outline">
+          <div class="card-body box-profile">
+            <h3 class="profile-username text-center">{{$asentamiento->nombre}}</h3>
+          </div>
+          <!-- /.card-body -->
+          <div class="card-footer">
+            <div class="row text-right">
+              <a href="{{route('asentamiento.show',$asentamiento->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col col-sm-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+              <a href="{{route('asentamiento.edit',$asentamiento->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col col-sm-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+              <button data-id="{{$asentamiento->id}}" data-nombre="{{$asentamiento->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col col-sm-4" data-toggle="modal" data-target="#eliminar-asentamiento"><i class="fas fa-trash mr-1"></i></button>
+            </div>
+          </div>
         </div>
       </div>
+      @endforeach
+    @else
+    <div class="col-12">
+      <h5 class="card-title">No hay asentamientos almacenados</h5>
     </div>
-  </div>
-  @endforeach
+      </br>
+    <div class="col-12 mt-3">
+      <a href="{{route('asentamiento.create')}}" class="btn btn-dark">Crear nuevo asentamiento</a>
+    </div>
+    @endif
   @endif
 </div>
 @endsection

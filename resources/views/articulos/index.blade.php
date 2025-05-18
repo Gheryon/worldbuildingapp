@@ -78,10 +78,11 @@
 <div class="row">
   <div class="col-md-12">
     @if (Arr::has($articulos, 'error.error'))
-    <div class="text-center">No se encontraron artículos.
+    <div class="text-center">
       {{Arr::get($articulos, 'error.error')}}
     </div>
     @else
+    @if($articulos->count()>0)
     <table class="table table-bordered table-sm table-striped table-hoover">
       <thead>
         <tr>
@@ -107,6 +108,15 @@
         </tr>
         @endforeach
       </tbody>
+      @else
+      <div class="col-12">
+        <h5 class="card-title">No hay artículos almacenados</h5>
+      </div>
+      </br>
+      <div class="col-12 mt-3">
+        <a href="{{route('articulos.create')}}" class="btn btn-dark">Añadir nuevo articulo</a>
+      </div>
+      @endif
     </table>
 
     @endif
