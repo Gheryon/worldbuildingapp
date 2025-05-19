@@ -263,7 +263,7 @@ class ConfigurationController extends Controller
   public function update(Request $request)
   {
     try {
-      if($request->tipo_editar=='lugar'){
+      if($request->tipo_editar=='asentamiento'){
         $tipo_editar=tipo_asentamiento::findorfail($request->id_editar);
       }
       if($request->tipo_editar=='conflicto'){
