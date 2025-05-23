@@ -315,7 +315,7 @@ class PersonajeController extends Controller
           app(ConfigurationController::class)->update_fecha($request->input('dfallecimiento', 0), $request->input('mfallecimiento', 0), $request->input('afallecimiento', 0), $personaje->fallecimiento);
         } else {
           //el personaje no tenía fecha de fallecimiento antes de editar, hay que añadirla a la db.
-          $personaje->nacimiento = app(ConfigurationController::class)->store_fecha($request->input('dfallecimiento', 0), $request->input('mfallecimiento', 0), $request->input('afallecimiento', 0), "personajes");
+          $personaje->fallecimiento = app(ConfigurationController::class)->store_fecha($request->input('dfallecimiento', 0), $request->input('mfallecimiento', 0), $request->input('afallecimiento', 0), "personajes");
         }
       }
 
