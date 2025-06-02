@@ -133,6 +133,15 @@
             <label for="lema" class="form-label">Lema</label>
             <input type="text" name="lema" class="form-control" id="lema" value="{{$organizacion->lema}}">
           </div>
+        <div class="col-md-5">
+          <label for="religiones" class="form-label">Religiones presentes</label>
+          <select class="form-select form-control" multiple="multiple" data-placeholder="Religiones" name="religiones[]" id="religiones" style="width: 100%;">
+            <option selected disabled value="">Elegir</option>
+            @foreach($religiones as $religion)
+            <option value="{{$religion->id}}" @foreach($religiones_p as $p) @if($religion->id==$p->religion)selected @endif @endforeach >{{$religion->nombre}}</option>
+            @endforeach
+          </select>
+        </div>
         </div>
       </div>
       <div class="col-md-3 mt-2 mb-2">

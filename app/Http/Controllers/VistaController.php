@@ -192,7 +192,15 @@ class VistaController extends Controller
       $fecha_disolucion = "Desconocido";
     }
 
-    return view('organizaciones.show', ['vista' => $organizacion, 'fundacion' => $fecha_fundacion, 'disolucion' => $fecha_disolucion, 'tipo' => $tipo[0]->nombre, 'owner' => $owner, 'soberano' => $soberano, 'subditos' => $subditos]);
+    try {
+      $religiones = DB::select('SELECT religiones.nombre, religiones.id FROM religiones JOIN religion_presence ON religion_presence.religion=religiones.id WHERE religion_presence.organizacion = ?', [$id]);
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $religiones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $religiones = ['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    return view('organizaciones.show', ['vista' => $organizacion, 'fundacion' => $fecha_fundacion, 'disolucion' => $fecha_disolucion, 'tipo' => $tipo[0]->nombre, 'owner' => $owner, 'soberano' => $soberano, 'subditos' => $subditos, 'religiones'=>$religiones]);
   }
 
   public function show_lugar($id)

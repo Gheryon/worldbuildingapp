@@ -71,6 +71,14 @@ class OrganizacionController extends Controller
     }
 
     try {
+      $religiones = DB::table('religiones')->select('id', 'nombre')->orderBy('nombre', 'asc')->get();
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $religiones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $religiones = ['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try {
       $paises = DB::table('organizaciones')->select('id_organizacion', 'nombre')->where('id_organizacion', '!=', 0)->orderBy('nombre', 'asc')->get();
     } catch (\Illuminate\Database\QueryException $excepcion) {
       $paises = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
@@ -78,7 +86,7 @@ class OrganizacionController extends Controller
       $paises = ['error' => ['error' => $excepcion->getMessage()]];
     }
 
-    return view('organizaciones.create', ['tipo_organizacion' => $tipo_organizacion, 'personajes' => $personajes, 'paises' => $paises]);
+    return view('organizaciones.create', ['tipo_organizacion' => $tipo_organizacion, 'paises' => $paises, 'personajes' => $personajes, 'religiones'=>$religiones]);
   }
 
   /**
@@ -93,6 +101,8 @@ class OrganizacionController extends Controller
       'gentilicio' => 'nullable|max:128',
       'capital' => 'nullable|max:128',
       'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
+      'dfundacion' => 'nullable|integer|min:1|max:30',
+      'ddisolucion' => 'nullable|integer|min:1|max:30',
     ]);
 
     try {
@@ -159,6 +169,22 @@ class OrganizacionController extends Controller
     $organizacion->id_owner = $request->input('owner', 0);
     $organizacion->id_tipo_organizacion = $request->select_tipo;
 
+    if($request->filled('religiones')){
+      $religiones=$request->input('religiones');
+      try{
+        foreach ($religiones as $religion) {
+          DB::table('religion_presence')->insert([
+            'organizacion' => $id,
+            'religion' => $religion
+          ]);
+        }
+      }catch(\Illuminate\Database\QueryException $excepcion){
+
+      }catch(Exception $excepcion){
+        
+      }
+    }
+
     try {
       //------------escudo----------//
       if ($request->hasFile('escudo')) {
@@ -206,7 +232,7 @@ class OrganizacionController extends Controller
     }
 
     try {
-      $tipo_organizacion = tipo_organizacion::orderBy('nombre', 'asc')->get();
+      $tipo_organizacion = tipo_organizacion::where('id', '=', $organizacion->id_tipo_organizacion)->get();
     } catch (\Illuminate\Database\QueryException $excepcion) {
       $tipo_organizacion = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     } catch (Exception $excepcion) {
@@ -229,6 +255,22 @@ class OrganizacionController extends Controller
       $paises = ['error' => ['error' => $excepcion->getMessage()]];
     }
 
+    try {
+      $religiones = DB::table('religiones')->select('id', 'nombre')->orderBy('nombre', 'asc')->get();
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $religiones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $religiones = ['error' => ['error' => $excepcion->getMessage()]];
+    }
+
+    try {
+      $religiones_p = DB::table('religion_presence')->select('religion')->where('organizacion', '=', $id)->get();
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $religiones_p = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $religiones_p = ['error' => ['error' => $excepcion->getMessage()]];
+    }
+
     if ($organizacion->fundacion != 0) {
       $fecha_fundacion = Fecha::find($organizacion->fundacion);
     } else {
@@ -241,7 +283,7 @@ class OrganizacionController extends Controller
       $fecha_disolucion = Fecha::find(0);
     }
 
-    return view('organizaciones.edit', ['organizacion' => $organizacion, 'fundacion' => $fecha_fundacion, 'disolucion' => $fecha_disolucion, 'tipo_organizacion' => $tipo_organizacion, 'personajes' => $personajes, 'paises' => $paises]);
+    return view('organizaciones.edit', ['organizacion' => $organizacion, 'fundacion' => $fecha_fundacion, 'disolucion' => $fecha_disolucion, 'tipo_organizacion' => $tipo_organizacion, 'personajes' => $personajes, 'paises' => $paises, 'religiones' => $religiones, 'religiones_p' => $religiones_p]);
   }
 
   /**
@@ -256,6 +298,8 @@ class OrganizacionController extends Controller
       'gentilicio' => 'nullable|max:128',
       'capital' => 'nullable|max:128',
       'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
+      'dfundacion' => 'nullable|integer|min:1|max:30',
+      'ddisolucion' => 'nullable|integer|min:1|max:30',
     ]);
 
     try {
@@ -321,6 +365,24 @@ class OrganizacionController extends Controller
     //------------fechas----------//
     $organizacion->fundacion = $request->input('id_fundacion', 0);
     $organizacion->disolucion = $request->input('id_disolucion', 0);
+
+    if($request->filled('religiones')){
+      //se borran las religiones antiguas
+      DB::table('religion_presence')->where('organizacion', '=', $request->id)->delete();
+      $religiones=$request->input('religiones');
+      try{
+        foreach ($religiones as $religion) {
+          DB::table('religion_presence')->insert([
+            'organizacion' => $request->id,
+            'religion' => $religion
+          ]);
+        }
+      }catch(\Illuminate\Database\QueryException $excepcion){
+
+      }catch(Exception $excepcion){
+        
+      }
+    }
 
     try {
       //------------escudo----------//
@@ -401,6 +463,8 @@ class OrganizacionController extends Controller
         }
         imagen::destroy($imagen->id);
       }
+      DB::table('religion_presence')->where('organizacion', '=', $request->id_borrar)->delete();
+
       Organizacion::destroy($request->id_borrar);
       return redirect()->route('organizaciones.index')->with('message', $request->nombre_borrado . ' borrado correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {

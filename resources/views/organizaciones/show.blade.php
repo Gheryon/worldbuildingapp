@@ -24,60 +24,60 @@
         
         @if (isset($vista->descripcionBreve))
           <h3 class="mt-3">Descripción breve</h3>
-          <p class="ml-2 mr-2">{!!$vista->descripcionBreve!!}</p>
+          <p class="ml-2 mr-2 mt-1">{!!$vista->descripcionBreve!!}</p>
         @endif
 
         @if (isset($vista->historia))
-          <h2>Historia</h2>
-          <p class="ml-2 mr-2">{!!$vista->historia!!}</p>
+          <h2 class="mt-2">Historia</h2>
+          <p class="ml-2 mr-2 mt-1">{!!$vista->historia!!}</p>
         @endif
 
         @if (isset($vista->estructura))
-          <h3>Estructura política</h3>
-          <p class="ml-2 mr-2">{!!$vista->estructura!!}</p>
+          <h3 class="mt-2">Estructura política</h3>
+          <p class="ml-2 mr-2 mt-1">{!!$vista->estructura!!}</p>
         @endif
         @if (isset($vista->politicaExteriorInterior))
-          <h3>Política exterior e interior</h3>
-          <p class="ml-2 mr-2">{!!$vista->politicaExteriorInterior!!}</p>
+          <h3 class="mt-2">Política exterior e interior</h3>
+          <p class="ml-2 mr-2 mt-1">{!!$vista->politicaExteriorInterior!!}</p>
         @endif
         @if (isset($vista->militar))
-          <h3>Militar</h3>
-          <p class="ml-2 mr-2">{!!$vista->militar!!}</p>
+          <h3 class="mt-2">Militar</h3>
+          <p class="ml-2 mr-2 mt-1">{!!$vista->militar!!}</p>
         @endif
         @if (isset($vista->territorio))
-          <h3>Territorio</h3>
-          <p class="ml-2 mr-2">{!!$vista->territorio!!}</p>
+          <h3 class="mt-2">Territorio</h3>
+          <p class="ml-2 mr-2 mt-1">{!!$vista->territorio!!}</p>
         @endif
 
         @if (isset($vista->demografia))
-          <h3>Demografía</h3>
-          <p class="ml-2 mr-2">{!!$vista->demografia!!}</p>
+          <h3 class="mt-2">Demografía</h3>
+          <p class="ml-2 mr-2 mt-1">{!!$vista->demografia!!}</p>
         @endif
         @if (isset($vista->religion))
-          <h3>Religión</h3>
-          <p class="ml-2 mr-2">{!!$vista->religion!!}</p>
+          <h3 class="mt-2">Religión</h3>
+          <p class="ml-2 mr-2 mt-1">{!!$vista->religion!!}</p>
         @endif
         @if (isset($vista->educacion))
-          <h3>Educación</h3>
-          <p class="ml-2 mr-2"></br>{!!$vista->educacion!!}</p>
+          <h3 class="mt-2">Educación</h3>
+          <p class="ml-2 mr-2 mt-1">{!!$vista->educacion!!}</p>
         @endif
         @if (isset($vista->cultura))
-          <h3>Elementos culturales</h3>
-          <p class="ml-2 mr-2">{!!$vista->cultura!!}</p>
+          <h3 class="mt-2">Elementos culturales</h3>
+          <p class="ml-2 mr-2 mt-1">{!!$vista->cultura!!}</p>
         @endif
         
         @if (isset($vista->economia))
-          <h3>Economía</h3>
-          <p class="ml-2 mr-2">{!!$vista->economia!!}</p>
+          <h3 class="mt-2">Economía</h3>
+          <p class="ml-2 mr-2 mt-1">{!!$vista->economia!!}</p>
         @endif
         @if (isset($vista->recursosNaturales))
-          <h3>Recursos naturales</h3>
-          <p class="ml-2 mr-2"></br>{!!$vista->recursosNaturales!!}</p>
+          <h3 class="mt-2">Recursos naturales</h3>
+          <p class="ml-2 mr-2 mt-1"><{!!$vista->recursosNaturales!!}</p>
         @endif
 
         @if (isset($vista->otros))
         <h2>Otros</h2>
-        <p class="ml-2 mr-2">{!!$vista->otros!!}</p>
+        <p class="ml-2 mr-2 mt-1">{!!$vista->otros!!}</p>
         @endif
         
       </div>
@@ -126,6 +126,15 @@
               <p class="ml-1 mr-2"><a href="{{route('organizacion.show',$owner->id_organizacion)}}">{{$owner->nombre}}</a></p>
             @endif
             
+            @if (isset($religiones))
+            @if (filled($religiones))
+            <h3 class="mt-2">Religiones presentes</h3>
+            @foreach($religiones as $rel)
+            <p class="ml-1 mr-2"><a href="{{route('religion.show', [$rel->id] )}}">{{$rel->nombre}}</a></p>
+            @endforeach
+            @endif
+            @endif
+
             @if (isset($subditos))
               @if (filled($subditos))
               <h3 class="mt-2">Súbditos</h3>

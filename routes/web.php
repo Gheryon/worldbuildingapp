@@ -24,7 +24,7 @@ Route::controller(App\Http\Controllers\PersonajeController::class)->group(functi
   Route::get('/personajes/{id}/edit', 'edit')->name('personaje.edit');
   Route::put('/personajes/{id}', 'update')->name('personaje.update');
   Route::delete('/personaje/destroy', 'destroy')->name('personaje.destroy');
-  Route::get('/personajes', 'search')->name('personajes.search');
+  Route::get('/personajes/index', 'search')->name('personajes.search');
 });
 
 /*******organizaciones routes********/
@@ -35,7 +35,7 @@ Route::controller(App\Http\Controllers\OrganizacionController::class)->group(fun
   Route::get('/organizaciones/{id}/edit', 'edit')->name('organizacion.edit');
   Route::put('/organizaciones/{id}', 'update')->name('organizacion.update');
   Route::delete('/organizacion/destroy', 'destroy')->name('organizacion.destroy');
-  Route::get('/organizaciones', 'search')->name('organizaciones.search');
+  Route::get('/organizaciones/index', 'search')->name('organizaciones.search');
 });
 
 /*******religiones routes********/
@@ -46,7 +46,7 @@ Route::controller(App\Http\Controllers\ReligionesController::class)->group(funct
   Route::get('/religiones/{id}/edit', 'edit')->name('religion.edit');
   Route::put('/religiones/{id}', 'update')->name('religion.update');
   Route::delete('/religiones/destroy', 'destroy')->name('religion.destroy');
-  Route::get('/religiones', 'search')->name('religiones.search');
+  Route::get('/religiones/index', 'search')->name('religiones.search');
 });
 
 /*******especies routes********/
