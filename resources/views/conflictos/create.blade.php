@@ -44,6 +44,9 @@
             <div class="input-group">
               <input id="id_inicio" type="hidden" name="id_inicio" value="0">
               <input type="number" id="dinicio" name="dinicio" class="form-select form-control" placeholder="Día">
+              @error('dinicio')
+              <small style="color: red">{{$message}}</small>
+              @enderror
               <select id="minicio" name="minicio" class="form-control">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
@@ -60,7 +63,13 @@
                 <option value="11">Noviembre</option>
                 <option value="12">Diciembre</option>
               </select>
+              @error('minicio')
+              <small style="color: red">{{$message}}</small>
+              @enderror
               <input type="number" id="ainicio" name="ainicio" class="form-control" placeholder="Año">
+              @error('ainicio')
+              <small style="color: red">{{$message}}</small>
+              @enderror
             </div>
           </div>
           <div class="col">
@@ -68,6 +77,9 @@
             <div class="input-group">
               <input id="id_fin" type="hidden" name="id_fin" value="0">
               <input type="number" id="dfin" name="dfin" class="form-control" placeholder="Día">
+              @error('dfin')
+              <small style="color: red">{{$message}}</small>
+              @enderror
               <select id="mfin" name="mfin" class="form-select form-control">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
@@ -84,7 +96,13 @@
                 <option value="11">Noviembre</option>
                 <option value="12">Diciembre</option>
               </select>
+              @error('mfin')
+              <small style="color: red">{{$message}}</small>
+              @enderror
               <input type="number" id="afin" name="afin" class="form-control" placeholder="Año">
+              @error('afin')
+              <small style="color: red">{{$message}}</small>
+              @enderror
             </div>
           </div>
         </div>

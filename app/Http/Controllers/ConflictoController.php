@@ -97,6 +97,8 @@ class ConflictoController extends Controller
       'nombre'=>'required|max:256',
       'select_tipo'=>'required',
       'tipo_localizacion'=>'required',
+      'dfin' => 'nullable|integer|min:1|max:30',
+      'dinicio' => 'nullable|integer|min:1|max:30',
     ]);
 
     $conflicto=new Conflicto();
@@ -322,6 +324,8 @@ class ConflictoController extends Controller
     'nombre'=>'required|max:256',
     'select_tipo'=>'required',
     'tipo_localizacion'=>'required',
+    'dfin' => 'nullable|integer|min:1|max:30',
+    'dinicio' => 'nullable|integer|min:1|max:30',
     ]);
 
     try {
