@@ -170,6 +170,16 @@
         <h3 class="timeline-header">Destrucción de <a href="{{route('organizacion.show',$evento->id)}}" role="button" title="Ver {{$evento->nombre}}" class=""><b>{{$evento->nombre}}</b></a></h3>
         @break
 
+        @case('fecha_actual')
+        <h3 class="timeline-header">Fecha actual: 
+          @if($evento->dia==0&&$evento->mes==0)
+          <span >{{$evento->anno}}</span>
+          @else
+          <span ><b>{{$evento->dia}}/{{$evento->mes}}/{{$evento->anno}}</b></span>
+          @endif
+        </h3>
+        @break
+
         @default
         <h3 class="timeline-header">{{$evento->nombre}}</h3>
         <div class="timeline-body">

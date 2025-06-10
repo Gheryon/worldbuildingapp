@@ -69,7 +69,7 @@ class LugaresController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'nombre'=>'required|max:128',
+      'nombre'=>'required|max:256',
       'select_tipo'=>'required',
     ]);
 
@@ -158,7 +158,7 @@ class LugaresController extends Controller
   public function update(Request $request)
   {
     $request->validate([
-      'nombre'=>'required|max:128',
+      'nombre'=>'required|max:256',
       'select_tipo'=>'required',
     ]);
 

@@ -69,9 +69,15 @@ class PersonajeController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:128',
+      'nombre' => 'required|max:256',
+      'nombre_familia' => 'nullable|max:256',
+      'causa_fallecimiento' => 'nullable|max:256',
       'sexo' => 'required',
       'select_especie' => 'required',
+      'dnacimiento' => 'nullable|integer|min:1|max:30',
+      'anacimiento' => 'nullable|integer',
+      'dfallecimiento' => 'nullable|integer|min:1|max:30',
+      'afallecimiento' => 'nullable|integer',
       'retrato' => 'file|image|mimes:jpg,png,gif|max:10240',
     ]);
 
@@ -209,9 +215,15 @@ class PersonajeController extends Controller
   public function update(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:128',
+      'nombre' => 'required|max:256',
+      'nombre_familia' => 'nullable|max:256',
+      'causa_fallecimiento' => 'nullable|max:256',
       'sexo' => 'required',
       'select_especie' => 'required',
+      'dnacimiento' => 'nullable|integer|min:1|max:30',
+      'anacimiento' => 'nullable|integer',
+      'dfallecimiento' => 'nullable|integer|min:1|max:30',
+      'afallecimiento' => 'nullable|integer',
       'retrato' => 'file|image|mimes:jpg,png,gif|max:10240',
     ]);
 

@@ -125,6 +125,20 @@ class TimelineController extends Controller
       $organizaciones_fin=['error' => ['error' => $excepcion->getMessage()]];
     }
     
+    try {//la fecha actual se guarda con id=1
+      $fecha_actual=DB::table('fechas')
+      ->select('fechas.id', 'fechas.dia', 'fechas.mes', 'fechas.anno')
+      ->selectRaw("CONCAT(' ', ' ') AS descripcion")
+      ->selectRaw("CONCAT('nombre') AS nombre, CONCAT('fecha_actual') AS tipo")
+      ->where('fechas.id', '=', 1);
+    } catch (\Illuminate\Database\QueryException $excepcion) {
+      $fecha_actual=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
+    } catch (Exception $excepcion) {
+      $fecha_actual=['error' => ['error' => $excepcion->getMessage()]];
+    }
+    
+    //para unionAll es necesario que todas las consultas anteriores devuelvan el mismo numero de columnas y 
+    //con el mismo nombre: id, dia, mes, anno, descripcion, nombre y tipo, sino dará error
     try{
       $eventos=DB::table('timelines')
         ->select('id', 'dia', 'mes', 'anno', 'descripcion', 'nombre')
@@ -137,6 +151,7 @@ class TimelineController extends Controller
         ->unionAll($asentamientos_fin)
         ->unionAll($organizaciones_ini)
         ->unionAll($organizaciones_fin)
+        ->unionAll($fecha_actual)
         ->orderBy('anno', $orden)
         ->get();
       if($cronologia!=0){

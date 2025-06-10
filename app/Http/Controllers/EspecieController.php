@@ -43,7 +43,7 @@ class EspecieController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'nombre'=>'required|max:32',
+      'nombre'=>'required|max:256',
       'estatus'=>'required'
     ]);
 
@@ -140,7 +140,7 @@ class EspecieController extends Controller
   public function update(Request $request, Especie $especie)
   {
     $request->validate([
-      'nombre'=>'required|max:32',
+      'nombre'=>'required|max:256',
       'estatus'=>'required'
     ]);
 

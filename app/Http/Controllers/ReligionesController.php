@@ -43,7 +43,12 @@ class ReligionesController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:128',
+      'nombre' => 'required|max:256',
+      'lema' => 'nullable|max:256',
+      'dfundacion' => 'nullable|integer|min:1|max:30',
+      'afundacion' => 'nullable|integer',
+      'ddisolucion' => 'nullable|integer|min:1|max:30',
+      'adisolucion' => 'nullable|integer',
       'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
     ]);
 
@@ -153,7 +158,12 @@ class ReligionesController extends Controller
   public function update(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:128',
+      'nombre' => 'required|max:256',
+      'lema' => 'nullable|max:256',
+      'dfundacion' => 'nullable|integer|min:1|max:30',
+      'afundacion' => 'nullable|integer',
+      'ddisolucion' => 'nullable|integer|min:1|max:30',
+      'adisolucion' => 'nullable|integer',
       'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
     ]);
 

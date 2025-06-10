@@ -72,9 +72,14 @@ class AsentamientoController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:128',
+      'nombre' => 'required|max:256',
       'select_tipo' => 'required',
       'poblacion' => 'nullable|numeric',
+      'gentilicio' => 'nullable|max:256',
+      'afundacion' => 'nullable|integer|min:1|max:30',
+      'dfundacion' => 'nullable|integer',
+      'adisolucion' => 'nullable|integer|min:1|max:30',
+      'ddisolucion' => 'nullable|integer',
     ]);
 
     $asentamiento = new Asentamiento();
@@ -191,9 +196,14 @@ class AsentamientoController extends Controller
   public function update(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:128',
+      'nombre' => 'required|max:256',
       'select_tipo' => 'required',
-      'poblacion' => 'numeric|nullable',
+      'poblacion' => 'nullable|numeric',
+      'gentilicio' => 'nullable|max:256',
+      'dfundacion' => 'nullable|integer|min:1|max:30',
+      'afundacion' => 'nullable|integer',
+      'adisolucion' => 'nullable|integer|min:1|max:30',
+      'ddisolucion' => 'nullable|integer',
     ]);
 
     try {

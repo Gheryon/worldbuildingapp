@@ -72,8 +72,12 @@ class ConstruccionController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:255',
+      'nombre' => 'required|max:256',
       'select_tipo' => 'required',
+      'dconstruccion' => 'nullable|integer|min:1|max:30',
+      'aconstruccion' => 'nullable|integer',
+      'ddestruccion' => 'nullable|integer|min:1|max:30',
+      'adestruccion' => 'nullable|integer',
     ]);
 
     try {
@@ -170,8 +174,12 @@ class ConstruccionController extends Controller
   public function update(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:255',
+      'nombre' => 'required|max:256',
       'select_tipo' => 'required',
+      'dconstruccion' => 'nullable|integer|min:1|max:30',
+      'aconstruccion' => 'nullable|integer',
+      'ddestruccion' => 'nullable|integer|min:1|max:30',
+      'adestruccion' => 'nullable|integer',
     ]);
 
     try {

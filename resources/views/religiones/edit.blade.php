@@ -43,6 +43,9 @@
           <div class="col-md">
             <label for="lema" class="form-label">Lema</label>
             <input type="text" name="lema" class="form-control" id="lema" value="{{$religion->lema}}" placeholder="Lema">
+            @error('lema')
+            <small style="color: red">{{$message}}</small>
+            @enderror
           </div>
         </div>
         <div class="row mt-2">
@@ -50,7 +53,10 @@
             <label for="afundacion" class="form-label">Fecha de fundacion</label>
             <div class="input-group">
               <input id="id_fundacion" type="hidden" name="id_fundacion" value="0">
-              <input type="number" id="dfundacion" name="dfundacion" class="form-select form-control" placeholder="Día">
+              <input type="number" id="dfundacion" name="dfundacion" class="form-control" placeholder="Día">
+              @error('dfundacion')
+              <small style="color: red">{{$message}}</small>
+              @enderror
               <select id="mfundacion" name="mfundacion" class="form-control">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
@@ -68,6 +74,9 @@
                 <option value="12">Diciembre</option>
               </select>
               <input type="number" id="afundacion" name="afundacion" class="form-control" placeholder="Año">
+              @error('afundacion')
+              <small style="color: red">{{$message}}</small>
+              @enderror
             </div>
           </div>
           <div class="col-md">
@@ -75,6 +84,9 @@
             <div class="input-group">
               <input id="id_disolucion" type="hidden" name="id_disolucion" value="0">
               <input type="number" id="ddisolucion" name="ddisolucion" class="form-control" placeholder="Día">
+              @error('ddisolucion')
+              <small style="color: red">{{$message}}</small>
+              @enderror
               <select id="mdisolucion" name="mdisolucion" class="form-select form-control">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
@@ -92,14 +104,20 @@
                 <option value="12">Diciembre</option>
               </select>
               <input type="number" id="adisolucion" name="adisolucion" class="form-control" placeholder="Año">
+              @error('adisolucion')
+              <small style="color: red">{{$message}}</small>
+              @enderror
             </div>
           </div>
         </div>
       </div>
       <div class="col-md-4">
         <label for="escudo" class="form-label">Escudo</label>
-        <img alt="escudo" id="escudo-img" src="{{asset("storage/escudos/default.png")}}" class="img-fluid" style="width: 50%;">
+        <img alt="escudo" id="escudo-img" src="{{asset("storage/escudos{$religion->escudo}")}}" class="img-fluid" style="width: 50%;">
         <input type="file" name="escudo" class="form-control" id="escudo">
+        @error('escudo')
+        <small style="color: red">{{$message}}</small>
+        @enderror
       </div>
     </div>
     <div class="row mt-2 mb-3">

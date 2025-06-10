@@ -42,6 +42,9 @@
           <div class="col-md">
             <label for="gentilicio" class="form-label">Gentilicio</label>
             <input type="text" name="gentilicio" class="form-control" id="gentilicio" placeholder="Ej: Cordobés">
+            @error('gentilicio')
+            <small style="color: red">{{$message}}</small>
+            @enderror
           </div>
           <div class="col-md-3">
             <label for="select_tipo" class="form-label">Tipo</label>
@@ -78,6 +81,9 @@
             <div class="input-group">
               <input id="id_fundacion" type="hidden" name="id_fundacion" value="0">
               <input type="text" id="dfundacion" name="dfundacion" class="form-control" placeholder="Día">
+              @error('dfundacion')
+              <small style="color: red">{{$message}}</small>
+              @enderror
               <select class="form-control" id="mfundacion" name="mfundacion">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
@@ -95,6 +101,9 @@
                 <option value="12">Diciembre</option>
               </select>
               <input type="text" id="afundacion" name="afundacion" class="form-control" placeholder="Año">
+              @error('afundacion')
+              <small style="color: red">{{$message}}</small>
+              @enderror
             </div>
           </div>
           <div class="col">
@@ -102,6 +111,9 @@
             <div class="input-group">
               <input id="id_disolucion" type="hidden" name="id_disolucion" value="0">
               <input type="text" id="ddisolucion" name="ddisolucion" class="form-control" placeholder="Día">
+              @error('ddisolucion')
+              <small style="color: red">{{$message}}</small>
+              @enderror
               <select class="form-control" id="mdisolucion" name="mdisolucion">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
@@ -119,6 +131,9 @@
                 <option value="12">Diciembre</option>
               </select>
               <input type="text" id="adisolucion" name="adisolucion" class="form-control" placeholder="Año">
+              @error('adisolucion')
+              <small style="color: red">{{$message}}</small>
+              @enderror
             </div>
           </div>
         </div>

@@ -240,9 +240,9 @@ class ConfigurationController extends Controller
   public function update_fecha_mundo(Request $request)
   {
     $request->validate([
-      'dia'=>'required',
+      'dia'=>'required|integer|min:1|max:30',
       'mes'=>'required',
-      'anno'=>'required',
+      'anno'=>'required|integer',
     ]);
 
     try{

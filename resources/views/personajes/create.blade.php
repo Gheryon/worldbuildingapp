@@ -22,7 +22,7 @@
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-create-personaje" class="position-relative needs-validation" action="{{url('/personajes/store')}}" method="post" enctype="multipart/form-data">
+  <form id="form-create-personaje" class="position-relative needs-validation" action="{{route('personaje.store')}}" method="post" enctype="multipart/form-data">
     @csrf
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
@@ -42,6 +42,9 @@
           <div class="col-md">
             <label for="nombre_familia" class="form-label">Nombre de familia</label>
             <input type="text" name="nombre_familia" class="form-control" id="nombre_familia" placeholder="Nombre de la familia o clan">
+            @error('nombre_familia')
+            <small style="color: red">{{$message}}</small>
+            @enderror
           </div>
           <div class="col-md">
             <label for="apellidos" class="form-label">Apellidos</label>
@@ -56,6 +59,9 @@
               <option>Hombre</option>
               <option>Mujer</option>
             </select>
+            @error('sexo')
+            <small style="color: red">{{$message}}</small>
+            @enderror
           </div>
           <div class="col-md-3">
             @if (Arr::has($especies, 'error.error'))
@@ -69,6 +75,9 @@
                   @endforeach
               </select>
               @endif
+            @error('select_especie')
+            <small style="color: red">{{$message}}</small>
+            @enderror
           </div>
           <div class="col-md">
             <label for="lugar_nacimiento" class="form-label">Lugar de nacimiento</label>
@@ -81,6 +90,9 @@
             <div class="input-group">
               <input id="id_nacimiento" type="hidden" name="id_nacimiento" value="0">
               <input type="number" id="dnacimiento" name="dnacimiento" class="form-select form-control" placeholder="Día">
+            @error('dnacimiento')
+            <small style="color: red">{{$message}}</small>
+            @enderror
               <select id="mnacimiento" name="mnacimiento" class="form-control">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
@@ -98,6 +110,9 @@
                 <option value="12">Diciembre</option>
               </select>
               <input type="number" id="anacimiento" name="anacimiento" class="form-control" placeholder="Año">
+            @error('anacimiento')
+            <small style="color: red">{{$message}}</small>
+            @enderror
             </div>
           </div>
           <div class="col-md-4">
@@ -105,6 +120,9 @@
             <div class="input-group">
               <input id="id_fallecimiento" type="hidden" name="id_fallecimiento" value="0">
               <input type="number" id="dfallecimiento" name="dfallecimiento" class="form-control" placeholder="Día">
+            @error('dfallecimiento')
+            <small style="color: red">{{$message}}</small>
+            @enderror
               <select id="mfallecimiento" name="mfallecimiento" class="form-select form-control">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
@@ -122,11 +140,17 @@
                 <option value="12">Diciembre</option>
               </select>
               <input type="number" id="afallecimiento" name="afallecimiento" class="form-control" placeholder="Año">
+            @error('afallecimiento')
+            <small style="color: red">{{$message}}</small>
+            @enderror
             </div>
           </div>
           <div class="col-md">
             <label for="causa_fallecimiento" class="form-label">Causa de fallecimiento</label>
             <input type="text" name="causa_fallecimiento" class="form-control" id="causa_fallecimiento" placeholder="Causa de fallecimiento">
+            @error('causa_fallecimiento')
+            <small style="color: red">{{$message}}</small>
+            @enderror
           </div>
         </div>
       </div>
@@ -134,6 +158,9 @@
         <label for="retrato" class="form-label">Retrato</label>
         <img alt="retrato" id="retrato-img" src="{{asset('storage/retratos/default.png')}}" class="img-fluid" width="185" height="180">
         <input type="file" name="retrato" class="form-control" id="retrato">
+        @error('retrato')
+        <small style="color: red">{{$message}}</small>
+        @enderror
       </div>
     </div>
     <div class="row mt-2 mb-3">

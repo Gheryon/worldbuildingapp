@@ -68,6 +68,9 @@
             <div class="input-group">
               <input id="id_construccion" type="hidden" name="id_construccion" value="0">
               <input type="text" id="dconstruccion" name="dconstruccion" class="form-control" placeholder="Día">
+              @error('dconstruccion')
+              <small style="color: red">{{$message}}</small>
+              @enderror
               <select class="form-control" id="mconstruccion" name="mconstruccion">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
@@ -85,6 +88,9 @@
                 <option value="12">Diciembre</option>
               </select>
               <input type="text" id="aconstruccion" name="aconstruccion" class="form-control" placeholder="Año">
+              @error('aconstruccion')
+              <small style="color: red">{{$message}}</small>
+              @enderror
             </div>
           </div>
           <div class="col">
@@ -92,6 +98,9 @@
             <div class="input-group">
               <input id="id_destruccion" type="hidden" name="id_destruccion" value="0">
               <input type="text" id="ddestruccion" name="ddestruccion" class="form-control" placeholder="Día">
+              @error('ddestruccion')
+              <small style="color: red">{{$message}}</small>
+              @enderror
               <select class="form-control" id="mdestruccion" name="mdestruccion">
                 <option selected disabled value="">Mes</option>
                 <option value="0">Semana de año nuevo</option>
@@ -109,6 +118,9 @@
                 <option value="12">Diciembre</option>
               </select>
               <input type="text" id="adestruccion" name="adestruccion" class="form-control" placeholder="Año">
+              @error('adestruccion')
+              <small style="color: red">{{$message}}</small>
+              @enderror
             </div>
           </div>
         </div>

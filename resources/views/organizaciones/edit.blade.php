@@ -142,7 +142,7 @@
                 <option value="11">Noviembre</option>
                 <option value="12">Diciembre</option>
               </select>
-              error('mdisolucion')
+              @error('mdisolucion')
               <small style="color: red">{{$message}}</small>
               @enderror
               <input type="number" id="adisolucion" name="adisolucion" class="form-control" placeholder="Año">
