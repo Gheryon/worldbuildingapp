@@ -37,7 +37,6 @@
             @method('DELETE')
             <input type="hidden" name="id_borrar" id="id_borrar">
             <input type="hidden" name="tipo" id="tipo">
-            <input type="hidden" name="nombre_borrado" id="nombre_borrado">
             <button type="button" id="cancelar-borrar-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
             <button type="submit" id="confirmar-borrar-button" class="btn btn-danger">Eliminar</button>
           </form>

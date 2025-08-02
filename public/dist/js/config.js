@@ -5,7 +5,7 @@ $(document).ready(function () {
     }
   });
 
-  //usado en la vista de config
+  //lleva los datos al modal de editar en la vista de configuracion
   $(document).on('click', '.editar-tipo',(e)=>{
     const elemento=$(this)[0].activeElement;
     
@@ -18,16 +18,14 @@ $(document).ready(function () {
     $('#tipo_editar').val(tipo);
   });
 
-  //lleva el id a borrar al modal de confirmacion
+  //lleva el id a borrar al modal de confirmacion en vista de configuracion
   $(document).on('click', '.borrar-tipo', (e) => {
     const elemento=$(this)[0].activeElement;
-    let id=$(elemento).attr('id');
-    const nombre = $(elemento).attr('nombre');
-    const tipo = $(elemento).attr('tipo');
-
+    const nombre = elemento.getAttribute('data-nombre');
+    const id = elemento.getAttribute('data-id');
+    const tipo = elemento.getAttribute('data-tipo');
     $('#id_borrar').val(id);
     $('#tipo').val(tipo);
-    $('#nombre_borrado').val(nombre);
     $('#texto-borrar').html(nombre);
   });
 
@@ -38,7 +36,7 @@ $(document).ready(function () {
     $('#descripcion').summernote('reset');
   });
 
-  //lleva el id a borrar al modal de confirmacion
+  //lleva el id a borrar al modal de confirmacion de las vistas index
   $(document).on('click', '.borrar', (e) => {
     const elemento=$(this)[0].activeElement;
     const nombre = elemento.getAttribute('data-nombre');
@@ -65,12 +63,12 @@ $(document).ready(function () {
     $('#tipo_editar').val(tipo);
   });
   
+  //lleva los datos al modal de edicion en la vista index de nombres
   $(document).on('click', '.editar-nombres',(e)=>{
     const elemento=$(this)[0].activeElement;
     let id=$(elemento).attr('id');
     const nombre = $(elemento).attr('nombre');
     
-    console.log(id+' '+nombre);
     $('#id_editar').val(id);
     $('#nombres_editar').val(nombre);
   });

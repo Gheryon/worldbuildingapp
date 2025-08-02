@@ -102,7 +102,7 @@
             @endif
 
             @if (isset($vista->capital))
-            <h3 class="mt-2">Capitial</h3>
+            <h3 class="mt-2">Capital</h3>
             <p class="ml-2 mr-2">{{$vista->capital}}</p>
             @endif
 

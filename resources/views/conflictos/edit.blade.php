@@ -198,7 +198,7 @@
     <label for="desarrollo" class="form-label">Desarrollo</label>
     <textarea name="desarrollo" class="form-control summernote" id="desarrollo" rows="4" aria-label="With textarea">{!!$conflicto->desarrollo!!}</textarea>
 
-    <label for="resultado" class="form-label">resultado</label>
+    <label for="resultado" class="form-label">Resultado</label>
     <textarea name="resultado" class="form-control summernote" id="resultado" rows="4" aria-label="With textarea">{!!$conflicto->resultado!!}</textarea>
 
     <label for="consecuencias" class="form-label">Consecuencias</label>

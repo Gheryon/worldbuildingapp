@@ -54,11 +54,11 @@
         @endif
         @if (isset($vista->Magia))
         <h3>Habilidades mágicas</h3>
-        <p class="ml-2 mr-2">{!!$vista->Magia!!}</br></p>
+        <p class="ml-2 mr-2">{!!$vista->Magia!!}</p>
         @endif
         @if (isset($vista->educacion))
         <h3>Educación</h3>
-        <p class="ml-2 mr-2">{!!$vista->educacion!!}</br></p>
+        <p class="ml-2 mr-2">{!!$vista->educacion!!}</p>
         @endif
 
         @if (isset($vista->Historia))

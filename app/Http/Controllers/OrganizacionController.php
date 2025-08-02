@@ -232,7 +232,7 @@ class OrganizacionController extends Controller
     }
 
     try {
-      $tipo_organizacion = tipo_organizacion::where('id', '=', $organizacion->id_tipo_organizacion)->get();
+      $tipo_organizacion = tipo_organizacion::orderBy('nombre', 'asc')->get();
     } catch (\Illuminate\Database\QueryException $excepcion) {
       $tipo_organizacion = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     } catch (Exception $excepcion) {

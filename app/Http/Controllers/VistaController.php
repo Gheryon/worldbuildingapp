@@ -56,7 +56,7 @@ class VistaController extends Controller
         if ($nacimiento->dia == 0 && $nacimiento->mes == 0) {
           $fecha_nacimiento = $nacimiento->anno;
         } else {
-          $fecha_nacimiento = $nacimiento->dia . "-" . $meses[$nacimiento->mes] . "-" . $nacimiento->anno;
+          $fecha_nacimiento = $nacimiento->dia . "/" . $meses[$nacimiento->mes] . "/" . $nacimiento->anno;
         }
       } catch (\Illuminate\Database\QueryException $excepcion) {
         $fecha_nacimiento = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
@@ -73,7 +73,7 @@ class VistaController extends Controller
         if ($fallecimiento->dia == 0 && $fallecimiento->mes == 0) {
           $fecha_fallecimiento = $fallecimiento->anno;
         } else {
-          $fecha_fallecimiento = $fallecimiento->dia . "-" . $meses[$fallecimiento->mes] . "-" . $fallecimiento->anno;
+          $fecha_fallecimiento = $fallecimiento->dia . "/" . $meses[$fallecimiento->mes] . "/" . $fallecimiento->anno;
         }
       } catch (\Illuminate\Database\QueryException $excepcion) {
         $fecha_nacimiento = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
@@ -161,10 +161,10 @@ class VistaController extends Controller
     if ($organizacion->fundacion != 0 && $organizacion->fundacion != null) {
       try {
         $fundacion = Fecha::findorfail($organizacion->fundacion);
-        if ($fundacion->dia && $fundacion->mes == 0) {
-          $fecha_fundacion = $organizacion->anno;
+        if ($fundacion->dia==0 && $fundacion->mes == 0) {
+          $fecha_fundacion = $fundacion->anno;
         } else {
-          $fecha_fundacion = $fundacion->dia . "-" . $meses[$fundacion->mes] . "-" . $fundacion->anno;
+          $fecha_fundacion = $fundacion->dia . "/" . $meses[$fundacion->mes] . "/" . $fundacion->anno;
         }
       } catch (\Illuminate\Database\QueryException $excepcion) {
         $fecha_fundacion = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
@@ -178,10 +178,10 @@ class VistaController extends Controller
     if ($organizacion->disolucion != 0 && $organizacion->disolucion != null) {
       try {
         $disolucion = Fecha::findorfail($organizacion->disolucion);
-        if ($disolucion->dia && $disolucion->mes == 0) {
-          $fecha_disolucion = $organizacion->anno;
+        if ($disolucion->dia==0 && $disolucion->mes == 0) {
+          $fecha_disolucion = $disolucion->anno;
         } else {
-          $fecha_disolucion = $disolucion->dia . "-" . $meses[$disolucion->mes] . "-" . $disolucion->anno;
+          $fecha_disolucion = $disolucion->dia . "/" . $meses[$disolucion->mes] . "/" . $disolucion->anno;
         }
       } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $excepcion) {
         $fecha_disolucion = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
@@ -413,20 +413,20 @@ class VistaController extends Controller
 
       if ($religion->fundacion != 0 && $religion->fundacion != null) {
         $fundacion = Fecha::find($religion->fundacion);
-        if ($fundacion->dia && $fundacion->mes == 0) {
+        if ($fundacion->dia==0 && $fundacion->mes == 0) {
           $fecha_fundacion = $religion->anno;
         } else {
-          $fecha_fundacion = $fundacion->dia . "-" . $meses[$fundacion->mes] . "-" . $fundacion->anno;
+          $fecha_fundacion = $fundacion->dia . "/" . $meses[$fundacion->mes] . "/" . $fundacion->anno;
         }
       } else {
         $fecha_fundacion = "Desconocido";
       }
       if ($religion->disolucion != 0 && $religion->disolucion != null) {
         $disolucion = Fecha::find($religion->disolucion);
-        if ($disolucion->dia && $disolucion->mes == 0) {
+        if ($disolucion->dia==0 && $disolucion->mes == 0) {
           $fecha_disolucion = $religion->anno;
         } else {
-          $fecha_disolucion = $disolucion->dia . "-" . $meses[$disolucion->mes] . "-" . $disolucion->anno;
+          $fecha_disolucion = $disolucion->dia . "/" . $meses[$disolucion->mes] . "/" . $disolucion->anno;
         }
       } else {
         $fecha_disolucion = "Desconocido";
@@ -488,7 +488,7 @@ class VistaController extends Controller
         if ($fundacion->dia == 0 && $fundacion->mes == 0) {
           $fecha_fundacion = $fundacion->anno;
         } else {
-          $fecha_fundacion = $fundacion->dia . "-" . $meses[$fundacion->mes] . "-" . $fundacion->anno;
+          $fecha_fundacion = $fundacion->dia . "/" . $meses[$fundacion->mes] . "/" . $fundacion->anno;
         }
       } catch (\Illuminate\Database\QueryException $excepcion) {
         $fecha_fundacion = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
@@ -505,7 +505,7 @@ class VistaController extends Controller
         if ($disolucion->dia == 0 && $disolucion->mes == 0) {
           $fecha_disolucion = $disolucion->anno;
         } else {
-          $fecha_disolucion = $disolucion->dia . "-" . $meses[$disolucion->mes] . "-" . $disolucion->anno;
+          $fecha_disolucion = $disolucion->dia . "/" . $meses[$disolucion->mes] . "/" . $disolucion->anno;
         }
       } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $excepcion) {
         $fecha_disolucion = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];

@@ -154,7 +154,7 @@
             <div class="row">
               <button data-id="{{$generador->id}}" data-nombre="{{$generador->nombre}}" data-tipo="{{$generador->tipo}}" data-url="{{$generador->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
               <button data-id="{{$generador->id}}" data-nombre="{{$generador->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
-              <a href="{{$generador->url}}" class="ml-2">{{$generador->nombre}}</a>
+              <a href="{{$generador->url}}" target="_blank" class="ml-2">{{$generador->nombre}}</a>
             </div>        
             @endforeach
           @else
@@ -181,7 +181,7 @@
             <div class="row">
               <button data-id="{{$criatura->id}}" data-nombre="{{$criatura->nombre}}" data-tipo="{{$criatura->tipo}}" data-url="{{$criatura->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
               <button data-id="{{$criatura->id}}" data-nombre="{{$criatura->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
-              <a href="{{$criatura->url}}" class="ml-2">{{$criatura->nombre}}</a>
+              <a href="{{$criatura->url}}" target="_blank" class="ml-2">{{$criatura->nombre}}</a>
             </div>
             @endforeach
           @else
@@ -208,7 +208,7 @@
             <div class="row">
               <button data-id="{{$referencia->id}}" data-nombre="{{$referencia->nombre}}" data-tipo="{{$referencia->tipo}}" data-url="{{$referencia->url}}" title="Editar" class="editar-enlace btn btn-sm btn-success" data-toggle="modal" data-target="#editar_enlace"><i class="fas fa-pencil-alt"></i></button>
               <button data-id="{{$referencia->id}}" data-nombre="{{$referencia->nombre}}" title="Borrar" class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmar_eliminacion"><i class="fas fa-times-circle"></i></button>
-              <a href="{{$referencia->url}}" class="ml-2">{{$referencia->nombre}}</a>
+              <a href="{{$referencia->url}}" target="_blank" class="ml-2">{{$referencia->nombre}}</a>
             </div>        
             @endforeach
           @else

@@ -15,26 +15,4 @@ $(document).ready(function () {
       //}
     //}
   });
-
-  function sendFile(file) {
-    //var url = '{{ route("articulos.get", ":id") }}';
-    //url = url.replace(':id', id);
-
-    data = new FormData();
-    data.append("file", file);
-    $.ajax({
-      data: data,
-      type: "POST",
-      url: "../controlador/imagenesController.php",
-      cache: false,
-      contentType: false,
-      processData: false,
-      success: function (url) {
-        $('.summernote').summernote("insertImage", url, 'filename');
-      },
-      error: function (data) {
-        console.log(data);
-      }
-    });
-  }
 });
