@@ -82,7 +82,7 @@
 @else
 @if($personajes->count()>0)
 @foreach($personajes as $personaje)
-<div class="col-4 col-sm-12 col-md-4 col-lg-3">
+<div class="col-sm-12 col-md-6 col-lg-3 col-xl-2">
   <div class="card card-dark card-outline">
     <div class="card-body box-profile">
       <div class="text-center">

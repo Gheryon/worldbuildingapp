@@ -90,7 +90,7 @@
   @else
   @if($conflictos->count()>0)
   @foreach($conflictos as $conflicto)
-  <div class="col col-sm-12 col-md-4 col-lg-4">
+  <div class="col-sm-12 col-md-6 col-lg-3 col-xl-2">
     <div class="card card-dark card-outline">
       <div class="card-body box-profile">
         <h3 class="profile-username text-center">{{$conflicto->nombre}}</h3>

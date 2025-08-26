@@ -17,7 +17,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="editar_nombres" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="Editar nombre" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="card card-dark">
         <div class="card-header">
@@ -34,7 +34,7 @@
             <div class="row">
               <div class="col">
                 <label for="nombres_editar" class="form-label">Nombres</label>
-                <textarea name="nombres_editar" class="form-control" id="nombres_editar" rows="4" aria-label="With textarea"></textarea>
+                <textarea name="nombres_editar" class="form-control" id="nombres_editar" rows="8" aria-label="With textarea"></textarea>
                 <div class="invalid-feedback">
                   Nombre no puede estar vacío.
                 </div>

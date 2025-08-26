@@ -303,6 +303,9 @@ class ConfigurationController extends Controller
       if($request->tipo=='conflicto'){
         tipo_conflicto::destroy($request->id_borrar);
       }
+      if($request->tipo=='construccion'){
+        tipo_construccion::destroy($request->id_borrar);
+      }
       if($request->tipo=='lugar'){
         tipo_lugar::destroy($request->id_borrar);
       }
@@ -327,7 +330,7 @@ class ConfigurationController extends Controller
   public function store_fecha($dia=0, $mes=0, $anno=0, $tabla)
   {
     try {
-      //si los input de las fechas no se introducen, la fecha es indeterminada, se establece a 0-0-0 por defecto
+      //si los input de las fechas no se introducen, la fecha es indeterminada, no se guarda fecha
       if($anno==0&&$mes==0&&$dia==0){
         $id_fecha=0;
       }else{

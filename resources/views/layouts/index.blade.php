@@ -30,7 +30,7 @@
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
-    <div class="container overflow-auto">
+    <div class="container-fluid p-5 overflow-auto">
       @yield('content')
     </div>
   </div>
