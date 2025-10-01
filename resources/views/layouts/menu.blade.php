@@ -75,6 +75,14 @@
           </a>
         </li>
         <li class="nav-item">
+          <a href="{{route('relatos')}}" class="nav-link">
+            <i class="nav-icon fa-solid fa-book-open"></i>
+            <p>
+              Relatos
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
           <a href="{{route('galeria.index')}}" class="nav-link">
             <i class="nav-icon fa-solid fa-image"></i>
             <p>
@@ -87,7 +95,7 @@
           <a href="{{route('articulos')}}" class="nav-link">
             <i class="nav-icon fa-solid fa-book-open"></i>
             <p>
-              Apuntes y relatos
+              Apuntes
             </p>
           </a>
         </li>

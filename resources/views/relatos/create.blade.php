@@ -3,27 +3,27 @@
 @extends('layouts.menu')
 
 @section('title')
-<title id="title">Nuevo artículo</title>
+<title id="title">Nueva historia</title>
 @endsection
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-<a href="{{route('articulos')}}" class="btn btn-dark">Cancelar</a>
+  <a href="{{route('relatos')}}" class="btn btn-dark">Cancelar</a>
 </li>
 @endsection
 
 @section('content')
 <div class="row">
-  <h1>Nuevo artículo</h1>
+  <h1>Nueva historia</h1>
 </div>
 <hr>
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-create" action="{{route('articulos.store')}}" method="post">
+  <form id="form-create" action="{{route('relatos.store')}}" method="post">
     @csrf
     <div class="row mb-3 justify-content-center">
-      <button type="submit" class="btn btn-success ml-1" id="guardar">Guardar</button>
+      <button type="submit" class="btn btn-success ml-1">Guardar</button>
     </div>
     <div class="container-fluid">
       <div class="row">
@@ -38,15 +38,23 @@
                   <small style="color: red">{{$message}}</small>
                   @enderror
                 </div>
-                <div class="col-4">
-                  <label for="tipo" class="form-label">Tipo</label>
-                  <select class="form-control" name="tipo" id="tipo" required>
+                <div class="col-md-4">
+                  <label for="personajes" class="form-label">Personajes relevantes</label>
+                  <select class="form-select form-control" multiple="multiple" data-placeholder="Personajes" name="personajes[]" id="personajes" style="width: 100%;">
                     <option selected disabled value="">Elegir</option>
-                    <option>Referencia</option>
-                    <option>Canon</option>
-                    <option>Crónica</option>
+                    @if (Arr::has($personajes, 'error.error'))
+                    <option disabled value="">Se produjo un error en la base de datos</option>
+                    @else
+                      @if($personajes->isEmpty())
+                      <option disabled value="">No hay personajes guardados.</option>
+                      @else
+                      @foreach($personajes as $persona)
+                      <option value="{{$persona->id}}">{{$persona->Nombre}}</option>
+                      @endforeach
+                      @endif
+                    @endif
                   </select>
-                  @error('tipo')
+                  @error('personajes')
                   <small style="color: red">{{$message}}</small>
                   @enderror
                 </div>
@@ -55,10 +63,10 @@
             <!-- /.card-header -->
             <div class="card-body">
               <label for="contenido" class="form-label">Contenido</label>
-              <textarea class="form-control summernote" id="contenido" name="contenido" rows="8" aria-label="With textarea" required></textarea>
-                @error('contenido')
-                <small style="color: red">{{$message}}</small>
-                @enderror
+              <textarea class="form-control summernote" id="contenido" name="contenido" rows="8" aria-label="With textarea"></textarea>
+              @error('contenido')
+              <small style="color: red">{{$message}}</small>
+              @enderror
             </div>
             <div class="card-footer">
             </div>
