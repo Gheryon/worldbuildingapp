@@ -16,7 +16,6 @@
     <option value="all">Todos</option>
     <option value="Referencia">Referencia</option>
     <option value="Canon">Canon</option>
-    <option value="Crónica">Crónica</option>
   </select>
 </li>
 <li class="nav-item ml-2">

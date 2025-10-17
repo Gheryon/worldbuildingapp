@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asentamiento;
-use App\Models\tipo_asentamiento;
 use App\Models\Fecha;
 use App\Models\imagen;
+use App\Models\organizacion;
+use App\Models\tipo_asentamiento;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AsentamientoController extends Controller
 {
@@ -31,18 +33,15 @@ class AsentamientoController extends Controller
           ->orderBy('nombre', $orden)->get();
       }
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('AsentamientoController->index: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $asentamientos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     } catch (Exception $excepcion) {
+      Log::error('AsentamientoController->index: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $asentamientos = ['error' => ['error' => $excepcion->getMessage()]];
     }
 
-    try {
-      $tipos = tipo_asentamiento::orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todos los tipos de asentamiento almacenados
+    $tipos = tipo_asentamiento::get_tipos_asentamientos();
 
     return view('asentamientos.index', ['asentamientos' => $asentamientos, 'tipos' => $tipos, 'orden' => $orden, 'tipo_o' => $tipo]);
   }
@@ -52,18 +51,13 @@ class AsentamientoController extends Controller
    */
   public function create()
   {
-    try {
-      $tipo_asentamiento = tipo_asentamiento::orderBy('nombre', 'asc')->get();
+    // Obtener todos los paises almacenados
+    $paises = organizacion::get_organizaciones();
 
-      $paises = DB::table('organizaciones')->select('id_organizacion', 'nombre')
-        ->where('id_organizacion', '!=', 0)->orderBy('nombre', 'asc')->get();
+    // Obtener todos los tipos de asentamiento almacenados
+    $tipos_asentamiento = tipo_asentamiento::get_tipos_asentamientos();
 
-      return view('asentamientos.create', ['tipo_asentamiento' => $tipo_asentamiento, 'paises' => $paises]);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('asentamientos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      return redirect()->route('asentamientos.index')->with('error', $excepcion->getMessage());
-    }
+    return view('asentamientos.create', ['paises' => $paises, 'tipo_asentamiento' => $tipos_asentamiento]);
   }
 
   /**
@@ -142,8 +136,10 @@ class AsentamientoController extends Controller
       $asentamiento->save();
       return redirect()->route('asentamientos.index')->with('message', 'Asentamiento ' . $asentamiento->nombre . ' añadido correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('AsentamientoController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('asentamientos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
     } catch (Exception $excepcion) {
+      Log::error('AsentamientoController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('asentamientos.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -161,33 +157,35 @@ class AsentamientoController extends Controller
    */
   public function edit($id)
   {
-    try {
-      $asentamiento = Asentamiento::findorfail($id);
-      $tipo_asentamiento = tipo_asentamiento::orderBy('nombre', 'asc')->get();
-
-      $paises = DB::table('organizaciones')->select('id_organizacion', 'nombre')
-        ->where('id_organizacion', '!=', 0)->orderBy('nombre', 'asc')->get();
-
-      $fecha_disolucion = 0;
-      $fecha_fundacion = 0;
-      if ($asentamiento->fundacion != 0) {
-        $fecha_fundacion = Fecha::find($asentamiento->fundacion);
-      } else {
-        $fecha_fundacion = Fecha::find(0);
-      }
-
-      if ($asentamiento->disolucion != 0) {
-        $fecha_disolucion = Fecha::find($asentamiento->disolucion);
-      } else {
-        $fecha_disolucion = Fecha::find(0);
-      }
-
-      return view('asentamientos.edit', ['asentamiento' => $asentamiento, 'fundacion' => $fecha_fundacion, 'disolucion' => $fecha_disolucion, 'paises' => $paises, 'tipo_asentamiento' => $tipo_asentamiento]);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('asentamientos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      return redirect()->route('asentamientos.index')->with('error', $excepcion->getMessage());
+    // Obtener la organizacion a editar
+    $asentamiento = Asentamiento::get_asentamiento($id);
+    if (isset($asentamiento['error'])) {
+      Log::error('AsentamientoController->index: Se produjo un problema en la base de datos.: ' . $asentamiento['error']['error']);
+      return redirect()->route('organizaciones.index')->with('error', $asentamiento['error']['error']);
     }
+
+    // Obtener todos los paises almacenados
+    $paises = organizacion::get_organizaciones();
+
+    // Obtener todos los tipos de asentamiento almacenados
+    $tipo_asentamiento = tipo_asentamiento::get_tipos_asentamientos();
+
+    //obtención de las fechas de fundacion y disolucion
+    $fecha_disolucion = 0;
+    $fecha_fundacion = 0;
+    if ($asentamiento->fundacion != 0) {
+      $fecha_fundacion = Fecha::find($asentamiento->fundacion);
+    } else {
+      $fecha_fundacion = Fecha::find(0);
+    }
+
+    if ($asentamiento->disolucion != 0) {
+      $fecha_disolucion = Fecha::find($asentamiento->disolucion);
+    } else {
+      $fecha_disolucion = Fecha::find(0);
+    }
+
+    return view('asentamientos.edit', ['asentamiento' => $asentamiento, 'fundacion' => $fecha_fundacion, 'disolucion' => $fecha_disolucion, 'paises' => $paises, 'tipo_asentamiento' => $tipo_asentamiento]);
   }
 
   /**
@@ -209,8 +207,10 @@ class AsentamientoController extends Controller
     try {
       $asentamiento = Asentamiento::find($request->id);
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('AsentamientoController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('asentamientos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
     } catch (Exception $excepcion) {
+      Log::error('AsentamientoController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('asentamientos.index')->with('error', $excepcion->getMessage());
     }
 
@@ -286,8 +286,10 @@ class AsentamientoController extends Controller
       $asentamiento->save();
       return redirect()->route('asentamientos.index')->with('message', 'Asentamiento ' . $asentamiento->nombre . ' editado correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('AsentamientoController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('asentamientos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
     } catch (Exception $excepcion) {
+      Log::error('AsentamientoController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('asentamientos.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -326,8 +328,10 @@ class AsentamientoController extends Controller
         Asentamiento::destroy($request->id_borrar);
         return redirect()->route('asentamientos.index')->with('message', $request->nombre_borrado . ' borrado correctamente.');
       } catch (\Illuminate\Database\QueryException $excepcion) {
+        Log::error('AsentamientoController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
         return redirect()->route('asentamientos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo borrar.');
       } catch (Exception $excepcion) {
+        Log::error('AsentamientoController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
         return redirect()->route('asentamientos.index')->with('error', $excepcion->getMessage());
       }
     } else {
@@ -356,8 +360,10 @@ class AsentamientoController extends Controller
     try {
       $tipos = tipo_asentamiento::orderBy('nombre', 'asc')->get();
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('AsentamientoController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $tipos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     } catch (Exception $excepcion) {
+      Log::error('AsentamientoController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $tipos = ['error' => ['error' => $excepcion->getMessage()]];
     }
 

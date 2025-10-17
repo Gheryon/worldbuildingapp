@@ -8,6 +8,7 @@ use App\Models\imagen;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReligionesController extends Controller
 {
@@ -16,15 +17,8 @@ class ReligionesController extends Controller
    */
   public function index($orden = 'asc')
   {
-    try {
-      $religiones = DB::table('religiones')
-        ->select('id', 'nombre', 'descripcion')
-        ->orderBy('nombre', $orden)->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $religiones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $religiones = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todas las religiones almacenadas
+    $religiones=Religion::get_religiones();
 
     return view('religiones.index', ['religiones' => $religiones, 'orden' => $orden]);
   }
@@ -60,8 +54,10 @@ class ReligionesController extends Controller
 
       $id_religion = DB::scalar("SELECT MAX(id) as id FROM religiones");
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ReligionesController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('religiones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
     } catch (Exception $excepcion) {
+      Log::error('ReligionesController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('religiones.index')->with('error', $excepcion->getMessage());
     }
 
@@ -115,8 +111,10 @@ class ReligionesController extends Controller
       $religion->save();
       return redirect()->route('religiones.index')->with('message', 'Religión añadida correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ReligionesController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('religiones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
     } catch (Exception $excepcion) {
+      Log::error('ReligionesController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('religiones.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -134,7 +132,12 @@ class ReligionesController extends Controller
    */
   public function edit($id)
   {
-    $religion = Religion::findorfail($id);
+    //obtener religion
+    $religion = Religion::get_religion($id);
+    if ($religion['error'] ?? false) {
+      return redirect()->route('religiones.index')->with('error', $religion['error']['error']);
+    }
+
     $fecha_disolucion = 0;
     $fecha_fundacion = 0;
     if ($religion->fundacion != 0) {
@@ -167,12 +170,10 @@ class ReligionesController extends Controller
       'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
     ]);
 
-    try {
-      $religion = Religion::findorfail($request->id);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('religiones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo editar.');
-    } catch (Exception $excepcion) {
-      return redirect()->route('religiones.index')->with('error', $excepcion->getMessage());
+    //obtener religion
+    $religion = Religion::get_religion($request->id);
+    if ($religion['error'] ?? false) {
+      return redirect()->route('religiones.index')->with('error', $religion['error']['error']);
     }
 
     if ($request->filled('nombre')) {
@@ -250,11 +251,12 @@ class ReligionesController extends Controller
       }
 
       $religion->save();
-      return redirect()->route('religiones.index')->with('message', 'Religión editada correctamente.');
+      return redirect()->route('religiones.index')->with('message', 'Religión '.$religion->nombre.' editada correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ReligionesController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('religiones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo editar.');
-      //echo $excepcion;
     } catch (Exception $excepcion) {
+      Log::error('ReligionesController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('religiones.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -299,8 +301,10 @@ class ReligionesController extends Controller
       }
       return redirect()->route('religiones.index')->with('message', $request->nombre_borrado . ' borrado correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ReligionesController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('religiones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo borrar.');
     } catch (Exception $excepcion) {
+      Log::error('ReligionesController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('religiones.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -317,8 +321,10 @@ class ReligionesController extends Controller
         ->where('nombre', 'LIKE', "%{$search}%")
         ->orderBy('nombre', 'asc')->get();
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ReligionesController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $religiones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     } catch (Exception $excepcion) {
+      Log::error('ReligionesController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $religiones = ['error' => ['error' => $excepcion->getMessage()]];
     }
     return view('religiones.index', ['religiones' => $religiones, 'orden' => 'asc']);

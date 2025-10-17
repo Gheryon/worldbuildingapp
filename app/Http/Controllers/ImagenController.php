@@ -51,11 +51,11 @@ class ImagenController extends Controller
     imagen::create([
       'nombre' => basename($path),
       //'filename' => $filename
-      'path'=> $path,
-      'owner'=>$request->owner,
-      'table_owner'=>$request->table_owner,
+      'path' => $path,
+      'owner' => $request->owner,
+      'table_owner' => $request->table_owner,
     ]);
-    
+
     /*
     $imagen=new imagen();
     $imagen->nombre=$request->nombre;
@@ -76,24 +76,24 @@ class ImagenController extends Controller
     $searchPage = mb_convert_encoding($content, 'HTML-ENTITIES', "UTF-8"); //necesario para mantener las tildes en el texto
     $dom->loadHtml($searchPage, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
     $imageFile = $dom->getElementsByTagName('img');
-    
+
     foreach ($imageFile as $item => $image) {
       $data = $image->getAttribute('src');
       list($type, $data) = explode(';', $data);
       list(, $data)      = explode(',', $data);
       $imgeData = base64_decode($data);
-      $image_name= time().rand(0, 1234567890).$item.'.png';
+      $image_name = time() . rand(0, 1234567890) . $item . '.png';
       $path = public_path() . "/storage/imagenes/" . $image_name;
       file_put_contents($path, $imgeData);
-            
+
       $image->removeAttribute('src');
       $image->setAttribute('src', asset("/storage/imagenes/" . $image_name));
-      
-      $imagen=new imagen();
-      $imagen->owner=$id_owner;
-      $imagen->table_owner=$table_owner;
-      $imagen->nombre=$image_name;
-      $imagen->path=asset("/storage/imagenes/" . $image_name);
+
+      $imagen = new imagen();
+      $imagen->owner = $id_owner;
+      $imagen->table_owner = $table_owner;
+      $imagen->nombre = $image_name;
+      $imagen->path = asset("/storage/imagenes/" . $image_name);
       $imagen->save();
     }
 
@@ -104,14 +104,14 @@ class ImagenController extends Controller
   /**
    * Update a resource from summernote in storage.
    */
-  public function update_for_summernote($content, string $table_owner, int $id_owner=0)
+  public function update_for_summernote($content, string $table_owner, int $id_owner = 0)
   {
     $dom = new \DomDocument();
     libxml_use_internal_errors(true);
     $searchPage = mb_convert_encoding($content, 'HTML-ENTITIES', "UTF-8"); //necesario para mantener las tildes en el texto
     $dom->loadHtml($searchPage, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | libxml_use_internal_errors(true));
     $imageFile = $dom->getElementsByTagName('img');
-    
+
     //no se borran las imagenes antiguas en caso de existir, esto se hace desde otra función
     foreach ($imageFile as $item => $image) {
       $data = $image->getAttribute('src');
@@ -121,18 +121,18 @@ class ImagenController extends Controller
       list($type, $data) = explode(';', $data);
       list(, $data)      = explode(',', $data);
       $imgeData = base64_decode($data);
-      $image_name= time().rand(0, 1234567890).$item.'.png';
+      $image_name = time() . rand(0, 1234567890) . $item . '.png';
       $path = public_path() . "/storage/imagenes/" . $image_name;
       file_put_contents($path, $imgeData);
-            
+
       $image->removeAttribute('src');
       $image->setAttribute('src', asset("/storage/imagenes/" . $image_name));
-      
-      $imagen=new imagen();
-      $imagen->owner=$id_owner;
-      $imagen->table_owner=$table_owner;
-      $imagen->nombre=$image_name;
-      $imagen->path=asset("/storage/imagenes/" . $image_name);
+
+      $imagen = new imagen();
+      $imagen->owner = $id_owner;
+      $imagen->table_owner = $table_owner;
+      $imagen->nombre = $image_name;
+      $imagen->path = asset("/storage/imagenes/" . $image_name);
       $imagen->save();
     }
 
@@ -143,42 +143,40 @@ class ImagenController extends Controller
   /**
    * Elimina obtiene los id de los artículos de la tabla imágenes, analiza aquellos presentes y borra imágenes que no se usan en ninguno.
    */
-  public function limpiar_imagenes(string $table_owner="a", int $id_owner=0)
+  public function limpiar_imagenes(string $table_owner = "a", int $id_owner = 0)
   {
     //id_articulos contiene el id de los articulos que contienen alguna imagen
     $id_articulos = DB::table('imagenes')->select('owner')->where('table_owner', '=', 'articulos')->distinct()->get();
-//var_dump($id_articulos);
+    //var_dump($id_articulos);
     $imagenes = DB::table('imagenes')
-                  ->select('id', 'path')
-                  ->where('table_owner', '=', 'articulos')->get();
+      ->select('id', 'path')
+      ->where('table_owner', '=', 'articulos')->get();
 
     foreach ($id_articulos as $id_articulo) {
-    //var_dump($id_articulo->owner);
+      //var_dump($id_articulo->owner);
       $articulo = DB::table('articulosgenericos')
-                  ->select('contenido')
-                  ->where('id_articulo', '=', $id_articulo->owner)->get();
+        ->select('contenido')
+        ->where('id_articulo', '=', $id_articulo->owner)->get();
       //var_dump($articulo);
 
       $dom = new \DomDocument();
       libxml_use_internal_errors(true);
       $dom->loadHtml($articulo, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | libxml_use_internal_errors(true));
       $imageFile = $dom->getElementsByTagName('img');
-    
+
       foreach ($imageFile as $item => $image) {
         $data = $image->getAttribute('src');
         //echo $data;
         var_dump($imagenes);
-        if($imagenes->contains('path', $data)){
+        if ($imagenes->contains('path', $data)) {
           echo "encontrado";
         }
-        
       }
-
     }
     foreach ($imagenes as $imagen) {
       //if (file_exists(public_path("/storage/imagenes/" . $imagen->nombre))) {
-        //unlink(public_path("/storage/imagenes/" . $imagen->nombre));
-        //Storage::delete(asset($imagen->nombre));
+      //unlink(public_path("/storage/imagenes/" . $imagen->nombre));
+      //Storage::delete(asset($imagen->nombre));
       //}
       //imagen::destroy($imagen->id);
     }

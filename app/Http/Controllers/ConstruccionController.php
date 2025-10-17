@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\imagen;
+use App\Models\Asentamiento;
 use App\Models\Construccion;
 use App\Models\Fecha;
-use App\Http\Controllers\ImagenController;
+use App\Models\imagen;
 use App\Models\tipo_construccion;
+use App\Http\Controllers\ImagenController;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ConstruccionController extends Controller
 {
@@ -18,32 +20,12 @@ class ConstruccionController extends Controller
    */
   public function index($orden = 'asc', $tipo = '0')
   {
-    try {
-      if ($tipo != 0) {
-        $construcciones = DB::table('construccions')
-          ->leftjoin('tipo_construccion', 'construccions.tipo', '=', 'tipo_construccion.id')
-          ->select('construccions.id', 'construccions.nombre', 'descripcion', 'tipo_construccion.nombre AS tipo')
-          ->where('construccions.tipo', '=', $tipo)
-          ->orderBy('construccions.nombre', $orden)->get();
-      } else {
-        $construcciones = DB::table('construccions')
-          ->leftjoin('tipo_construccion', 'construccions.tipo', '=', 'tipo_construccion.id')
-          ->select('construccions.id', 'construccions.nombre', 'descripcion', 'tipo_construccion.nombre AS tipo')
-          ->orderBy('construccions.nombre', $orden)->get();
-      }
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $construcciones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $construcciones = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener las construcciones
+    $construcciones = Construccion::get_construcciones($tipo, $orden);
 
-    try {
-      $tipos = tipo_construccion::orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todos los tipos de construcciones almacenados
+    $tipos = tipo_construccion::get_tipos_construcciones();
+
     return view('construcciones.index', ['construcciones' => $construcciones, 'tipos' => $tipos, 'orden' => $orden, 'tipo_o' => $tipo]);
   }
 
@@ -52,18 +34,13 @@ class ConstruccionController extends Controller
    */
   public function create()
   {
-    try {
-      $tipo_construccion = tipo_construccion::orderBy('nombre', 'asc')->get();
+    // Obtener todos los tipos de construcciones almacenados
+    $tipos = tipo_construccion::get_tipos_construcciones();
 
-      $ubicaciones = DB::table('asentamientos')->select('id', 'nombre')
-        ->where('id', '!=', 0)->orderBy('nombre', 'asc')->get();
+    // Obtener todos los asentamientos almacenados
+    $ubicaciones = Asentamiento::get_asentamientos();
 
-      return view('construcciones.create', ['tipos' => $tipo_construccion, 'ubicaciones' => $ubicaciones]);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('construcciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      return redirect()->route('construcciones.index')->with('error', $excepcion->getMessage());
-    }
+    return view('construcciones.create', ['tipos' => $tipos, 'ubicaciones' => $ubicaciones]);
   }
 
   /**
@@ -86,8 +63,10 @@ class ConstruccionController extends Controller
 
       $id_construccion = DB::scalar("SELECT MAX(id) as id FROM construccions");
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ConstruccionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('construcciones.index')->with('error', 'Se produjo un problema en la base de datos.' . $excepcion->getMessage());
     } catch (Exception $excepcion) {
+      Log::error('ConstruccionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('construcciones.index')->with('error', $excepcion->getMessage());
     }
 
@@ -120,8 +99,10 @@ class ConstruccionController extends Controller
       $construccion->save();
       return redirect()->route('construcciones.index')->with('message', 'Construcción ' . $construccion->nombre . ' añadida correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ConstruccionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('construcciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.' . $excepcion->getMessage());
     } catch (Exception $excepcion) {
+      Log::error('ConstruccionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('construcciones.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -131,41 +112,30 @@ class ConstruccionController extends Controller
    */
   public function edit($id)
   {
-    try {
-      $tipos = tipo_construccion::orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-    try {
-      $ubicaciones = DB::table('asentamientos')->select('id', 'nombre')
-        ->where('id', '!=', 0)->orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos = ['error' => ['error' => $excepcion->getMessage()]];
+    // Obtener todos los tipos de construcciones almacenados
+    $tipos = tipo_construccion::get_tipos_construcciones();
+
+    // Obtener todos los asentamientos almacenados
+    $ubicaciones = Asentamiento::get_asentamientos();
+
+    // Obtener la construccion
+    $construccion = Construccion::get_construccion($id);
+    if ($construccion['error'] ?? false) {
+      return redirect()->route('construcciones')->with('error', $construccion['error']['error']);
     }
 
-    try {
-      $construccion = Construccion::findorfail($id);
-
-      if ($construccion->construccion != 0) {
-        $construccion_ini = Fecha::find($construccion->construccion);
-      } else {
-        $construccion_ini = Fecha::find(0);
-      }
-
-      if ($construccion->destruccion != 0) {
-        $construccion_fin = Fecha::find($construccion->destruccion);
-      } else {
-        $construccion_fin = Fecha::find(0);
-      }
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      return view('construcciones.index')->with('error', 'Se produjo un problema en la base de datos.' . $excepcion->getMessage());
-    } catch (Exception $excepcion) {
-      return view('construcciones.index')->with('error', $excepcion->getMessage());
+    if ($construccion->construccion != 0) {
+      $construccion_ini = Fecha::find($construccion->construccion);
+    } else {
+      $construccion_ini = Fecha::find(0);
     }
+
+    if ($construccion->destruccion != 0) {
+      $construccion_fin = Fecha::find($construccion->destruccion);
+    } else {
+      $construccion_fin = Fecha::find(0);
+    }
+
     return view('construcciones.edit', ['construccion' => $construccion, 'construccion_ini' => $construccion_ini, 'construccion_fin' => $construccion_fin, 'tipos' => $tipos, 'ubicaciones' => $ubicaciones]);
   }
   /**
@@ -182,12 +152,10 @@ class ConstruccionController extends Controller
       'adestruccion' => 'nullable|integer',
     ]);
 
-    try {
-      $construccion = Construccion::findorfail($request->id);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('construcciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo editar.' . $excepcion->getMessage());
-    } catch (Exception $excepcion) {
-      return redirect()->route('construcciones.index')->with('error', $excepcion->getMessage());
+    // Obtener la construccion
+    $construccion = Construccion::get_construccion($request->id);
+    if ($construccion['error'] ?? false) {
+      return redirect()->route('construcciones')->with('error', $construccion['error']['error']);
     }
 
     $construccion->nombre = $request->nombre;
@@ -216,7 +184,6 @@ class ConstruccionController extends Controller
     $construccion->destruccion = $request->input('id_destruccion', 0);
 
     try {
-
       if ($request->input('aconstruccion', 0) != 0) {
         if ($construccion->construccion != 0) {
           //la construccion ya tenía fecha de construccion antes de editar
@@ -240,8 +207,10 @@ class ConstruccionController extends Controller
       $construccion->save();
       return redirect()->route('construcciones.index')->with('message', $construccion->nombre . ' editado correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ConstruccionController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('construcciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo editar.' . $excepcion->getMessage());
     } catch (Exception $excepcion) {
+      Log::error('ConstruccionController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('construcciones.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -280,8 +249,10 @@ class ConstruccionController extends Controller
 
       return redirect()->route('construcciones.index')->with('message', $request->nombre_borrado . ' borrado correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ConstruccionController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('construcciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo borrar.');
     } catch (Exception $excepcion) {
+      Log::error('ConstruccionController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('construcciones.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -299,19 +270,16 @@ class ConstruccionController extends Controller
         ->where('construccions.nombre', 'LIKE', "%{$search}%")
         ->orderBy('construccions.nombre', 'asc')->get();
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ConstruccionController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $construcciones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     } catch (Exception $excepcion) {
+      Log::error('ConstruccionController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $construcciones = ['error' => ['error' => $excepcion->getMessage()]];
     }
 
-    try {
-      $tipos = tipo_construccion::orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-    
-    return view('construcciones.index', ['construcciones' => $construcciones, 'tipos'=>$tipos, 'orden'=>'asc', 'tipo_o'=>0]);
+    // Obtener todos los tipos de construcciones almacenados
+    $tipos = tipo_construccion::get_tipos_construcciones();
+
+    return view('construcciones.index', ['construcciones' => $construcciones, 'tipos' => $tipos, 'orden' => 'asc', 'tipo_o' => 0]);
   }
 }

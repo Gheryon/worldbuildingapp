@@ -44,7 +44,6 @@
                     <option selected disabled value="">Elegir</option>
                     <option>Referencia</option>
                     <option>Canon</option>
-                    <option>Crónica</option>
                   </select>
                   @error('tipo')
                   <small style="color: red">{{$message}}</small>

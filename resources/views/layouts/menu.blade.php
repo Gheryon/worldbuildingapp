@@ -78,7 +78,7 @@
           <a href="{{route('relatos')}}" class="nav-link">
             <i class="nav-icon fa-solid fa-book-open"></i>
             <p>
-              Relatos
+              Relatos e historias
             </p>
           </a>
         </li>

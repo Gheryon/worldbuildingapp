@@ -37,46 +37,21 @@ class ConfigurationController extends Controller
     } catch (Exception $excepcion) {
       $fecha=['error' => ['error' => $excepcion->getMessage()]];
     }
+    
+    // Obtener todos los tipos de asentamiento almacenados
+    $tipos_asentamiento = tipo_asentamiento::get_tipos_asentamientos();
 
-    try{
-      $tipos_asentamiento=tipo_asentamiento::orderBy('nombre', 'asc')->get();
-    }catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos_asentamiento=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos_asentamiento=['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todos los tipos de conflictos almacenados
+    $tipos_conflicto = tipo_conflicto::get_tipos_conflictos();
 
-    try{
-      $tipos_conflicto=tipo_conflicto::orderBy('nombre', 'asc')->get();
-    }catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos_conflicto=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos_conflicto=['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todos los tipos de construcciones almacenados
+    $tipos_construccion = tipo_construccion::get_tipos_construcciones();
 
-    try{
-      $tipos_construccion=tipo_construccion::orderBy('nombre', 'asc')->get();
-    }catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos_construccion=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos_construccion=['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todos los tipos de lugares almacenados
+    $tipos_lugar = tipo_lugar::get_tipos_lugares();
 
-    try{
-      $tipos_lugar=tipo_lugar::orderBy('nombre', 'asc')->get();
-    }catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos_lugar=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos_lugar=['error' => ['error' => $excepcion->getMessage()]];
-    }
-
-    try{
-      $tipos_organizacion=tipo_organizacion::orderBy('nombre', 'asc')->get();
-    }catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos_organizacion=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos_organizacion=['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todos los tipos de organizacion almacenados
+    $tipos_organizacion = tipo_organizacion::get_tipos_organizaciones();
 
     try {
       $lineas_temporales=lineas_temporales::orderBy('nombre', 'asc')->get();

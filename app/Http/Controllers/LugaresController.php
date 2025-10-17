@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Lugar;
 use App\Models\imagen;
-use App\Http\Controllers\ImagenController;
 use App\Models\tipo_lugar;
+use App\Http\Controllers\ImagenController;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class LugaresController extends Controller
 {
@@ -17,32 +18,11 @@ class LugaresController extends Controller
    */
   public function index($orden='asc', $tipo='0')
   {
-    try{
-      if($tipo!=0){
-        $lugares=DB::table('lugares')
-          ->leftjoin('tipo_lugar', 'lugares.id_tipo_lugar', '=', 'tipo_lugar.id')
-          ->select('lugares.id', 'lugares.nombre', 'descripcion_breve', 'tipo_lugar.nombre AS tipo')
-          ->where('lugares.id_tipo_lugar', '=', $tipo)
-          ->orderBy('lugares.nombre', $orden)->get();
-      }else{
-        $lugares=DB::table('lugares')
-          ->leftjoin('tipo_lugar', 'lugares.id_tipo_lugar', '=', 'tipo_lugar.id')
-          ->select('lugares.id', 'lugares.nombre', 'descripcion_breve', 'tipo_lugar.nombre AS tipo')
-          ->orderBy('lugares.nombre', $orden)->get();
-      }
-    }catch(\Illuminate\Database\QueryException $excepcion){
-      $lugares=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    }catch(Exception $excepcion){
-      $lugares=['error' => ['error' => $excepcion->getMessage()]];
-    }
+    //obtener todos los lugares almacenados
+    $lugares=Lugar::get_lugares($tipo, $orden);
 
-    try{
-      $tipos=tipo_lugar::orderBy('nombre', 'asc')->get();
-    }catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos=['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todos los tipos de lugares almacenados
+    $tipos = tipo_lugar::get_tipos_lugares();
 
     return view('lugares.index', ['lugares' => $lugares, 'tipos'=>$tipos, 'orden'=>$orden, 'tipo_o'=>$tipo]);
   }
@@ -52,15 +32,10 @@ class LugaresController extends Controller
    */
   public function create()
   {
-    try {
-      $tipo_lugar =tipo_lugar::orderBy('nombre', 'asc')->get();
-  
-      return view('lugares.create', ['tipos'=>$tipo_lugar]);
-    }catch(\Illuminate\Database\QueryException $excepcion){
-      return view('lugares.index')->with('error', 'Se produjo un problema en la base de datos.');
-    }catch(Exception $excepcion){
-      return view('lugares.index')->with('error', $excepcion->getMessage());
-    }
+    // Obtener todos los tipos de lugares almacenados
+    $tipos = tipo_lugar::get_tipos_lugares();
+
+    return view('lugares.create', ['tipos'=>$tipos]);
   }
 
   /**
@@ -79,8 +54,10 @@ class LugaresController extends Controller
   
       $id_lugar=DB::scalar("SELECT MAX(id) as id FROM lugares");
     }catch(\Illuminate\Database\QueryException $excepcion){
+      Log::error('LugaresController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('lugares.index')->with('error', 'Se produjo un problema en la base de datos.');
     }catch(Exception $excepcion){
+      Log::error('LugaresController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('lugares.index')->with('error', $excepcion->getMessage());
     }
 
@@ -121,8 +98,10 @@ class LugaresController extends Controller
       $lugar->save();
       return redirect()->route('lugares.index')->with('message','Lugar añadido correctamente.');
     }catch(\Illuminate\Database\QueryException $excepcion){
+      Log::error('LugaresController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('lugares.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
     }catch(Exception $excepcion){
+      Log::error('LugaresController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('lugares.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -140,16 +119,16 @@ class LugaresController extends Controller
    */
   public function edit($id)
   {
-    try {
-      $lugar=lugar::findorfail($id);
-      $tipo_lugar =tipo_lugar::orderBy('nombre', 'asc')->get();
-  
-      return view('lugares.edit', ['lugar'=>$lugar, 'tipos'=>$tipo_lugar]);
-    } catch(\Illuminate\Database\QueryException $excepcion){
-      return view('lugares.index')->with('error', 'Se produjo un problema en la base de datos.');
-    }catch(Exception $excepcion){
-      return view('lugares.index')->with('error', $excepcion->getMessage());
+    // Obtener todos los tipos de lugares almacenados
+    $tipos = tipo_lugar::get_tipos_lugares();
+
+
+    $lugar = Lugar::get_lugar($id);
+    if($lugar['error']??false){
+      return redirect()->route('lugares')->with('error', $lugar['error']['error']);
     }
+
+    return view('lugares.edit', ['lugar'=>$lugar, 'tipos'=>$tipos]);
   }
 
   /**
@@ -162,12 +141,9 @@ class LugaresController extends Controller
       'select_tipo'=>'required',
     ]);
 
-    try {
-      $lugar=lugar::findorfail($request->id);
-    }catch(\Illuminate\Database\QueryException $excepcion){
-      return view('lugares.index')->with('error', 'Se produjo un problema en la base de datos.');
-    }catch(Exception $excepcion){
-      return view('lugares.index')->with('error', $excepcion->getMessage());
+     $lugar = Lugar::get_lugar($$request->id);
+    if($lugar['error']??false){
+      return redirect()->route('lugares')->with('error', $lugar['error']['error']);
     }
     
     if($request->filled('nombre')){
@@ -204,12 +180,13 @@ class LugaresController extends Controller
     $lugar->id_tipo_lugar=$request->select_tipo;
     
     try{
-
       $lugar->save();
       return redirect()->route('lugares.index')->with('message', $lugar->nombre.' editado correctamente.');
     }catch(\Illuminate\Database\QueryException $excepcion){
+      Log::error('LugaresController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('lugares.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
     }catch(Exception $excepcion){
+      Log::error('LugaresController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('lugares.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -237,8 +214,10 @@ class LugaresController extends Controller
       lugar::destroy($request->id_borrar);
       return redirect()->route('lugares.index')->with('message','lugar borrado correctamente.');
     }catch(\Illuminate\Database\QueryException $excepcion){
+      Log::error('LugaresController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('lugares.index')->with('error','Se produjo un problema en la base de datos, no se pudo borrar.');
     }catch(Exception $excepcion){
+      Log::error('LugaresController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('lugares.index')->with('error',$excepcion->getMessage());
     }
   }
@@ -257,18 +236,15 @@ class LugaresController extends Controller
         ->orderBy('lugares.nombre', 'asc')->get();
       
     }catch(\Illuminate\Database\QueryException $excepcion){
+      Log::error('LugaresController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $lugares=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     }catch(Exception $excepcion){
+      Log::error('LugaresController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $lugares=['error' => ['error' => $excepcion->getMessage()]];
     }
 
-    try{
-      $tipos=tipo_lugar::orderBy('nombre', 'asc')->get();
-    }catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos=['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todos los tipos de lugares almacenados
+    $tipos = tipo_lugar::get_tipos_lugares();
     
     return view('lugares.index', ['lugares' => $lugares, 'tipos'=>$tipos, 'orden'=>'asc', 'tipo_o'=>0]);
   }

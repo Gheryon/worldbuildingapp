@@ -1,15 +1,17 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\organizacion;
 use App\Models\tipo_organizacion;
 use App\Models\Fecha;
 use App\Models\imagen;
+use App\Models\personaje;
 use App\Http\Controllers\ImagenController;
+use App\Models\Religion;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrganizacionController extends Controller
 {
@@ -18,33 +20,11 @@ class OrganizacionController extends Controller
    */
   public function index($orden = 'asc', $tipo = '0')
   {
-    try {
-      if ($tipo != 0) {
-        $organizaciones = DB::table('organizaciones')
-          ->join('tipo_organizacion', 'organizaciones.id_tipo_organizacion', '=', 'tipo_organizacion.id')
-          ->select('organizaciones.id_organizacion', 'organizaciones.nombre', 'organizaciones.escudo', 'tipo_organizacion.nombre AS tipo')
-          ->where('organizaciones.id_organizacion', '!=', 0)
-          ->where('organizaciones.id_tipo_organizacion', '=', $tipo)
-          ->orderBy('organizaciones.nombre', $orden)->get();
-      } else {
-        $organizaciones = DB::table('organizaciones')
-          ->join('tipo_organizacion', 'organizaciones.id_tipo_organizacion', '=', 'tipo_organizacion.id')
-          ->select('organizaciones.id_organizacion', 'organizaciones.nombre', 'organizaciones.escudo', 'tipo_organizacion.nombre AS tipo')
-          ->where('organizaciones.id_organizacion', '!=', 0)
-          ->orderBy('organizaciones.nombre', $orden)->get();
-      }
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $organizaciones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $organizaciones = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-    try {
-      $tipos_organizacion = tipo_organizacion::orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos_organizacion = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos_organizacion = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    //Obtener organizaciones almacenadas
+    $organizaciones = organizacion::get_organizaciones($tipo, $orden);
+
+    // Obtener todos los tipos de organizacion almacenados
+    $tipos_organizacion = tipo_organizacion::get_tipos_organizaciones();
 
     return view('organizaciones.index', ['organizaciones' => $organizaciones, 'tipos' => $tipos_organizacion, 'orden' => $orden, 'tipo_o' => $tipo]);
   }
@@ -54,37 +34,17 @@ class OrganizacionController extends Controller
    */
   public function create()
   {
-    try {
-      $tipo_organizacion = tipo_organizacion::orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipo_organizacion = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipo_organizacion = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todos los tipos de organizacion almacenados
+    $tipo_organizacion = tipo_organizacion::get_tipos_organizaciones();
 
-    try {
-      $personajes = DB::table('personaje')->select('id', 'Nombre')->where('id', '!=', 0)->orderBy('Nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $personajes = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $personajes = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todos los personajes almacenados
+    $personajes = personaje::get_personajes_id_nombre();
 
-    try {
-      $religiones = DB::table('religiones')->select('id', 'nombre')->orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $religiones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $religiones = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-
-    try {
-      $paises = DB::table('organizaciones')->select('id_organizacion', 'nombre')->where('id_organizacion', '!=', 0)->orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $paises = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $paises = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    //obtener todas las religiones
+    $religiones=Religion::get_religiones();
+    
+    // Obtener todos los paises almacenados
+    $paises = organizacion::get_organizaciones_id_nombre();
 
     return view('organizaciones.create', ['tipo_organizacion' => $tipo_organizacion, 'paises' => $paises, 'personajes' => $personajes, 'religiones'=>$religiones]);
   }
@@ -112,8 +72,10 @@ class OrganizacionController extends Controller
 
       $id = DB::scalar("SELECT MAX(id_organizacion) as id FROM organizaciones");
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('OrganizacionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('organizaciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
     } catch (Exception $excepcion) {
+      Log::error('OrganizacionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
     }
 
@@ -201,8 +163,10 @@ class OrganizacionController extends Controller
       $organizacion->save();
       return redirect()->route('organizaciones.index')->with('message', 'Organización ' . $organizacion->nombre . ' añadida correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('OrganizacionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('organizaciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.' . $excepcion->getMessage());
     } catch (Exception $excepcion) {
+      Log::error('OrganizacionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -220,56 +184,29 @@ class OrganizacionController extends Controller
    */
   public function edit($id)
   {
+    // Obtener la organizacion a editar
+    $organizacion = organizacion::get_organizacion($id);
+    if (isset($organizacion['error'])) {
+      return redirect()->route('organizaciones.index')->with('error', $organizacion['error']['error']);
+    }
+
     $fecha_fundacion = 0;
     $fecha_disolucion = 0;
 
-    try {
-      $organizacion = organizacion::findorfail($id);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $organizacion = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $organizacion = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todos los tipos de organizacion almacenados
+    $tipo_organizacion = tipo_organizacion::get_tipos_organizaciones();
 
-    try {
-      $tipo_organizacion = tipo_organizacion::orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipo_organizacion = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipo_organizacion = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+     // Obtener todos los personajes almacenados
+    $personajes = personaje::get_personajes_id_nombre();
 
-    try {
-      $personajes = DB::table('personaje')->select('id', 'Nombre')->where('id', '!=', 0)->orderBy('Nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $personajes = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $personajes = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todos los paises almacenados
+    $paises = organizacion::get_organizaciones_id_nombre();
 
-    try {
-      $paises = DB::table('organizaciones')->select('id_organizacion', 'nombre')->where('id_organizacion', '!=', 0)->orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $paises = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $paises = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    //obtener todas las religiones
+    $religiones=Religion::get_religiones();
 
-    try {
-      $religiones = DB::table('religiones')->select('id', 'nombre')->orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $religiones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $religiones = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-
-    try {
-      $religiones_p = DB::table('religion_presence')->select('religion')->where('organizacion', '=', $id)->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $religiones_p = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $religiones_p = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    //Obtener religiones presentes en la organizacion
+    $religiones_p=organizacion::get_religiones_presentes($id);
 
     if ($organizacion->fundacion != 0) {
       $fecha_fundacion = Fecha::find($organizacion->fundacion);
@@ -302,13 +239,12 @@ class OrganizacionController extends Controller
       'ddisolucion' => 'nullable|integer|min:1|max:30',
     ]);
 
-    try {
-      $organizacion = organizacion::findorfail($request->id);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('organizaciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
+    // Obtener la organizacion a editar
+    $organizacion = organizacion::get_organizacion($request->id);
+    if (isset($organizacion['error'])) {
+      return redirect()->route('organizaciones.index')->with('error', $organizacion['error']['error']);
     }
+
     $organizacion->nombre = $request->nombre;
     $organizacion->gentilicio = $request->gentilicio;
     $organizacion->capital = $request->capital;
@@ -420,8 +356,10 @@ class OrganizacionController extends Controller
       $organizacion->save();
       return redirect()->route('organizaciones.index')->with('message', $organizacion->nombre . ' editado correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('OrganizacionController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('organizaciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
     } catch (Exception $excepcion) {
+      Log::error('OrganizacionController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -468,8 +406,10 @@ class OrganizacionController extends Controller
       Organizacion::destroy($request->id_borrar);
       return redirect()->route('organizaciones.index')->with('message', $request->nombre_borrado . ' borrado correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('OrganizacionController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('organizaciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo borrar.');
     } catch (Exception $excepcion) {
+      Log::error('OrganizacionController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -488,17 +428,16 @@ class OrganizacionController extends Controller
         ->where('organizaciones.nombre', 'LIKE', "%{$search}%")
         ->orderBy('organizaciones.nombre', 'asc')->get();
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('OrganizacionController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $organizaciones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     } catch (Exception $excepcion) {
+      Log::error('OrganizacionController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $organizaciones = ['error' => ['error' => $excepcion->getMessage()]];
     }
-    try {
-      $tipos_organizacion = tipo_organizacion::orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $tipos_organizacion = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $tipos_organizacion = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    
+    // Obtener todos los tipos de organizacion almacenados
+    $tipos_organizacion = tipo_organizacion::get_tipos_organizaciones();
+
     return view('organizaciones.index', ['organizaciones' => $organizaciones, 'tipos' => $tipos_organizacion, 'orden' => 'asc', 'tipo_o' => 0]);
   }
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\ImagenController;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ArticuloController extends Controller
 {
@@ -17,18 +18,8 @@ class ArticuloController extends Controller
    */
   public function index($orden = 'asc', $filtro = 'all')
   {
-    try {
-      //si filtro==all se obtienen todos, si filtro
-      if ($filtro == 'all') {
-        $articulos = articulo::where('tipo', '!=', 'relato')->orderBy('nombre', $orden)->get();
-      } else {
-        $articulos = articulo::where('tipo', '=', $filtro)->orderBy('nombre', $orden)->get();
-      }
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $articulos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $articulos = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    $articulos = articulo::get_articulos($orden, $filtro);
+
     return view('articulos.index', ['articulos' => $articulos, 'orden' => $orden, 'filtro_o' => $filtro]);
   }
 
@@ -65,8 +56,10 @@ class ArticuloController extends Controller
       $articulo->save();
       return redirect()->route('articulos')->with('message', 'Artículo ' . $articulo->nombre . ' añadido correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ArticuloController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('articulos')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
     } catch (Exception $excepcion) {
+      Log::error('ArticuloController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('articulos')->with('error', $excepcion->getMessage());
     }
   }
@@ -76,13 +69,11 @@ class ArticuloController extends Controller
    */
   public function show($id)
   {
-    try {
-      $articulo = Articulo::findorfail($id);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('articulos')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      return redirect()->route('articulos')->with('error', $excepcion->getMessage());
+    $articulo = articulo::get_articulo($id);
+    if ($articulo['error'] ?? false) {
+      return redirect()->route('articulos')->with('error', $articulo['error']['error']);
     }
+
     return view('articulos.show', ['articulo' => $articulo]);
   }
 
@@ -91,7 +82,11 @@ class ArticuloController extends Controller
    */
   public function edit($id)
   {
-    $articulo = articulo::findorfail($id);
+    $articulo = articulo::get_articulo($id);
+    if ($articulo['error'] ?? false) {
+      return redirect()->route('articulos')->with('error', $articulo['error']['error']);
+    }
+
     return view('articulos.edit', ['articulo' => $articulo]);
   }
 
@@ -106,12 +101,9 @@ class ArticuloController extends Controller
       'tipo' => 'required'
     ]);
 
-    try {
-      $articulo = Articulo::findorfail($id);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('articulos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      return redirect()->route('articulos.index')->with('error', $excepcion->getMessage());
+    $articulo = articulo::get_articulo($id);
+    if ($articulo['error'] ?? false) {
+      return redirect()->route('articulos')->with('error', $articulo['error']['error']);
     }
 
     $articulo->nombre = $request->nombre;
@@ -123,8 +115,10 @@ class ArticuloController extends Controller
       $articulo->save();
       return redirect()->route('articulos')->with('message', $articulo->nombre . ' editado correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ArticuloController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('articulos')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
     } catch (Exception $excepcion) {
+      Log::error('ArticuloController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('articulos')->with('error', $excepcion->getMessage());
     }
   }
@@ -151,8 +145,10 @@ class ArticuloController extends Controller
 
       return redirect()->route('articulos')->with('message', $request->nombre_borrado . ' borrado correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ArticuloController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('articulos')->with('error', 'Se produjo un problema en la base de datos, no se pudo borrar.' . $excepcion->getMessage());
     } catch (Exception $excepcion) {
+      Log::error('ArticuloController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('articulos')->with('error', $excepcion->getMessage());
     }
   }
@@ -175,18 +171,15 @@ class ArticuloController extends Controller
     return view('articulos.index', ['articulos' => $articulos, 'orden' => 'asc', 'filtro_o' => 0]);
   }
 
+
   /**
    * Display a listing of the resource.
    */
   public function index_relatos($orden = 'asc')
   {
-    try {
-      $articulos = articulo::where('tipo', '=', 'relato')->orderBy('nombre', $orden)->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $articulos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $articulos = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    // Obtener todos los relatos almacenados
+    $articulos = articulo::get_relatos();
+
     return view('relatos.index', ['relatos' => $articulos, 'orden' => $orden]);
   }
 
@@ -195,7 +188,9 @@ class ArticuloController extends Controller
    */
   public function create_relato()
   {
-    $personajes = personaje::getPersonajes();
+    //Obtener todos los personajes almacenados
+    $personajes = personaje::get_personajes_id_nombre();
+
     return view('relatos.create')->with('personajes', $personajes);
   }
 
@@ -236,25 +231,22 @@ class ArticuloController extends Controller
       $articulo->save();
       return redirect()->route('relatos')->with('message', 'Historia ' . $articulo->nombre . ' añadida correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ArticuloController->store_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('relatos')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
     } catch (Exception $excepcion) {
+      Log::error('ArticuloController->store_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('relatos')->with('error', $excepcion->getMessage());
     }
   }
-
-
 
   /**
    * Display the specified resource.
    */
   public function show_relato($id)
   {
-    try {
-      $articulo = Articulo::findorfail($id);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('relatos')->with('error', 'Se produjo un problema en la base de datos.');
-    } catch (Exception $excepcion) {
-      return redirect()->route('relatos')->with('error', $excepcion->getMessage());
+    $articulo = articulo::get_articulo($id);
+    if ($articulo['error'] ?? false) {
+      return redirect()->route('relatos')->with('error', $articulo['error']['error']);
     }
 
     try {
@@ -273,22 +265,21 @@ class ArticuloController extends Controller
    */
   public function edit_relato($id)
   {
-    try {
-      $articulo = articulo::findorfail($id);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('relatos.index')->with('error', 'Se produjo un problema en la base de datos.');
-    } catch (Exception $excepcion) {
-      return redirect()->route('relatos.index')->with('error', $excepcion->getMessage());
+    $articulo = articulo::get_articulo($id);
+    if ($articulo['error'] ?? false) {
+      return redirect()->route('relatos')->with('error', $articulo['error']['error']);
     }
 
     // Obtener todos los personajes almacenados
-    $personajes = personaje::getPersonajes();
+    $personajes = personaje::get_personajes_id_nombre();
 
     try {
       $personajes_r = DB::table('personajes_relevantes')->select('personaje')->where('relato', '=', $id)->get();
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ArticuloController->edit_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $personajes_r = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     } catch (Exception $excepcion) {
+      Log::error('ArticuloController->edit_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $personajes_r = ['error' => ['error' => $excepcion->getMessage()]];
     }
 
@@ -305,12 +296,9 @@ class ArticuloController extends Controller
       'contenido' => 'required',
     ]);
 
-    try {
-      $relato = Articulo::findorfail($id);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('relatos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo actualizar.');
-    } catch (Exception $excepcion) {
-      return redirect()->route('relatos.index')->with('error', $excepcion->getMessage());
+    $relato = articulo::get_articulo($id);
+    if ($relato['error'] ?? false) {
+      return redirect()->route('relatos')->with('error', $relato['error']['error']);
     }
 
     $relato->nombre = $request->nombre;
@@ -338,8 +326,10 @@ class ArticuloController extends Controller
       $relato->save();
       return redirect()->route('relatos')->with('message', $relato->nombre . ' editado correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ArticuloController->update_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('relatos')->with('error', 'Se produjo un problema en la base de datos, no se pudo actualizar.');
     } catch (Exception $excepcion) {
+      Log::error('ArticuloController->update_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('relatos')->with('error', $excepcion->getMessage());
     }
   }
@@ -373,8 +363,10 @@ class ArticuloController extends Controller
 
       return redirect()->route('relatos')->with('message', $request->nombre_borrado . ' borrado correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ArticuloController->destroy_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('relatos')->with('error', 'Se produjo un problema en la base de datos, no se pudo borrar.' . $excepcion->getMessage());
     } catch (Exception $excepcion) {
+      Log::error('ArticuloController->destroy_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('relatos')->with('error', $excepcion->getMessage());
     }
   }
@@ -390,10 +382,12 @@ class ArticuloController extends Controller
         ->where('nombre', 'LIKE', "%{$search}%")
         ->orderBy('nombre', 'asc')->get();
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('ArticuloController->search_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $articulos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     } catch (Exception $excepcion) {
+      Log::error('ArticuloController->search_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $articulos = ['error' => ['error' => $excepcion->getMessage()]];
     }
-    return view('articulos.index', ['articulos' => $articulos, 'orden' => 'asc', 'filtro_o' => 0]);
+    return view('relatos.index', ['relatos' => $articulos, 'orden' => 'asc', 'filtro_o' => 0]);
   }
 }

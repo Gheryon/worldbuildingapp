@@ -1,15 +1,15 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\personaje;
+use App\Models\Especie;
 use App\Models\Fecha;
 use App\Models\imagen;
+use App\Models\personaje;
 use App\Http\Controllers\ImagenController;
-use Especie;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PersonajeController extends Controller
 {
@@ -18,33 +18,12 @@ class PersonajeController extends Controller
    */
   public function index($orden = 'asc', $tipo = '0')
   {
-    try {
-      if ($tipo != 0) {
-        $personajes = DB::table('personaje')
-          ->leftjoin('especies', 'personaje.id_foranea_especie', '=', 'especies.id')
-          ->select('personaje.id', 'personaje.Nombre', 'Retrato', 'Sexo', 'id_foranea_especie', 'especies.nombre AS especie')
-          ->where('personaje.id', '!=', 0)
-          ->where('personaje.id_foranea_especie', '=', $tipo)
-          ->orderBy('personaje.Nombre', $orden)->get();
-      } else {
-        $personajes = DB::table('personaje')
-          ->leftjoin('especies', 'personaje.id_foranea_especie', '=', 'especies.id')
-          ->select('personaje.id', 'personaje.Nombre', 'Retrato', 'Sexo', 'id_foranea_especie', 'especies.nombre AS especie')
-          ->where('personaje.id', '!=', 0)
-          ->orderBy('personaje.Nombre', $orden)->get();
-      }
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $personajes = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $personajes = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-    try {
-      $especies = DB::table('especies')->select('id', 'nombre')->orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $especies = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $especies = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    //obtener personajes almacenados
+    $personajes=personaje::get_personajes($orden, $tipo);
+    
+    //obtener todas las especies
+    $especies = Especie::get_especies();
+
     return view('personajes.index', ['personajes' => $personajes, 'tipos' => $especies, 'orden' => $orden, 'tipo_o' => $tipo]);
   }
 
@@ -53,13 +32,9 @@ class PersonajeController extends Controller
    */
   public function create()
   {
-    try {
-      $especies = DB::table('especies')->select('id', 'nombre')->orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $especies = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $especies = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    //obtener todas las especies
+    $especies = Especie::get_especies();
+
     return view('personajes.create', ['especies' => $especies]);
   }
 
@@ -158,8 +133,10 @@ class PersonajeController extends Controller
       $personaje->save();
       return redirect()->route('personajes.index')->with('message', 'Personaje añadido correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('PersonajeController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('personajes.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
     } catch (Exception $excepcion) {
+      Log::error('PersonajeController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('personajes.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -177,23 +154,17 @@ class PersonajeController extends Controller
    */
   public function edit($id)
   {
-    $fecha_fallecimiento = 0;
-    $fecha_nacimiento = 0;
-    try {
-      $personaje = personaje::findorfail($id);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $personaje = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $personaje = ['error' => ['error' => $excepcion->getMessage()]];
+    //obtener personaje
+    $personaje = personaje::get_personaje($id);
+    if ($personaje['error'] ?? false) {
+      return redirect()->route('personajes.index')->with('error', $personaje['error']['error']);
     }
 
-    try {
-      $especies = DB::table('especies')->select('id', 'nombre')->orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $especies = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $especies = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    $fecha_fallecimiento = 0;
+    $fecha_nacimiento = 0;
+
+    //obtener todas las especies
+    $especies = Especie::get_especies();
 
     if ($personaje->nacimiento != 0) {
       $fecha_nacimiento = Fecha::find($personaje->nacimiento);
@@ -227,13 +198,12 @@ class PersonajeController extends Controller
       'retrato' => 'file|image|mimes:jpg,png,gif|max:10240',
     ]);
 
-    try {
-      $personaje = Personaje::findorfail($request->id);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('personajes.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      return redirect()->route('personajes.index')->with('error', $excepcion->getMessage());
+    //obtener personaje
+    $personaje = personaje::get_personaje($request->id);
+    if ($personaje['error'] ?? false) {
+      return redirect()->route('personajes.index')->with('error', $personaje['error']['error']);
     }
+
     if ($request->filled('nombre')) {
       $personaje->Nombre = $request->nombre;
     }
@@ -334,8 +304,10 @@ class PersonajeController extends Controller
       $personaje->save();
       return redirect()->route('personajes.index')->with('message', 'Personaje editado correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('personajes.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
+      Log::error('PersonajeController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
+      return redirect()->route('personajes.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo actualizar.');
     } catch (Exception $excepcion) {
+      Log::error('PersonajeController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('personajes.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -379,8 +351,10 @@ class PersonajeController extends Controller
       Personaje::destroy($request->id_borrar);
       return redirect()->route('personajes.index')->with('message', $request->nombre_borrado . ' borrado correctamente.');
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('PersonajeController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('personajes.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo borrar.');
     } catch (Exception $excepcion) {
+      Log::error('PersonajeController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('personajes.index')->with('error', $excepcion->getMessage());
     }
   }
@@ -399,17 +373,16 @@ class PersonajeController extends Controller
         ->where('personaje.Nombre', 'LIKE', "%{$search}%")
         ->orderBy('personaje.Nombre', 'asc')->get();
     } catch (\Illuminate\Database\QueryException $excepcion) {
+      Log::error('PersonajeController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $personajes = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
     } catch (Exception $excepcion) {
+      Log::error('PersonajeController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       $personajes = ['error' => ['error' => $excepcion->getMessage()]];
     }
-    try {
-      $especies = DB::table('especies')->select('id', 'nombre')->orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $especies = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $especies = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    
+    //obtener todas las especies
+    $especies = Especie::get_especies();
+    
     return view('personajes.index', ['personajes' => $personajes, 'tipos' => $especies, 'orden' => 'asc', 'tipo_o' => 0]);
   }
 }

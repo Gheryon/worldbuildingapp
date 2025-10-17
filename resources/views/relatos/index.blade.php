@@ -3,7 +3,7 @@
 @extends('layouts.menu')
 
 @section('title')
-<title id="title">Relatos y episodios</title>
+<title id="title">Relatos e historias</title>
 @endsection
 
 @section('navbar-buttons')
