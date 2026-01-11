@@ -59,19 +59,19 @@
         <h5 class="card-title">Hombres</h5>
       </div>
       <div class="card-body">
-        @if (Arr::has($hombres, 'error.error'))
-          {{Arr::get($hombres, 'error.error')}}
+        @if (!$hombres)
+        No hay nombres de hombres disponibles.
         @else
-          {{$hombres[0]->lista}}
+        {{$hombres}}
         @endif
       </div>
-      <button id="Hombres" nombre="{{$hombres[0]->lista}}" title="Editar" class="editar-nombres btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombres">Editar</button>
+      <button id="Hombres" nombre="{{$hombres}}" title="Editar" class="editar-nombres btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombres">Editar</button>
       <div class="card-footer">
         <label for="form-add-nombre-h" class="form-label">Añadir nuevo</label>
         <form id="form-add-nombre-h" class="row" action="{{route('nombre.store_nombre')}}" method="POST">
           @csrf
           <div class="col">
-          <input type="hidden" name="id" id="id" value="Hombres">
+            <input type="hidden" name="id" id="id" value="Hombres">
             <input type="text" value="{{old('nuevo_nombre')}}" name="nuevo_nombre" class="form-control" id="nuevo_nombre" placeholder="Ej: Gumersindo">
             @error('nuevo_nombre')
             <small style="color: red">{{$message}}</small>
@@ -89,13 +89,13 @@
         <h5 class="card-title">Mujeres</h5>
       </div>
       <div class="card-body">
-        @if (Arr::has($mujeres, 'error.error'))
-          {{Arr::get($mujeres, 'error.error')}}
+        @if (!$mujeres)
+        No hay nombres de mujeres disponibles.
         @else
-          {{$mujeres[0]->lista}}
+        {{$mujeres}}
         @endif
       </div>
-      <button id="Mujeres" nombre="{{$mujeres[0]->lista}}" title="Editar" class="editar-nombres btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombres">Editar</button>
+      <button id="Mujeres" nombre="{{$mujeres}}" title="Editar" class="editar-nombres btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombres">Editar</button>
 
       <div class="card-footer">
         <label for="nuevoTimeline" class="form-label">Añadir nuevo</label>
@@ -118,56 +118,56 @@
 
   <div class="row">
 
-<div class="card col ml-1">
-  <div class="card-header">
-    <h5 class="card-title">Lugares</h5>
-  </div>
-  <div class="card-body">
-    @if (Arr::has($lugares, 'error.error'))
-      {{Arr::get($lugares, 'error.error')}}
-    @else
-      {{$lugares[0]->lista}}
-    @endif
-  </div>
-  <button id="Lugares" nombre="{{$lugares[0]->lista}}" title="Editar" class="editar-nombres btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombres">Editar</button>
-
-  <div class="card-footer">
-    <label for="nuevoTimeline" class="form-label">Añadir nuevo</label>
-    <form id="form-add-nombre-lugar" class="row" action="{{route('nombre.store_nombre')}}" method="POST">
-      @csrf
-      <div class="col">
-      <input type="hidden" name="id" id="id" value="Lugares">
-        <input type="text" value="{{old('nuevo_nombre')}}" name="nuevo_nombre" class="form-control" id="nuevo_nombre" placeholder="Ej: Córdoba">
-        @error('nuevo_nombre')
-        <small style="color: red">{{$message}}</small>
-        @enderror
+    <div class="card col ml-1">
+      <div class="card-header">
+        <h5 class="card-title">Lugares</h5>
       </div>
-      <div class="col-3 align-bottom">
-        <button type="submit" class="btn btn-primary">Añadir</button>
+      <div class="card-body">
+        @if (!$lugares)
+        No hay nombres de lugares disponibles.
+        @else
+        {{$lugares}}
+        @endif
       </div>
-    </form>
-  </div>
-</div><!--card -->
+      <button id="Lugares" nombre="{{$lugares}}" title="Editar" class="editar-nombres btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombres">Editar</button>
 
-  <div class="card col ml-1">
+      <div class="card-footer">
+        <label for="nuevoTimeline" class="form-label">Añadir nuevo</label>
+        <form id="form-add-nombre-lugar" class="row" action="{{route('nombre.store_nombre')}}" method="POST">
+          @csrf
+          <div class="col">
+            <input type="hidden" name="id" id="id" value="Lugares">
+            <input type="text" value="{{old('nuevo_nombre')}}" name="nuevo_nombre" class="form-control" id="nuevo_nombre" placeholder="Ej: Córdoba">
+            @error('nuevo_nombre')
+            <small style="color: red">{{$message}}</small>
+            @enderror
+          </div>
+          <div class="col-3 align-bottom">
+            <button type="submit" class="btn btn-primary">Añadir</button>
+          </div>
+        </form>
+      </div>
+    </div><!--card -->
+
+    <div class="card col ml-1">
       <div class="card-header">
         <h5 class="card-title">Sin decidir</h5>
       </div>
       <div class="card-body">
-        @if (Arr::has($sindecidir, 'error.error'))
-          {{Arr::get($sindecidir, 'error.error')}}
+        @if (!$sindecidir)
+        No hay nombres disponibles.
         @else
-          {{$sindecidir[0]->lista}}
+        {{$sindecidir}}
         @endif
       </div>
-      <button id="Sin_decidir" nombre="{{$sindecidir[0]->lista}}" title="Editar" class="editar-nombres btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombres">Editar</button>
+      <button id="Sin_decidir" nombre="{{$sindecidir}}" title="Editar" class="editar-nombres btn btn-sm btn-success" data-toggle="modal" data-target="#editar_nombres">Editar</button>
 
       <div class="card-footer">
         <label for="nuevoTimeline" class="form-label">Añadir nuevo</label>
         <form id="form-add-nombre-sindecidir" class="row" action="{{route('nombre.store_nombre')}}" method="POST">
           @csrf
           <div class="col">
-          <input type="hidden" name="id" id="id" value="Sin_decidir">
+            <input type="hidden" name="id" id="id" value="Sin_decidir">
             <input type="text" value="{{old('nuevo_nombre')}}" name="nuevo_nombre" class="form-control" id="nuevo_nombre" placeholder="Ej: Algo">
             @error('nuevo_nombre')
             <small style="color: red">{{$message}}</small>

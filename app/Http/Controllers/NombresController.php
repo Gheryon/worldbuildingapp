@@ -14,37 +14,13 @@ class NombresController extends Controller
    */
   public function index()
   {
-    try {
-      $hombres=DB::table('nombres')->select('lista')->where('tipo', '=', 'Hombres')->get();
-    }catch (\Illuminate\Database\QueryException $excepcion) {
-      $hombres=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $hombres=['error' => ['error' => $excepcion->getMessage()]];
-    }
+    $hombres = Nombres::get_nombres_hombres();
 
-    try {
-      $mujeres=DB::table('nombres')->select('lista')->where('tipo', '=', 'Mujeres')->get();
-    }catch (\Illuminate\Database\QueryException $excepcion) {
-      $mujeres=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $mujeres=['error' => ['error' => $excepcion->getMessage()]];
-    }
+    $mujeres = Nombres::get_nombres_mujeres();
 
-    try {
-      $lugares=DB::table('nombres')->select('lista')->where('tipo', '=', 'Lugares')->get();
-    }catch (\Illuminate\Database\QueryException $excepcion) {
-      $lugares=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $lugares=['error' => ['error' => $excepcion->getMessage()]];
-    }
+    $lugares = Nombres::get_nombres_lugares();
 
-    try {
-      $sindecidir=DB::table('nombres')->select('lista')->where('tipo', '=', 'Sin_decidir')->get();
-    }catch (\Illuminate\Database\QueryException $excepcion) {
-      $sindecidir=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $sindecidir=['error' => ['error' => $excepcion->getMessage()]];
-    }
+    $sindecidir = Nombres::get_nombres_indeterminados();
 
     return view('nombres.index', ['hombres' => $hombres, 'mujeres' => $mujeres, 'lugares' => $lugares, 'sindecidir' => $sindecidir]);
   }
@@ -54,7 +30,7 @@ class NombresController extends Controller
    */
   public function create()
   {
-      //
+    //
   }
 
   /**
@@ -63,30 +39,18 @@ class NombresController extends Controller
   public function store_nombre(Request $request)
   {
     $request->validate([
-      'nuevo_nombre'=>'required|max:128',
+      'nuevo_nombre' => 'required|max:128',
     ]);
 
-    try{
-      $id=$request->input('id');
-      $hombres=Nombres::where('tipo', $id)->firstorfail();
-      $nuevo=$request->input('nuevo_nombre');
-      $nombres=$hombres->lista;
-      $json=array();
-      //los nombres se almacenan separados por una ',', con explode se convierten en un array
-      $json=explode(', ', $nombres);
-      //se añade el nombre nuevo y se reordena la lista de nombres
-      array_push($json, $nuevo);
-      sort($json);
-      //los nombres se combinan en un array de nuevo y se guardan los cambios
-      $nombres=implode(", ", $json);
-      $hombres->lista=$nombres;
-      $hombres->save();
-  
-      return redirect()->route('nombres.index')->with('message', $nuevo.' añadido correctamente.');      
-    }catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('nombres.index')->with('error', 'Se produjo un problema en la base de datos.');
-    } catch (Exception $excepcion) {
-      return redirect()->route('nombres.index')->with('error', $excepcion->getMessage());
+    $id = $request->input('id');
+    $nuevo = $request->input('nuevo_nombre');
+
+    $exito = Nombres::store_nombre($nuevo, $id);
+
+    if ($exito) {
+      return redirect()->back()->with('message', $nuevo . ' añadido correctamente.');
+    } else {
+      return redirect()->back()->with('error', 'No se pudo añadir el nombre. Revisa los datos.');
     }
   }
 
@@ -95,7 +59,7 @@ class NombresController extends Controller
    */
   public function show(Nombres $nombres)
   {
-      //
+    //
   }
 
   /**
@@ -103,7 +67,7 @@ class NombresController extends Controller
    */
   public function edit(Nombres $nombres)
   {
-      //
+    //
   }
 
   /**
@@ -112,29 +76,17 @@ class NombresController extends Controller
   public function update(Request $request, Nombres $nombres)
   {
     $request->validate([
-      'nombres_editar'=>'required',
+      'nombres_editar' => 'required',
     ]);
 
-    try{
-      $id=$request->input('id_editar');
-      $nuevo=$request->input('nombres_editar');
-      $nombres_old=Nombres::where('tipo', $id)->firstorfail();
+    $id = $request->input('id_editar');
+      $nuevo = $request->input('nombres_editar');
+    $exito = Nombres::update_nombres($nuevo, $id);
 
-      $nombres=$nombres_old->lista;
-      $json=array();
-      //los nombres se almacenan separados por una ',', con explode se convierten en un array y se reordenan
-      $json=explode(', ', $nuevo);
-      sort($json);
-      //los nombres se combinan en un array de nuevo y se guardan los cambios
-      $nombres=implode(", ", $json);
-      $nombres_old->lista=$nombres;
-      $nombres_old->save();
-  
-      return redirect()->route('nombres.index')->with('message', 'Editado correctamente.');      
-    }catch (\Illuminate\Database\QueryException $excepcion) {
-      return redirect()->route('nombres.index')->with('error', 'Se produjo un problema en la base de datos.');
-    } catch (Exception $excepcion) {
-      return redirect()->route('nombres.index')->with('error', $excepcion->getMessage());
+    if ($exito) {
+      return redirect()->back()->with('message', 'Editado correctamente.');
+    } else {
+      return redirect()->back()->with('error', 'No se pudo actualizar la lista. Revisa los datos.');
     }
   }
 
@@ -143,6 +95,6 @@ class NombresController extends Controller
    */
   public function destroy(Nombres $nombres)
   {
-      //
+    //
   }
 }
