@@ -22,11 +22,11 @@
 <body class="hold-transition sidebar-mini layout-fixed" id="_body_">
 <div class="wrapper">
   <!-- Navbar -->
-    @yield('navbar')
+    @include('layouts.navbar')
   <!-- /.navbar -->
 
   <!-- Main Sidebar Container -->
-    @yield('menu')
+    @include('layouts.menu')
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">

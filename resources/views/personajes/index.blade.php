@@ -1,6 +1,4 @@
 @extends('layouts.index')
-@extends('layouts.navbar')
-@extends('layouts.menu')
 
 @section('title')
 <title id="title">Personajes</title>
@@ -8,23 +6,23 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-<a href="{{route('personaje.create')}}" class="btn btn-dark">Nuevo personaje</a>
+  <a href="{{route('personaje.create')}}" class="btn btn-dark">Nuevo personaje</a>
 </li>
 <li class="nav-item ml-2">
-<select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
-<option selected disabled value="0">Filtrar especie</option>
-<option value="0">Todas</option>
-@foreach($tipos as $tipo)
-<option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
-@endforeach
-</select>
+  <select id="filter_especie" class="form-control ml-2" name="filter_especie">
+    <option selected disabled value="0">Filtrar especie</option>
+    <option value="0">Todas</option>
+    @foreach($especies as $especie)
+    <option value="{{$especie->id}}">{{$especie->nombre}}</option>
+    @endforeach
+  </select>
 </li>
 <li class="nav-item ml-2">
-<select id="order" class="form-control ml-2" name="order">
-  <option selected disabled value="ASC">Orden</option>
-  <option value="asc">Ascendente</option>
-  <option value="desc">Descendente</option>
-</select>
+  <select id="order" class="form-control ml-2" name="order">
+    <option disabled value="ASC">Orden</option>
+    <option value="asc" {{ $orden == 'asc' ? 'selected' : '' }}>Ascendente</option>
+    <option value="desc" {{ $orden == 'desc' ? 'selected' : '' }}>Descendente</option>
+  </select>
 </li>
 @endsection
 
@@ -77,38 +75,38 @@
 </div>
 
 <div class="row">
-@if (Arr::has($personajes, 'error.error'))
+  @if (Arr::has($personajes, 'error.error'))
   {{Arr::get($personajes, 'error.error')}}
-@else
-@if($personajes->count()>0)
-@foreach($personajes as $personaje)
-<div class="col-sm-12 col-md-6 col-lg-3 col-xl-2">
-  <div class="card card-dark card-outline">
-    <div class="card-body box-profile">
-      <div class="text-center">
-        <img class="profile-user-img img-fluid img-circle" src="{{asset("storage/retratos/{$personaje->Retrato}")}}" alt="User profile picture">
+  @else
+  @if($personajes->count()>0)
+  @foreach($personajes as $personaje)
+  <div class="col-sm-12 col-md-6 col-lg-3 col-xl-2">
+    <div class="card card-dark card-outline">
+      <div class="card-body box-profile">
+        <div class="text-center">
+          <img class="profile-user-img img-fluid img-circle" src="{{asset("storage/retratos/{$personaje->Retrato}")}}" alt="User profile picture">
+        </div>
+        <h3 class="profile-username text-center">{{$personaje->Nombre}}</h3>
+        <ul class="list-group list-group-unbordered">
+          <li class="list-group-item">
+            <b><i class="fa-solid fa-dna"></i> Especie</b> <a class="float-right">{{$personaje->especie}}</a>
+          </li>
+          <li class="list-group-item">
+            <b><i class="fas fa-lg fa-smile-wink"></i> Sexo</b> <a class="float-right">{{$personaje->Sexo}}</a>
+          </li>
+        </ul>
       </div>
-      <h3 class="profile-username text-center">{{$personaje->Nombre}}</h3>
-      <ul class="list-group list-group-unbordered">
-        <li class="list-group-item">
-          <b><i class="fa-solid fa-dna"></i> Especie</b> <a class="float-right">{{$personaje->especie}}</a>
-        </li>
-        <li class="list-group-item">
-          <b><i class="fas fa-lg fa-smile-wink"></i> Sexo</b> <a class="float-right">{{$personaje->Sexo}}</a>
-        </li>
-      </ul>
-    </div>
-    <!-- /.card-body -->
-    <div class="card-footer">
-      <div class="row text-right">
-        <a href="{{route('personaje.show',$personaje->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-        <a href="{{route('personaje.edit',$personaje->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-        <button data-id="{{$personaje->id}}" data-nombre="{{$personaje->Nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-personaje"><i class="fas fa-trash mr-1"></i></button>
+      <!-- /.card-body -->
+      <div class="card-footer">
+        <div class="row text-right">
+          <a href="{{route('personaje.show',$personaje->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+          <a href="{{route('personaje.edit',$personaje->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+          <button data-id="{{$personaje->id}}" data-nombre="{{$personaje->Nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-personaje"><i class="fas fa-trash mr-1"></i></button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-@endforeach
+  @endforeach
   @else
   <div class="col-12">
     <h5 class="card-title">No hay personajes almacenados</h5>
@@ -129,72 +127,71 @@
 <script>
   $(function() {
 
-    $(document).on('change', '#order', function(){
-      orden=this.value;
-      tipo="{{$tipo_o}}";
-      let url = "{{ route('personajes.index', ['orden'=>'_orden', 'tipo'=>'_tipo']) }}";
-      url = url.replace('_orden', orden);
-      url = url.replace('_tipo', tipo);
-      document.location.href=url;
-    });
+    function redirigirConFiltros() {
+      const orden = $('#order').val();
+      const tipo = $('#filter_especie').val();
 
-    $(document).on('change', '#filter_tipo', function(){
-      tipo=this.value;
-      orden="{{$orden}}";
-      let url = "{{ route('personajes.index', ['orden'=>'_orden', 'tipo'=>'_tipo']) }}";
-      url = url.replace('_orden', orden);
-      url = url.replace('_tipo', tipo);
-      document.location.href=url;
-    });
+      // Creamos el objeto de parámetros de búsqueda
+      const params = new URLSearchParams();
+
+      // Solo agregamos los parámetros si tienen un valor útil
+      if (orden) params.append('orden', orden);
+      if (tipo && tipo !== '0') params.append('tipo', tipo);
+
+      // Generamos la URL base desde Laravel
+      const baseUrl = "{{ route('personajes.index') }}";
+      const urlFinal = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+      console.log(orden, tipo, urlFinal);
+      document.location.href = urlFinal;
+    }
+
+    $(document).on('change', '#order', redirigirConFiltros);
+    $(document).on('change', '#filter_especie', redirigirConFiltros);
   });
 </script>
 <script>
   @if(Session::has('message'))
-  toastr.options =
-  {
-  	"closeButton" : true,
-    "closeOnHover" : true,
-  	"progressBar" : false,
-    "showDuration" : 600,
-    "preventDuplicates" : true,
+  toastr.options = {
+    "closeButton": true,
+    "closeOnHover": true,
+    "progressBar": false,
+    "showDuration": 600,
+    "preventDuplicates": true,
   }
-  		toastr.success("{{ session('message') }}");
+  toastr.success("{{ session('message') }}");
   @endif
 
   @if(Session::has('error'))
-  toastr.options =
-  {
-  	"closeButton" : true,
-    "closeOnHover" : true,
-  	"progressBar" : false,
-    "showDuration" : 900,
-    "preventDuplicates" : true,
+  toastr.options = {
+    "closeButton": true,
+    "closeOnHover": true,
+    "progressBar": false,
+    "showDuration": 900,
+    "preventDuplicates": true,
   }
-  		toastr.error("{{ session('error') }}");
+  toastr.error("{{ session('error') }}");
   @endif
 
   @if(Session::has('info'))
-  toastr.options =
-  {
-  	"closeButton" : true,
-    "closeOnHover" : true,
-  	"progressBar" : false,
-    "showDuration" : 600,
-    "preventDuplicates" : true,
+  toastr.options = {
+    "closeButton": true,
+    "closeOnHover": true,
+    "progressBar": false,
+    "showDuration": 600,
+    "preventDuplicates": true,
   }
-  		toastr.info("{{ session('info') }}");
+  toastr.info("{{ session('info') }}");
   @endif
 
   @if(Session::has('warning'))
-  toastr.options =
-  {
-  	"closeButton" : true,
-    "closeOnHover" : true,
-  	"progressBar" : false,
-    "showDuration" : 600,
-    "preventDuplicates" : true,
+  toastr.options = {
+    "closeButton": true,
+    "closeOnHover": true,
+    "progressBar": false,
+    "showDuration": 600,
+    "preventDuplicates": true,
   }
-  		toastr.warning("{{ session('warning') }}");
+  toastr.warning("{{ session('warning') }}");
   @endif
 </script>
 @endsection
