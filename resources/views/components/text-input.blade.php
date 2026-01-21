@@ -1,6 +1,6 @@
 @props(['name','label','value' => '','type' => 'text','placeholder' => '','required' => false])
 
-<div class="form-group">
+<div class="form-group mt-2">
   <label for="{{ $name }}">{{ $label }}</label>
   <input type="{{ $type }}" name="{{ $name }}" id="{{ $name }}"
     value="{{ old($name, $value) }}" placeholder="{{ $placeholder }}"

@@ -16,28 +16,28 @@ return new class extends Migration
       $table->collation = 'utf8mb4_general_ci';
       
       $table->id('id');
-      $table->string('Nombre', 256);
+      $table->string('nombre', 256);
       $table->integer('id_foranea_especie')->nullable();
       $table->integer('nacimiento')->nullable();
       $table->integer('fallecimiento')->nullable();
       $table->integer('lugar_nacimiento')->nullable();
-      $table->string('nombreFamilia', 256)->nullable();
-      $table->text('Apellidos')->nullable();
+      $table->string('nombre_familia', 256)->nullable();
+      $table->text('apellidos')->nullable();
       $table->string('causa_fallecimiento', 256)->nullable();
-      $table->text('DescripcionShort')->nullable();
-      $table->text('Descripcion')->nullable();
+      $table->text('descripcion_short')->nullable();
+      $table->text('descripcion')->nullable();
       $table->text('salud')->nullable();
-      $table->text('Personalidad')->nullable();
-      $table->text('Deseos')->nullable();
-      $table->text('Miedos')->nullable();
-      $table->text('Magia')->nullable();
+      $table->text('personalidad')->nullable();
+      $table->text('deseos')->nullable();
+      $table->text('miedos')->nullable();
+      $table->text('magia')->nullable();
       $table->text('educacion')->nullable();
-      $table->text('Historia')->nullable();
-      $table->text('Religion')->nullable();
-      $table->text('Familia')->nullable();
-      $table->text('Politica')->nullable();
-      $table->string('Retrato', 128)->nullable();
-      $table->string('Sexo', 16)->nullable();
+      $table->text('historia')->nullable();
+      $table->text('religion')->nullable();
+      $table->text('familia')->nullable();
+      $table->text('politica')->nullable();
+      $table->string('retrato', 128)->nullable();
+      $table->string('sexo', 16)->nullable();
       $table->text('otros')->nullable();
 
       // Foreign Keys

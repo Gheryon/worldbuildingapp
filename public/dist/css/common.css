@@ -104,3 +104,30 @@ section{
 		flex-direction: column;
 	}
 }
+
+/*================Pagination====================*/
+/* Cambia el color del texto y fondo de los items de paginación */
+.pagination .page-link {
+    color: #000; /* Texto negro */
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+/* Cambia el color cuando el ratón está encima (hover) */
+.pagination .page-link:hover {
+    color: #fff;
+    background-color: #343a40; /* Gris muy oscuro / Negro */
+    border-color: #343a40;
+}
+
+/* Cambia el color del botón activo (la página actual) */
+.pagination .page-item.active .page-link {
+    background-color: #000; /* Fondo negro */
+    border-color: #000;
+    color: #fff; /* Texto blanco */
+}
+
+/* Estilo para el estado enfocado (focus) */
+.pagination .page-link:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25);
+}

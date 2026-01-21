@@ -1,6 +1,4 @@
 @extends('layouts.index')
-@extends('layouts.navbar')
-@extends('layouts.menu')
 
 @section('title')
 <title id="title">Instituciones</title>
@@ -10,13 +8,16 @@
 <li class="nav-item ml-2">
   <a href="{{route('organizacion.create')}}" class="btn btn-dark">Nueva organización</a>
 </li>
+
 <li class="nav-item ml-2">
   <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
     <option selected disabled value="0">Filtrar tipo</option>
+    @if($tipos->count()>0)
     <option value="0">Todos</option>
     @foreach($tipos as $tipo)
     <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
     @endforeach
+    @endif
   </select>
 </li>
 <li class="nav-item ml-2">
@@ -81,11 +82,6 @@
 </div>
 
 <div class="row">
-  @if (Arr::has($organizaciones, 'error.error'))
-  <div class="text-center">
-    {{Arr::get($organizaciones, 'error.error')}}
-  </div>
-  @else
   @if($organizaciones->count()>0)
   @foreach($organizaciones as $organizacion)
   <div class="col-sm-12 col-md-6 col-lg-3 col-xl-2">
@@ -114,19 +110,19 @@
   @endforeach
   @else
   <div class="col-12">
-    <h5 class="card-title">No hay organizaciones almacenados</h5>
+    <h5 class="card-title">No hay instituciones almacenadas</h5>
   </div>
   </br>
   <div class="col-12 mt-3">
     <a href="{{route('organizacion.create')}}" class="btn btn-dark">Añadir organización nueva</a>
   </div>
   @endif
-  @endif
 </div>
 @endsection
 
 @section('specific-scripts')
 <script src="{{asset('dist/js/config.js')}}"></script>
+<script src="{{asset('dist/js/mensajes.js')}}"></script>
 <script>
   $(function() {
 
@@ -148,51 +144,5 @@
       document.location.href = url;
     });
   });
-</script>
-
-<script>
-  @if(Session::has('message'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 600,
-    "preventDuplicates": true,
-  }
-  toastr.success("{{ session('message') }}");
-  @endif
-
-  @if(Session::has('error'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 900,
-    "preventDuplicates": true,
-  }
-  toastr.error("{{ session('error') }}");
-  @endif
-
-  @if(Session::has('info'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 600,
-    "preventDuplicates": true,
-  }
-  toastr.info("{{ session('info') }}");
-  @endif
-
-  @if(Session::has('warning'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 600,
-    "preventDuplicates": true,
-  }
-  toastr.warning("{{ session('warning') }}");
-  @endif
 </script>
 @endsection

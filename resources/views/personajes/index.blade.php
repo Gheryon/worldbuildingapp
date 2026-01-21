@@ -11,9 +11,9 @@
 <li class="nav-item ml-2">
   <select id="filter_especie" class="form-control ml-2" name="filter_especie">
     <option selected disabled value="0">Filtrar especie</option>
-    <option value="0">Todas</option>
+    <option value="0" {{ $especie_id == 0 ? 'selected' : '' }}>Todas</option>
     @foreach($especies as $especie)
-    <option value="{{$especie->id}}">{{$especie->nombre}}</option>
+    <option value="{{$especie->id}}" {{ $especie_id == $especie->id ? 'selected' : '' }}>{{$especie->nombre}}</option>
     @endforeach
   </select>
 </li>
@@ -24,13 +24,21 @@
     <option value="desc" {{ $orden == 'desc' ? 'selected' : '' }}>Descendente</option>
   </select>
 </li>
+
+<li class="nav-item ml-2">
+  <a href="{{ route('personajes.index') }}" class="btn btn-outline-light ml-2" title="Limpiar filtros">
+    <i class="fas fa-sync-alt"></i>
+  </a>
+</li>
 @endsection
 
 @section('navbar-search')
 <li class="nav-item">
-  <form class="form-inline ml-2" action="{{route('personajes.search')}}" method="GET">
+  <form class="form-inline ml-2" action="{{route('personajes.index')}}" method="GET">
     <div class="input-group">
-      <input type="search" name="search" class="form-control" placeholder="Nombre a buscar">
+      <input type="search" name="search" class="form-control" placeholder="Nombre a buscar" value="{{ request('search') }}">
+      <input type="hidden" name="especie" value="{{ request('especie', 0) }}">
+      <input type="hidden" name="orden" value="{{ request('orden', 'asc') }}">
       <div class="input-group-append">
         <button type="submit" class="btn btn-default">
           <i class="fa fa-search"></i>
@@ -42,7 +50,7 @@
 @endsection
 
 @section('content')
-<h1>Personajes</h1>
+<h1 class="text-center mb-4">Personajes</h1>
 
 <div class="modal fade" id="eliminar-personaje" tabindex="-1" role="dialog" aria-labelledby="eliminar-personaje" aria-hidden="true">
   <div class="modal-dialog modal-sm" role="document">
@@ -75,49 +83,58 @@
 </div>
 
 <div class="row">
-  @if (Arr::has($personajes, 'error.error'))
-  {{Arr::get($personajes, 'error.error')}}
-  @else
-  @if($personajes->count()>0)
-  @foreach($personajes as $personaje)
-  <div class="col-sm-12 col-md-6 col-lg-3 col-xl-2">
-    <div class="card card-dark card-outline">
+  @forelse($personajes as $personaje)
+  <div class="col-sm-12 col-md-6 col-lg-3 col-xl-2 mb-3">
+    <div class="card card-dark card-outline h-100">
       <div class="card-body box-profile">
         <div class="text-center">
-          <img class="profile-user-img img-fluid img-circle" src="{{asset("storage/retratos/{$personaje->Retrato}")}}" alt="User profile picture">
+          <img class="profile-user-img img-fluid img-circle" src="{{ asset("storage/retratos/" . ($personaje->retrato ?? 'default.png')) }}" alt="Retrato de {{ $personaje->nombre }}">
         </div>
-        <h3 class="profile-username text-center">{{$personaje->Nombre}}</h3>
-        <ul class="list-group list-group-unbordered">
+        <h3 class="profile-username text-center text-truncate">{{ $personaje->nombre }}</h3>
+        <ul class="list-group list-group-unbordered mb-3">
           <li class="list-group-item">
-            <b><i class="fa-solid fa-dna"></i> Especie</b> <a class="float-right">{{$personaje->especie}}</a>
+            <b><i class="fa-solid fa-dna mr-1"></i> Especie</b>
+            <span class="float-right text-muted">{{ $personaje->especie }}</span>
           </li>
           <li class="list-group-item">
-            <b><i class="fas fa-lg fa-smile-wink"></i> Sexo</b> <a class="float-right">{{$personaje->Sexo}}</a>
+            <b><i class="fas fa-venus-mars mr-1"></i> Sexo</b>
+            <span class="float-right text-muted">{{ $personaje->sexo }}</span>
           </li>
         </ul>
       </div>
-      <!-- /.card-body -->
+
       <div class="card-footer">
-        <div class="row text-right">
-          <a href="{{route('personaje.show',$personaje->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-          <a href="{{route('personaje.edit',$personaje->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-          <button data-id="{{$personaje->id}}" data-nombre="{{$personaje->Nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-personaje"><i class="fas fa-trash mr-1"></i></button>
+        <div class="btn-group w-100" role="group">
+          <a href="{{ route('personaje.show', $personaje->id) }}" class="btn btn-info btn-sm" title="Ver">
+            <i class="fas fa-id-card"></i>
+          </a>
+          <a href="{{ route('personaje.edit', $personaje->id) }}" class="btn btn-success btn-sm" title="Editar">
+            <i class="fas fa-pencil-alt"></i>
+          </a>
+          <button type="button" class="btn btn-danger btn-sm borrar" data-id="{{ $personaje->id }}" data-nombre="{{ $personaje->nombre }}" data-toggle="modal" data-target="#eliminar-personaje">
+            <i class="fas fa-trash"></i>
+          </button>
         </div>
       </div>
     </div>
   </div>
-  @endforeach
-  @else
-  <div class="col-12">
-    <h5 class="card-title">No hay personajes almacenados</h5>
+  @empty
+  <div class="col-12 text-center mt-5">
+    <div class="callout callout-info">
+      <h5>No se encontraron personajes</h5>
+      <p>Intenta ajustar los filtros o crea uno nuevo.</p>
+      <a href="{{route('personaje.create')}}" class="btn btn-dark text-light">Crear nuevo personaje</a>
+    </div>
   </div>
-  </br>
-  <div class="col-12 mt-3">
-    <a href="{{route('personaje.create')}}" class="btn btn-dark">Crear nuevo personaje</a>
-  </div>
-  @endif
+  @endforelse
 </div>
-@endif
+
+<div class="row">
+  <div class="col-12 d-flex justify-content-center mt-4">
+    {{ $personajes->appends(request()->query())->links('pagination::bootstrap-4') }}
+  </div>
+</div>
+
 
 @endsection
 
@@ -129,69 +146,26 @@
 
     function redirigirConFiltros() {
       const orden = $('#order').val();
-      const tipo = $('#filter_especie').val();
+      const especie = $('#filter_especie').val();
+      const search = $('input[name="search"]').val();
 
       // Creamos el objeto de parámetros de búsqueda
       const params = new URLSearchParams();
 
       // Solo agregamos los parámetros si tienen un valor útil
       if (orden) params.append('orden', orden);
-      if (tipo && tipo !== '0') params.append('tipo', tipo);
+      if (especie && especie !== '0') params.append('especie', especie);
+      if (search) params.append('search', search); //Mantiene la búsqueda al filtrar
 
       // Generamos la URL base desde Laravel
       const baseUrl = "{{ route('personajes.index') }}";
       const urlFinal = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
-      console.log(orden, tipo, urlFinal);
+      //console.log(orden, tipo, urlFinal);
       document.location.href = urlFinal;
     }
 
     $(document).on('change', '#order', redirigirConFiltros);
     $(document).on('change', '#filter_especie', redirigirConFiltros);
   });
-</script>
-<script>
-  @if(Session::has('message'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 600,
-    "preventDuplicates": true,
-  }
-  toastr.success("{{ session('message') }}");
-  @endif
-
-  @if(Session::has('error'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 900,
-    "preventDuplicates": true,
-  }
-  toastr.error("{{ session('error') }}");
-  @endif
-
-  @if(Session::has('info'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 600,
-    "preventDuplicates": true,
-  }
-  toastr.info("{{ session('info') }}");
-  @endif
-
-  @if(Session::has('warning'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 600,
-    "preventDuplicates": true,
-  }
-  toastr.warning("{{ session('warning') }}");
-  @endif
 </script>
 @endsection

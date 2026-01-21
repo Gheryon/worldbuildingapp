@@ -1,6 +1,4 @@
 @extends('layouts.index')
-@extends('layouts.navbar')
-@extends('layouts.menu')
 
 @section('title')
 <title id="title">Nueva organización</title>
@@ -42,9 +40,9 @@
           <div class="col-md">
             <label for="gentilicio" class="form-label">Gentilicio</label>
             <input type="text" name="gentilicio" class="form-control" id="gentilicio" placeholder="Nombre de los habitantes">
-              @error('gentilicio')
-              <small style="color: red">{{$message}}</small>
-              @enderror
+            @error('gentilicio')
+            <small style="color: red">{{$message}}</small>
+            @enderror
           </div>
           <div class="col-md">
             <label for="capital" class="form-label">Capital</label>
@@ -54,11 +52,13 @@
         <div class="row mt-2">
           <div class="col-md-3">
             <label for="select_tipo" class="form-label">Tipo de organización</label>
-            <select class="form-select form-control" name="select_tipo" id="select_tipo" required>
+            <select class="form-select form-control" name="select_tipo" id="select_tipo"  @if($tipo_organizacion->count()>0)required @endif>
               <option selected disabled value="">Elegir</option>
+              @if($tipo_organizacion->count()>0)
               @foreach($tipo_organizacion as $tipo)
               <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
               @endforeach
+              @endif
             </select>
             @error('select_tipo')
             <small style="color: red">{{$message}}</small>
@@ -159,17 +159,17 @@
             <small style="color: red">{{$message}}</small>
             @enderror
           </div>
-        <div class="col-md-5">
-          <label for="religiones" class="form-label">Religiones presentes</label>
-          <select class="form-select form-control" multiple="multiple" data-placeholder="Religiones" name="religiones[]" id="religiones" style="width: 100%;">
-            <option selected disabled value="">Elegir</option>
-            @foreach($religiones as $religion)
-            <option value="{{$religion->id}}">{{$religion->nombre}}</option>
-            @endforeach
-          </select>
+          <div class="col-md-5">
+            <label for="religiones" class="form-label">Religiones presentes</label>
+            <select class="form-select form-control" multiple="multiple" data-placeholder="Religiones" name="religiones[]" id="religiones" style="width: 100%;">
+              <option selected disabled value="">Elegir</option>
+              @foreach($religiones as $religion)
+              <option value="{{$religion->id}}">{{$religion->nombre}}</option>
+              @endforeach
+            </select>
+          </div>
         </div>
-        </div>
-        
+
       </div>
       <div class="col-md-3 mt-2 mb-2">
         <label for="escudo" class="form-label">Escudo</label>

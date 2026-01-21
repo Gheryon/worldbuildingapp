@@ -41,7 +41,7 @@
                 <x-text-input name="nombre_familia" label="Nombre de familia o clan" placeholder="Ej: Cervantes, Fernández, etc." />
               </div>
               <div class="col-md-4">
-                <x-text-input name="apellidos" label="Apellidos" placeholder="Ej: García López, Sánchez, etc." required />
+                <x-text-input name="apellidos" label="Apellidos" placeholder="Ej: García López, Sánchez, etc." />
               </div>
             </div>
             <div class="row mt-3">
@@ -98,7 +98,6 @@
                 @enderror
               </div>
             </div>
-
           </div>
           <div class="col-md-3 text-center border-left">
             <label for="retrato">Retrato</label>
@@ -114,7 +113,7 @@
     {{-- Campo de descripción breve --}}
     <div class="card card-dark card-outline card-tabs mt-4">
       <div class="card-body">
-        <x-textarea-input name="DescripcionShort" label="Descripción breve" rows="2" />
+        <x-textarea-input name="descripcion_short" label="Descripción breve" rows="2" />
       </div>
     </div>
 

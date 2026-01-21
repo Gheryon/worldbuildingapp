@@ -1,6 +1,4 @@
 @extends('layouts.index')
-@extends('layouts.navbar')
-@extends('layouts.menu')
 
 @section('title')
 <title id="title">Configuración</title>
@@ -116,30 +114,30 @@
           <input type="text" readonly class="form-control-plaintext" id="fecha_actual" value="Fecha actual en el mundo">
         </div>
         <div class="form-group mx-sm-3 mb-2">
-          <input type="text" id="dia" name="dia" class="form-control col-2" placeholder="Día">
+          <input type="text" id="dia" name="dia" class="form-control col-2" placeholder="Día" value="{{$fecha->dia}}">
           @error('dia')
           <small style="color: red">{{$message}}</small>
           @enderror
           <select class="form-control col-4" id="mes" name="mes">
             <option selected disabled value="">Mes</option>
-            <option value="0">Semana de año nuevo</option>
-            <option value="1">Enero</option>
-            <option value="2">Febrero</option>
-            <option value="3">Marzo</option>
-            <option value="4">Abril</option>
-            <option value="5">Mayo</option>
-            <option value="6">Junio</option>
-            <option value="7">Julio</option>
-            <option value="8">Agosto</option>
-            <option value="9">Septiembre</option>
-            <option value="10">Octubre</option>
-            <option value="11">Noviembre</option>
-            <option value="12">Diciembre</option>
+            <option value="0" @selected($fecha->mes == 0)>Semana de año nuevo</option>
+            <option value="1" @selected($fecha->mes == 1)>Enero</option>
+            <option value="2" @selected($fecha->mes == 2)>Febrero</option>
+            <option value="3" @selected($fecha->mes == 3)>Marzo</option>
+            <option value="4" @selected($fecha->mes == 4)>Abril</option>
+            <option value="5" @selected($fecha->mes == 5)>Mayo</option>
+            <option value="6" @selected($fecha->mes == 6)>Junio</option>
+            <option value="7" @selected($fecha->mes == 7)>Julio</option>
+            <option value="8" @selected($fecha->mes == 8)>Agosto</option>
+            <option value="9" @selected($fecha->mes == 9)>Septiembre</option>
+            <option value="10" @selected($fecha->mes == 10)>Octubre</option>
+            <option value="11" @selected($fecha->mes == 11)>Noviembre</option>
+            <option value="12" @selected($fecha->mes == 12)>Diciembre</option>
           </select>
           @error('mes')
           <small style="color: red">{{$message}}</small>
           @enderror
-          <input type="text" id="anno" name="anno" class="form-control col-2" placeholder="Año">
+          <input type="text" id="anno" name="anno" class="form-control col-2" placeholder="Año" value="{{$fecha->anno}}">
           @error('anno')
           <small style="color: red">{{$message}}</small>
           @enderror
@@ -486,56 +484,4 @@
 
 @section('specific-scripts')
 <script src="{{asset('dist/js/config.js')}}"></script>
-<script>
-  $(function() {
-    $('#dia').val('{{$fecha->dia}}');
-    $('#mes').val('{{$fecha->mes}}');
-    $('#anno').val('{{$fecha->anno}}');
-  });
-</script>
-<script>
-  @if(Session::has('message'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 600,
-    "preventDuplicates": true,
-  }
-  toastr.success("{{ session('message') }}");
-  @endif
-
-  @if(Session::has('error'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 900,
-    "preventDuplicates": true,
-  }
-  toastr.error("{{ session('error') }}");
-  @endif
-
-  @if(Session::has('info'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 600,
-    "preventDuplicates": true,
-  }
-  toastr.info("{{ session('info') }}");
-  @endif
-
-  @if(Session::has('warning'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 600,
-    "preventDuplicates": true,
-  }
-  toastr.warning("{{ session('warning') }}");
-  @endif
-</script>
 @endsection

@@ -56,6 +56,20 @@
 <script src="{{asset('dist/js/summernote-bs4.min.js')}}"></script>
 <!-- toastr -->
 <script src="{{asset('dist/js/toastr.min.js')}}"></script>
+
+<script src="{{asset('dist/js/notifications.js')}}"></script>
+<script>
+    // Pasamos las variables de sesión de PHP a un objeto JS
+    const sessionData = {
+        success: "{{ session('message') }}",
+        error: "{{ session('error') }}",
+        info: "{{ session('info') }}",
+        warning: "{{ session('warning') }}"
+    };
+
+    // Ejecutamos la función del archivo externo
+    showNotifications(sessionData);
+</script>
 @yield('specific-scripts')
 
 </body>
