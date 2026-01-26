@@ -15,19 +15,19 @@ return new class extends Migration
       $table->charset = 'utf8mb4';
       $table->collation = 'utf8mb4_general_ci';
 
-      $table->unsignedInteger('id_organizacion')->primary();
+      $table->unsignedInteger('id')->primary();
 
       // Campos principales de texto y cadenas
       $table->string('nombre', 255)->nullable();
-      $table->text('descripcionBreve')->nullable();
+      $table->text('descripcion_breve')->nullable();
       $table->string('lema', 512)->nullable();
       $table->string('gentilicio', 128)->nullable();
       $table->string('capital', 128)->nullable();
       $table->string('escudo', 255)->default('default.png');
 
       // Campos de fecha (referenciando a la tabla 'fechas')
-      $table->unsignedInteger('fundacion')->default(0);
-      $table->unsignedInteger('disolucion')->default(0);
+      $table->unsignedInteger('fundacion')->default(2);
+      $table->unsignedInteger('disolucion')->default(2);
 
       // Claves foráneas que apuntan a otras tablas
       $table->unsignedInteger('id_tipo_organizacion')->nullable();
@@ -39,7 +39,7 @@ return new class extends Migration
       $table->text('demografia')->nullable();
       $table->text('historia')->nullable();
       $table->text('estructura')->nullable();
-      $table->text('politicaExteriorInterior')->nullable();
+      $table->text('geopolitica')->nullable();
       $table->text('militar')->nullable();
       $table->text('religion')->nullable();
       $table->text('cultura')->nullable();
@@ -47,7 +47,7 @@ return new class extends Migration
       $table->text('tecnologia')->nullable();
       $table->text('territorio')->nullable();
       $table->text('economia')->nullable();
-      $table->text('recursosNaturales')->nullable();
+      $table->text('recursos_naturales')->nullable();
       $table->text('otros')->nullable();
 
       // --- Definición de Claves Foráneas ---

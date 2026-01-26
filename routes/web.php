@@ -119,13 +119,13 @@ Route::controller(App\Http\Controllers\NombresController::class)->group(function
 
 /*******organizaciones routes********/
 Route::controller(App\Http\Controllers\OrganizacionController::class)->group(function () {
-  Route::get('/organizaciones/index/{orden?}/{tipo?}', 'index')->name('organizaciones.index');
+  Route::get('/organizaciones/index', 'index')->name('organizaciones.index');
   Route::get('/organizaciones/create', 'create')->name('organizacion.create');
   Route::post('/organizaciones/store', 'store')->name('organizacion.store');
   Route::get('/organizaciones/{id}/edit', 'edit')->name('organizacion.edit');
   Route::put('/organizaciones/{id}', 'update')->name('organizacion.update');
   Route::delete('/organizacion/destroy', 'destroy')->name('organizacion.destroy');
-  Route::get('/organizaciones/index', 'search')->name('organizaciones.search');
+  Route::get('/organizacion/{id}', 'show')->name('organizacion.show');
 });
 
 /*******personajes routes********/
@@ -136,7 +136,6 @@ Route::controller(App\Http\Controllers\PersonajeController::class)->group(functi
   Route::get('/personajes/{id}/edit', 'edit')->name('personaje.edit');
   Route::put('/personajes/{id}', 'update')->name('personaje.update');
   Route::delete('/personaje/destroy', 'destroy')->name('personaje.destroy');
-  Route::get('/personajes/index', 'search')->name('personajes.search');
   Route::get('/personaje/{id}', 'show')->name('personaje.show');
 });
 

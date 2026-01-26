@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
   public function run(): void
   {
     DB::table('fechas')->insert([
-      'id' => 0,
+      'id' => 2,
       'dia' => 0,
       'mes' => 0,
       'anno' => null,

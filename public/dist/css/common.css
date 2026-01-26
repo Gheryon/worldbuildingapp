@@ -131,3 +131,85 @@ section{
 .pagination .page-link:focus {
     box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25);
 }
+
+/*================Para multiselect y select2====================*/
+/* Ajuste para que el borde resalte según el enfoque de AdminLTE */
+/* Altura y alineación del contenedor principal */
+.select2-container--bootstrap4 .select2-selection--multiple {
+    min-height: calc(2.25rem + 2px) !important; /* Altura estándar Bootstrap 4 */
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap;
+    padding: 2px 4px !important;
+}
+
+/* Píldoras Dark (Estilo card-dark) */
+.select2-container--bootstrap4 .select2-selection--multiple .select2-selection__choice {
+    background-color: #343a40 !important; /* Gris oscuro de AdminLTE */
+    border: 1px solid #23272b !important;
+    color: #fff !important;
+    border-radius: 4px;
+    padding: 0 8px !important;
+    margin: 2px 4px 2px 0 !important;
+    line-height: 1.6;
+}
+
+/* Botón de eliminar (X) de las píldoras */
+.select2-container--bootstrap4 .select2-selection--multiple .select2-selection__choice__remove {
+    margin-right: 5px !important;
+	background-color: transparent !important; /* Elimina el fondo gris */
+    border: none !important;                  /* Elimina cualquier borde cuadrado */
+    border-right: 1px solid rgba(255,255,255,0.1) !important; /* Opcional: separador sutil */
+    color: #ef5350 !important;                /* Color rojizo para la X */
+    padding: 0 8px !important;
+    transition: all 0.2s ease;
+}
+
+.select2-container--bootstrap4 .select2-selection--multiple .select2-selection__choice__remove:hover {
+    color: #fff !important;
+	background-color: rgba(255, 255, 255, 0.1) !important; /* Fondo sutil al hover */
+	border: none;
+}
+
+/*Corrección del Placeholder y el input de búsqueda */
+.select2-container--bootstrap4 .select2-search--inline .select2-search__field {
+    margin-top: 0 !important;
+    height: 32px !important; /* Altura fija para que el placeholder no salte */
+    line-height: 32px !important;
+    padding-left: 8px !important;
+}
+
+/* Fondo del menú desplegable */
+.select2-container--bootstrap4 .select2-dropdown {
+    background-color: #343a40 !important;
+    border-color: #4b545c !important;
+    color: #fff !important;
+}
+
+/* Estilo de los items (opciones) */
+.select2-container--bootstrap4 .select2-results__option {
+    background-color: #343a40;
+    color: #fff;
+    padding: 8px 12px;
+}
+
+/* Color cuando pasa el ratón (hover) o teclado */
+.select2-container--bootstrap4 .select2-results__option--highlighted[aria-selected] {
+    background-color: #4b545c !important; /* Un gris ligeramente más claro */
+    color: #fff !important;
+}
+
+/* Estilo de la opción ya seleccionada dentro del menú */
+.select2-container--bootstrap4 .select2-results__option[aria-selected=true] {
+    background-color: #23272b !important;
+    color: #ced4da !important;
+}
+
+/* Campo de búsqueda dentro del dropdown */
+.select2-container--bootstrap4 .select2-search--dropdown .select2-search__field {
+    background-color: #3f474e !important;
+    border: 1px solid #56606a !important;
+    color: #fff !important;
+}

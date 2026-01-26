@@ -17,16 +17,11 @@
     @endforeach
   </select>
 </li>
-<li class="nav-item ml-2">
-  <select id="order" class="form-control ml-2" name="order">
-    <option disabled value="ASC">Orden</option>
-    <option value="asc" {{ $orden == 'asc' ? 'selected' : '' }}>Ascendente</option>
-    <option value="desc" {{ $orden == 'desc' ? 'selected' : '' }}>Descendente</option>
-  </select>
-</li>
+
+<x-order-input name="orden" label="Orden" :orden="$orden" />
 
 <li class="nav-item ml-2">
-  <a href="{{ route('personajes.index') }}" class="btn btn-outline-light ml-2" title="Limpiar filtros">
+  <a href="{{ route('personajes.index') }}" class="btn btn-outline-dark ml-2" title="Limpiar filtros">
     <i class="fas fa-sync-alt"></i>
   </a>
 </li>
