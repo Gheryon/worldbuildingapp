@@ -12,26 +12,25 @@
 <li class="nav-item ml-2">
   <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
     <option selected disabled value="0">Filtrar tipo</option>
-    @if($tipos->count()>0)
-    <option value="0">Todos</option>
-    @foreach($tipos as $tipo)
-    <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
+    <option value="0" {{ $tipo_id == 0 ? 'selected' : '' }}>Todos</option>
+    @foreach($tipos_organizacion as $tipo)
+    <option value="{{$tipo->id}}" {{ $tipo_id == $tipo->id ? 'selected' : '' }}>{{$tipo->nombre}}</option>
     @endforeach
-    @endif
   </select>
 </li>
+
+<x-order-input name="orden" label="Orden" :orden="$orden" />
+
 <li class="nav-item ml-2">
-  <select id="order" class="form-control ml-2" name="order">
-    <option selected disabled value="ASC">Orden</option>
-    <option value="asc">Ascendente</option>
-    <option value="desc">Descendente</option>
-  </select>
+  <a href="{{ route('organizaciones.index') }}" class="btn btn-outline-dark ml-2" title="Limpiar filtros">
+    <i class="fas fa-sync-alt"></i>
+  </a>
 </li>
 @endsection
 
 @section('navbar-search')
 <li class="nav-item">
-  <form class="form-inline ml-2" action="{{route('organizaciones.search')}}" method="GET">
+  <form class="form-inline ml-2" action="{{route('organizaciones.index')}}" method="GET">
     <div class="input-group">
       <input type="search" name="search" class="form-control" placeholder="Nombre a buscar">
       <div class="input-group-append">
@@ -45,9 +44,7 @@
 @endsection
 
 @section('content')
-<div class="row">
-  <h1>Instituciones</h1>
-</div>
+  <h1 class="text-center mb-4">Instituciones</h1>
 <hr>
 
 <!-- Modal -->
@@ -72,7 +69,7 @@
             @method('DELETE')
             <input type="hidden" name="id_borrar" id="id_borrar">
             <input type="hidden" name="nombre_borrado" id="nombre_borrado">
-            <button type="button" id="cancelar-borrar-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+            <button type="button" id="cancelar-borrar-button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
             <button type="submit" id="confirmar-borrar-button" class="btn btn-danger">Eliminar</button>
           </form>
         </div>
@@ -82,14 +79,13 @@
 </div>
 
 <div class="row">
-  @if($organizaciones->count()>0)
-  @foreach($organizaciones as $organizacion)
+  @forelse($organizaciones as $organizacion)
   <div class="col-sm-12 col-md-6 col-lg-3 col-xl-2">
     <div class="card card-dark card-outline">
       <div class="card-body box-profile">
         <div class="text-center">
           <h2 class="lead"><b>{{$organizacion->nombre}}</b></h2>
-          <img class="img-fluid" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" alt="Escudo">
+          <img class="img-fluid" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" alt="Escudo de {{ $organizacion->nombre }}">
         </div>
         <ul class="list-group list-group-unbordered mb-3">
           <li class="list-group-item">
@@ -100,23 +96,28 @@
       <!-- /.card-body -->
       <div class="card-footer">
         <div class="row text-right">
-          <a href="{{route('organizacion.show',$organizacion->id_organizacion)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-          <a href="{{route('organizacion.edit',$organizacion->id_organizacion)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-          <button data-id="{{$organizacion->id_organizacion}}" data-nombre="{{$organizacion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-organizacion"><i class="fas fa-trash mr-1"></i></button>
+          <a href="{{route('organizacion.show',$organizacion->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+          <a href="{{route('organizacion.edit',$organizacion->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+          <button data-id="{{$organizacion->id}}" data-nombre="{{$organizacion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-organizacion"><i class="fas fa-trash mr-1"></i></button>
         </div>
       </div>
     </div>
   </div>
-  @endforeach
-  @else
-  <div class="col-12">
-    <h5 class="card-title">No hay instituciones almacenadas</h5>
+  @empty
+  <div class="col-12 text-center mt-5">
+    <div class="callout callout-info">
+      <h5>No se encontraron organizaciones</h5>
+      <p>Intenta ajustar los filtros o crea una nueva.</p>
+      <a href="{{route('organizacion.create')}}" class="btn btn-dark text-light">Crear nueva organización</a>
+    </div>
   </div>
-  </br>
-  <div class="col-12 mt-3">
-    <a href="{{route('organizacion.create')}}" class="btn btn-dark">Añadir organización nueva</a>
+  @endforelse
+</div>
+
+<div class="row">
+  <div class="col-12 d-flex justify-content-center mt-4">
+    {{ $organizaciones->appends(request()->query())->links('pagination::bootstrap-4') }}
   </div>
-  @endif
 </div>
 @endsection
 
@@ -126,23 +127,28 @@
 <script>
   $(function() {
 
-    $(document).on('change', '#order', function() {
-      orden = this.value;
-      tipo = "{{$tipo_o}}";
-      let url = "{{ route('organizaciones.index', ['orden'=>'_orden', 'tipo'=>'_tipo']) }}";
-      url = url.replace('_orden', orden);
-      url = url.replace('_tipo', tipo);
-      document.location.href = url;
-    });
+    function redirigirConFiltros() {
+      const orden = $('#order').val();
+      const tipo = $('#filter_tipo').val();
+      const search = $('input[name="search"]').val();
 
-    $(document).on('change', '#filter_tipo', function() {
-      tipo = this.value;
-      orden = "{{$orden}}";
-      let url = "{{ route('organizaciones.index', ['orden'=>'_orden', 'tipo'=>'_tipo']) }}";
-      url = url.replace('_orden', orden);
-      url = url.replace('_tipo', tipo);
-      document.location.href = url;
-    });
+      // Creamos el objeto de parámetros de búsqueda
+      const params = new URLSearchParams();
+
+      // Solo agregamos los parámetros si tienen un valor útil
+      if (orden) params.append('orden', orden);
+      if (tipo && tipo !== '0') params.append('tipo', tipo);
+      if (search) params.append('search', search); //Mantiene la búsqueda al filtrar
+
+      // Generamos la URL base desde Laravel
+      const baseUrl = "{{ route('organizaciones.index') }}";
+      const urlFinal = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+      //console.log(orden, tipo, urlFinal);
+      document.location.href = urlFinal;
+    }
+
+    $(document).on('change', '#order', redirigirConFiltros);
+    $(document).on('change', '#filter_tipo', redirigirConFiltros);
   });
 </script>
 @endsection

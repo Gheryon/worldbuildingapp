@@ -117,7 +117,7 @@
       <div class="col-md-4">
         <div class="card card-dark">
           <div class="card-header">
-            <h3 class="card-title">Ficha de Personaje</h3>
+            <h3 class="card-title">Ficha de personaje</h3>
           </div>
           <div class="card-body text-center">
             <img alt="Retrato de {{ $personaje->nombre }}"
@@ -135,7 +135,7 @@
               <p class="text-muted">{{ $personaje->sexo }}</p>
 
               @if($personaje->lugar_nacimiento)
-              <strong><i class="fas fa-map-marker-alt mr-1"></i> Lugar de Nacimiento:</strong>
+              <strong><i class="fas fa-map-marker-alt mr-1"></i> Lugar de nacimiento:</strong>
               <p class="text-muted">{{ $personaje->lugar_nacimiento }}</p>
               @endif
 

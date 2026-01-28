@@ -125,7 +125,7 @@ Route::controller(App\Http\Controllers\OrganizacionController::class)->group(fun
   Route::get('/organizaciones/{id}/edit', 'edit')->name('organizacion.edit');
   Route::put('/organizaciones/{id}', 'update')->name('organizacion.update');
   Route::delete('/organizacion/destroy', 'destroy')->name('organizacion.destroy');
-  Route::get('/organizacion/{id}', 'show')->name('organizacion.show');
+  Route::get('/organizaciones/{id}', 'show')->name('organizacion.show');
 });
 
 /*******personajes routes********/
@@ -170,8 +170,6 @@ Route::controller(App\Http\Controllers\ArticuloController::class)->group(functio
 
 /*******vistas routes********/
 Route::controller(App\Http\Controllers\VistaController::class)->group(function () {
-  Route::get('/content/{id}', 'show_organizacion')->name('organizacion.show');
-  //Route::get('/personaje/{id}', 'show_personaje')->name('personaje.show');
   Route::get('/especies/{id}', 'show_especie')->name('especie.show');
   Route::get('/asentamientos/{id}', 'show_asentamiento')->name('asentamiento.show');
   Route::get('/lugares/{id}', 'show_lugar')->name('lugar.show');

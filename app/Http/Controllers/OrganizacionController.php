@@ -1,32 +1,55 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Models\organizacion;
+use App\Models\Organizacion;
 use App\Models\tipo_organizacion;
 use App\Models\Fecha;
-use App\Models\imagen;
 use App\Models\personaje;
-use App\Http\Controllers\ImagenController;
 use App\Models\Religion;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
+use function Ramsey\Uuid\v1;
 
 class OrganizacionController extends Controller
 {
   /**
-   * Muestra una lista de las organizaciones guardadas.
+   * Muestra una lista paginada de organizaciones almacenadas, permitiendo filtrar por especie y ordenar.
+   *
+   * Los parámetros de la URL se validan estrictamente para asegurar la integridad de la consulta.
+   *
+   * @param Request $request Objeto de solicitud inyectado para acceder a los parámetros.
+   * @return View La vista con la lista de organizaciones y los filtros disponibles.
    */
-  public function index($orden = 'asc', $tipo = '0')
+  public function index(Request $request)
   {
+    $datosValidados = $request->validate([
+      'orden' => 'sometimes|string|in:asc,desc', // 'sometimes' permite que no esté presente.
+      'tipo'  => 'sometimes|integer|nullable',
+      'search' => 'sometimes|nullable|string|max:100',
+    ], [
+      'orden.in' => 'El orden debe ser ascendente (asc) o descendente (desc).',
+      'tipo.exists' => 'El tipo seleccionado no es válido.',
+    ]);
+
+    // Si la validación falla o el parámetro no está presente, se usan los valores por defecto.
+    $orden = $datosValidados['orden'] ?? 'asc';
+    $tipo_id = $datosValidados['tipo'] ?? 0; // 0 es el valor para "todos los tipos de organización".
+    $terminoBusqueda = $datosValidados['search'] ?? null;
+
     //Obtener organizaciones almacenadas
-    $organizaciones = organizacion::get_organizaciones($tipo, $orden);
+    $organizaciones = Organizacion::filtrar([
+      'orden'  => $orden,
+      'tipo'   => $tipo_id,
+      'search' => $terminoBusqueda
+    ])->paginate(18);
 
     // Obtener todos los tipos de organizacion almacenados
     $tipos_organizacion = tipo_organizacion::get_tipos_organizaciones();
 
-    return view('organizaciones.index', ['organizaciones' => $organizaciones, 'tipos' => $tipos_organizacion, 'orden' => $orden, 'tipo_o' => $tipo]);
+    return view('organizaciones.index', compact('organizaciones', 'tipos_organizacion', 'orden', 'tipo_id', 'terminoBusqueda'));
   }
 
   /**
@@ -41,12 +64,12 @@ class OrganizacionController extends Controller
     $personajes = personaje::get_personajes_id_nombre();
 
     //obtener todas las religiones
-    $religiones=Religion::get_religiones();
-    
-    // Obtener todos los paises almacenados
-    $paises = organizacion::get_organizaciones_id_nombre();
+    $religiones = Religion::get_religiones();
 
-    return view('organizaciones.create', ['tipo_organizacion' => $tipo_organizacion, 'paises' => $paises, 'personajes' => $personajes, 'religiones'=>$religiones]);
+    // Obtener todos los paises almacenados, sólo id y nombre
+    $paises = Organizacion::get_organizaciones_id_nombre();
+
+    return view('organizaciones.create', compact('tipo_organizacion', 'paises', 'personajes', 'religiones'));
   }
 
   /**
@@ -54,129 +77,84 @@ class OrganizacionController extends Controller
    */
   public function store(Request $request)
   {
-    $request->validate([
+    $validacion = $request->validate([
       'nombre' => 'required|max:255',
-      'select_tipo' => 'required',
       'lema' => 'nullable|max:512',
       'gentilicio' => 'nullable|max:128',
       'capital' => 'nullable|max:128',
       'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
       'dfundacion' => 'nullable|integer|min:1|max:30',
       'ddisolucion' => 'nullable|integer|min:1|max:30',
+      'religiones' => 'nullable|array',
+      'religiones.*' => 'exists:religiones,id',
+      'select_tipo' => 'required|exists:tipo_organizacion,id',
+      'select_ruler' => 'nullable',
+      'select_ruler.*' => 'exists:personajes,id',
+      'select_owner' => 'nullable',
+      'select_owner.*' => 'exists:organizaciones,id',
     ]);
 
     try {
-      $organizacion = new organizacion();
-      $organizacion->nombre = $request->nombre;
-      $organizacion->save();
+      // Llamada a la lógica del modelo
+      $organizacion = Organizacion::store_organizacion($request);
 
-      $id = DB::scalar("SELECT MAX(id_organizacion) as id FROM organizaciones");
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('OrganizacionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('organizaciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      Log::error('OrganizacionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
-    }
-
-    $organizacion->gentilicio = $request->gentilicio;
-    $organizacion->capital = $request->capital;
-    $organizacion->lema = $request->lema;
-
-    //inputs de summernote
-    if ($request->filled('DescripcionShort')) {
-      $organizacion->descripcionBreve = app(ImagenController::class)->store_for_summernote($request->DescripcionShort, "organizaciones", $id);
-    }
-    if ($request->filled('historia')) {
-      $organizacion->historia = app(ImagenController::class)->store_for_summernote($request->historia, "organizaciones", $id);
-    }
-    if ($request->filled('politica')) {
-      $organizacion->politicaExteriorInterior = app(ImagenController::class)->store_for_summernote($request->politica, "organizaciones", $id);
-    }
-    if ($request->filled('militar')) {
-      $organizacion->militar = app(ImagenController::class)->store_for_summernote($request->militar, "organizaciones", $id);
-    }
-    if ($request->filled('estructura')) {
-      $organizacion->estructura = app(ImagenController::class)->store_for_summernote($request->estructura, "organizaciones", $id);
-    }
-    if ($request->filled('territorio')) {
-      $organizacion->territorio = app(ImagenController::class)->store_for_summernote($request->territorio, "organizaciones", $id);
-    }
-    if ($request->filled('religion')) {
-      $organizacion->religion = app(ImagenController::class)->store_for_summernote($request->religion, "organizaciones", $id);
-    }
-    if ($request->filled('demografia')) {
-      $organizacion->demografia = app(ImagenController::class)->store_for_summernote($request->demografia, "organizaciones", $id);
-    }
-    if ($request->filled('cultura')) {
-      $organizacion->cultura = app(ImagenController::class)->store_for_summernote($request->cultura, "organizaciones", $id);
-    }
-    if ($request->filled('educacion')) {
-      $organizacion->educacion = app(ImagenController::class)->store_for_summernote($request->educacion, "organizaciones", $id);
-    }
-    if ($request->filled('tecnologia')) {
-      $organizacion->tecnologia = app(ImagenController::class)->store_for_summernote($request->tecnologia, "organizaciones", $id);
-    }
-    if ($request->filled('economia')) {
-      $organizacion->economia = app(ImagenController::class)->store_for_summernote($request->economia, "organizaciones", $id);
-    }
-    if ($request->filled('recursos')) {
-      $organizacion->recursosNaturales = app(ImagenController::class)->store_for_summernote($request->recursos, "organizaciones", $id);
-    }
-    if ($request->filled('otros')) {
-      $organizacion->otros = app(ImagenController::class)->store_for_summernote($request->otros, "organizaciones", $id);
-    }
-
-    $organizacion->id_ruler = $request->input('soberano', 0);
-    $organizacion->id_owner = $request->input('owner', 0);
-    $organizacion->id_tipo_organizacion = $request->select_tipo;
-
-    if($request->filled('religiones')){
-      $religiones=$request->input('religiones');
-      try{
-        foreach ($religiones as $religion) {
-          DB::table('religion_presence')->insert([
-            'organizacion' => $id,
-            'religion' => $religion
-          ]);
-        }
-      }catch(\Illuminate\Database\QueryException $excepcion){
-
-      }catch(Exception $excepcion){
-        
-      }
-    }
-
-    try {
-      //------------escudo----------//
-      if ($request->hasFile('escudo')) {
-        $path = $request->file('escudo')->store('escudos', 'public');
-        $organizacion->escudo = basename($path);
-      } else {
-        $organizacion->escudo = "default.png";
-      }
-
-      //------------fechas----------//
-      $organizacion->fundacion = app(ConfigurationController::class)->store_fecha($request->input('dfundacion', 0), $request->input('mfundacion', 0), $request->input('afundacion', 0), "organizaciones");
-      $organizacion->disolucion = app(ConfigurationController::class)->store_fecha($request->input('ddisolucion', 0), $request->input('mdisolucion', 0), $request->input('adisolucion', 0), "organizaciones");
-
-      $organizacion->save();
-      return redirect()->route('organizaciones.index')->with('message', 'Organización ' . $organizacion->nombre . ' añadida correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('OrganizacionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('organizaciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.' . $excepcion->getMessage());
-    } catch (Exception $excepcion) {
-      Log::error('OrganizacionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('organizaciones.index')
+        ->with('success', 'Organización ' . $organizacion->nombre . ' añadida correctamente.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error(
+        "Error de base de datos al añadir organización.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'No se pudo crear la organización debido a un error en la base de datos.');
+    } catch (\Exception $e) {
+      Log::critical(
+        "Error inesperado al añadir organización.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'No se pudo crear la organización: ' . $e->getMessage());
     }
   }
 
   /**
    * Display the specified resource.
    */
-  public function show(organizacion $organizacion)
+  public function show($id)
   {
-    //
+    try {
+      // Cargamos la organización con sus fechas, tipo, religiones y ruler
+      $organizacion = Organizacion::with([
+        'fecha_fundacion',
+        'fecha_disolucion',
+        'religiones',
+        'tipo',
+        'ruler',
+        'subordinates'=> function ($query) {
+                $query->orderBy('nombre', 'asc');
+            }
+      ])->findOrFail($id);
+
+      // Formateamos las fechas para la vista
+      $fundacion = Fecha::get_fecha_string($organizacion->fundacion);
+      $disolucion = Fecha::get_fecha_string($organizacion->disolucion);
+
+      return view('organizaciones.show', compact('organizacion', 'fundacion', 'disolucion'));
+    } catch (\Exception $e) {
+      Log::error("Error al mostrar organización: " . $e->getMessage());
+      return redirect()->route('organizaciones.index')
+        ->with('error', 'Organización no encontrada.');
+    }
   }
 
   /**
@@ -184,183 +162,70 @@ class OrganizacionController extends Controller
    */
   public function edit($id)
   {
-    // Obtener la organizacion a editar
-    $organizacion = organizacion::get_organizacion($id);
-    if (isset($organizacion['error'])) {
-      return redirect()->route('organizaciones.index')->with('error', $organizacion['error']['error']);
+    try {
+      // Obtener la organizacion a editar
+      $organizacion = Organizacion::findOrFail($id);
+
+      // Obtener todos los tipos de organizacion almacenados
+      $tipo_organizacion = tipo_organizacion::get_tipos_organizaciones();
+
+      // Obtener todos los personajes almacenados
+      $personajes = personaje::get_personajes_id_nombre();
+
+      // Obtener todos los paises almacenados
+      $paises = Organizacion::get_organizaciones_id_nombre();
+
+      //obtener todas las religiones
+      $religiones = Religion::get_religiones();
+
+      //Obtener religiones presentes en la organizacion
+      $religiones_p = Organizacion::get_religiones_presentes($id);
+
+      //obtener fechas
+      $fundacion = Fecha::find($organizacion->fundacion);
+      $disolucion = Fecha::find($organizacion->disolucion);
+
+      return view('organizaciones.edit', compact('organizacion', 'fundacion', 'disolucion', 'tipo_organizacion', 'personajes', 'paises', 'religiones', 'religiones_p'));
+    } catch (\Exception $e) {
+      // Si hay un error de lógica, redirigimos con un mensaje flash
+      return redirect()->route('organizaciones.index')
+        ->with('error', 'No se pudo cargar la organización: ' . $e->getMessage());
     }
-
-    $fecha_fundacion = 0;
-    $fecha_disolucion = 0;
-
-    // Obtener todos los tipos de organizacion almacenados
-    $tipo_organizacion = tipo_organizacion::get_tipos_organizaciones();
-
-     // Obtener todos los personajes almacenados
-    $personajes = personaje::get_personajes_id_nombre();
-
-    // Obtener todos los paises almacenados
-    $paises = organizacion::get_organizaciones_id_nombre();
-
-    //obtener todas las religiones
-    $religiones=Religion::get_religiones();
-
-    //Obtener religiones presentes en la organizacion
-    $religiones_p=organizacion::get_religiones_presentes($id);
-
-    if ($organizacion->fundacion != 0) {
-      $fecha_fundacion = Fecha::find($organizacion->fundacion);
-    } else {
-      $fecha_fundacion = Fecha::find(0);
-    }
-
-    if ($organizacion->disolucion != 0) {
-      $fecha_disolucion = Fecha::find($organizacion->disolucion);
-    } else {
-      $fecha_disolucion = Fecha::find(0);
-    }
-
-    return view('organizaciones.edit', ['organizacion' => $organizacion, 'fundacion' => $fecha_fundacion, 'disolucion' => $fecha_disolucion, 'tipo_organizacion' => $tipo_organizacion, 'personajes' => $personajes, 'paises' => $paises, 'religiones' => $religiones, 'religiones_p' => $religiones_p]);
   }
 
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request)
+  public function update(Request $request, $id)
   {
-    $request->validate([
+    $validacion = $request->validate([
       'nombre' => 'required|max:255',
-      'select_tipo' => 'required',
       'lema' => 'nullable|max:512',
       'gentilicio' => 'nullable|max:128',
       'capital' => 'nullable|max:128',
-      'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
+      'escudo' => 'sometimes|file|image|mimes:jpg,png,gif|max:10240',
       'dfundacion' => 'nullable|integer|min:1|max:30',
       'ddisolucion' => 'nullable|integer|min:1|max:30',
+      'religiones' => 'nullable|array',
+      'religiones.*' => 'exists:religiones,id',
+      'select_tipo' => 'required|exists:tipo_organizacion,id',
+      'select_ruler' => 'nullable',
+      'select_ruler.*' => 'exists:personajes,id',
+      'select_owner' => 'nullable',
+      'select_owner.*' => 'exists:organizaciones,id',
     ]);
 
-    // Obtener la organizacion a editar
-    $organizacion = organizacion::get_organizacion($request->id);
-    if (isset($organizacion['error'])) {
-      return redirect()->route('organizaciones.index')->with('error', $organizacion['error']['error']);
-    }
-
-    $organizacion->nombre = $request->nombre;
-    $organizacion->gentilicio = $request->gentilicio;
-    $organizacion->capital = $request->capital;
-    $organizacion->lema = $request->lema;
-
-    //inputs de summernote
-    if ($request->filled('DescripcionShort')) {
-      $organizacion->descripcionBreve = app(ImagenController::class)->update_for_summernote($request->DescripcionShort, "organizaciones", $request->id);
-    }
-    if ($request->filled('historia')) {
-      $organizacion->historia = app(ImagenController::class)->update_for_summernote($request->historia, "organizaciones", $request->id);;
-    }
-    if ($request->filled('politica')) {
-      $organizacion->politicaExteriorInterior = app(ImagenController::class)->update_for_summernote($request->politica, "organizaciones", $request->id);;
-    }
-    if ($request->filled('militar')) {
-      $organizacion->militar = app(ImagenController::class)->update_for_summernote($request->militar, "organizaciones", $request->id);;
-    }
-    if ($request->filled('estructura')) {
-      $organizacion->estructura = app(ImagenController::class)->update_for_summernote($request->estructura, "organizaciones", $request->id);;
-    }
-    if ($request->filled('territorio')) {
-      $organizacion->territorio = app(ImagenController::class)->update_for_summernote($request->territorio, "organizaciones", $request->id);;
-    }
-    if ($request->filled('religion')) {
-      $organizacion->religion = app(ImagenController::class)->update_for_summernote($request->religion, "organizaciones", $request->id);;
-    }
-    if ($request->filled('demografia')) {
-      $organizacion->demografia = app(ImagenController::class)->update_for_summernote($request->demografia, "organizaciones", $request->id);;
-    }
-    if ($request->filled('cultura')) {
-      $organizacion->cultura = app(ImagenController::class)->update_for_summernote($request->cultura, "organizaciones", $request->id);;
-    }
-    if ($request->filled('educacion')) {
-      $organizacion->educacion = app(ImagenController::class)->update_for_summernote($request->educacion, "organizaciones", $request->id);;
-    }
-    if ($request->filled('tecnologia')) {
-      $organizacion->tecnologia = app(ImagenController::class)->update_for_summernote($request->tecnologia, "organizaciones", $request->id);;
-    }
-    if ($request->filled('economia')) {
-      $organizacion->economia = app(ImagenController::class)->update_for_summernote($request->economia, "organizaciones", $request->id);;
-    }
-    if ($request->filled('recursos')) {
-      $organizacion->recursosNaturales = app(ImagenController::class)->update_for_summernote($request->recursos, "organizaciones", $request->id);;
-    }
-    if ($request->filled('otros')) {
-      $organizacion->otros = app(ImagenController::class)->update_for_summernote($request->otros, "organizaciones", $request->id);;
-    }
-
-    $organizacion->id_ruler = $request->input('soberano', 0);
-    $organizacion->id_owner = $request->input('owner', 0);
-    $organizacion->id_tipo_organizacion = $request->select_tipo;
-
-    //------------fechas----------//
-    $organizacion->fundacion = $request->input('id_fundacion', 0);
-    $organizacion->disolucion = $request->input('id_disolucion', 0);
-
-    if($request->filled('religiones')){
-      //se borran las religiones antiguas
-      DB::table('religion_presence')->where('organizacion', '=', $request->id)->delete();
-      $religiones=$request->input('religiones');
-      try{
-        foreach ($religiones as $religion) {
-          DB::table('religion_presence')->insert([
-            'organizacion' => $request->id,
-            'religion' => $religion
-          ]);
-        }
-      }catch(\Illuminate\Database\QueryException $excepcion){
-
-      }catch(Exception $excepcion){
-        
-      }
-    }
-
     try {
-      //------------escudo----------//
-      if ($request->hasFile('escudo')) {
-        //el escudo anterior hay que borrarlo salvo que sea default.png
-        if ($organizacion->escudo != "default.png") {
-          if (file_exists('storage/escudos/' . $organizacion->escudo)) {
-            unlink('storage/escudos/' . $organizacion->escudo);
-          }
-        }
-        $path = $request->file('escudo')->store('escudos', 'public');
-        $organizacion->escudo = basename($path);
-      }
+      $organizacion = Organizacion::findOrFail($id); //obtiene la organizacion en bbdd
+      $organizacion->update_organizacion($request); //se actualiza con el request
 
-      if ($request->input('afundacion', 0) != 0) {
-        if ($organizacion->fundacion != 0) {
-          //la organizacion ya tenía fecha de fundacion antes de editar
-          app(ConfigurationController::class)->update_fecha($request->input('dfundacion', 0), $request->input('mfundacion', 0), $request->input('afundacion', 0), $organizacion->fundacion);
-        } else {
-          //la organizacion no tenía fecha de fundacion antes de editar, hay que añadirla a la db.
-          $organizacion->fundacion = app(ConfigurationController::class)->store_fecha($request->input('dfundacion', 0), $request->input('mfundacion', 0), $request->input('afundacion', 0), "organizaciones");
-        }
-      }
-
-      if ($request->input('adisolucion', 0) != 0) {
-        if ($organizacion->disolucion != 0) {
-          //el organizacion ya tenía fecha de disolucion antes de editar
-          app(ConfigurationController::class)->update_fecha($request->input('ddisolucion', 0), $request->input('mdisolucion', 0), $request->input('adisolucion', 0), $organizacion->disolucion);
-        } else {
-          //el organizacion no tenía fecha de disolucion antes de editar, hay que añadirla a la db.
-          $organizacion->disolucion = app(ConfigurationController::class)->store_fecha($request->input('ddisolucion', 0), $request->input('mdisolucion', 0), $request->input('adisolucion', 0), "organizaciones");
-        }
-      }
-
-      $organizacion->save();
-      return redirect()->route('organizaciones.index')->with('message', $organizacion->nombre . ' editado correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('OrganizacionController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('organizaciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      Log::error('OrganizacionController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('organizaciones.index')
+        ->with('success', 'Organización ' . $organizacion->nombre . ' actualizada con éxito.');
+    } catch (\Exception $e) {
+      Log::error("Error actualizando organización ID {$id}: " . $e->getMessage());
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'Error al actualizar: ' . $e->getMessage());
     }
   }
 
@@ -370,74 +235,16 @@ class OrganizacionController extends Controller
   public function destroy(Request $request)
   {
     try {
-      $fundacion = DB::scalar("SELECT fundacion FROM organizaciones where id_organizacion = ?", [$request->id_borrar]);
-      $disolucion = DB::scalar("SELECT disolucion FROM organizaciones where id_organizacion = ?", [$request->id_borrar]);
-      $escudo = DB::scalar("SELECT escudo FROM organizaciones where id_organizacion = ?", [$request->id_borrar]);
+      $organizacion = Organizacion::findOrFail($request->id_borrar);
 
-      //si fundacion/disolucion != 0, la organizacion tiene fecha establecida, hay que borrar
-      if ($fundacion != 0) {
-        Fecha::destroy($fundacion);
-      }
-      if ($disolucion != 0) {
-        Fecha::destroy($disolucion);
-      }
+      $organizacion->delete_organizacion();
 
-      if ($escudo != "default.png") {
-        if (file_exists('storage/escudos/' . $escudo)) {
-          unlink('storage/escudos/' . $escudo);
-        }
-      }
-
-      //borrado de las imagenes que pueda haber de summernote
-      $imagenes = DB::table('imagenes')
-        ->select('id', 'nombre')
-        ->where('table_owner', '=', 'organizaciones')
-        ->where('owner', '=', $request->id_borrar)->get();
-
-      foreach ($imagenes as $imagen) {
-        if (file_exists(public_path("/storage/imagenes/" . $imagen->nombre))) {
-          unlink(public_path("/storage/imagenes/" . $imagen->nombre));
-          //Storage::delete(asset($imagen->nombre));
-        }
-        imagen::destroy($imagen->id);
-      }
-      DB::table('religion_presence')->where('organizacion', '=', $request->id_borrar)->delete();
-
-      Organizacion::destroy($request->id_borrar);
-      return redirect()->route('organizaciones.index')->with('message', $request->nombre_borrado . ' borrado correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('OrganizacionController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('organizaciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo borrar.');
-    } catch (Exception $excepcion) {
-      Log::error('OrganizacionController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('organizaciones.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('organizaciones.index')
+        ->with('success', $request->nombre_borrado . ' borrado correctamente.');
+    } catch (\Exception $e) {
+      Log::error('Error al borrar organización: ' . $e->getMessage());
+      return redirect()->route('organizaciones.index')
+        ->with('error', 'No se pudo borrar la organización.');
     }
-  }
-
-  /**
-   * Display a listing of the resource searched.
-   */
-  public function search(Request $request)
-  {
-    $search = $request->input('search');
-    try {
-      $organizaciones = DB::table('organizaciones')
-        ->join('tipo_organizacion', 'organizaciones.id_tipo_organizacion', '=', 'tipo_organizacion.id')
-        ->select('organizaciones.id_organizacion', 'organizaciones.nombre', 'organizaciones.escudo', 'tipo_organizacion.nombre AS tipo')
-        ->where('organizaciones.id_organizacion', '!=', 0)
-        ->where('organizaciones.nombre', 'LIKE', "%{$search}%")
-        ->orderBy('organizaciones.nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('OrganizacionController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $organizaciones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      Log::error('OrganizacionController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $organizaciones = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-    
-    // Obtener todos los tipos de organizacion almacenados
-    $tipos_organizacion = tipo_organizacion::get_tipos_organizaciones();
-
-    return view('organizaciones.index', ['organizaciones' => $organizaciones, 'tipos' => $tipos_organizacion, 'orden' => 'asc', 'tipo_o' => 0]);
   }
 }

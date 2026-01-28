@@ -5,37 +5,48 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Collection;
 
 class tipo_organizacion extends Model
 {
-    use HasFactory;
-    protected $table = 'tipo_organizacion';
-    protected $primaryKey = 'id';
-    public $timestamps=false;
+  use HasFactory;
+  protected $table = 'tipo_organizacion';
+  protected $primaryKey = 'id';
+  public $timestamps = false;
 
-    protected $fillable = [
-        'nombre',
-    ];
+  protected $fillable = [
+    'nombre',
+  ];
 
-   /* Obtiene los tipos de organizaciones ordenados por nombre.
+  /* Obtiene los tipos de organizaciones ordenados por nombre.
    *
    * @return \Illuminate\Database\Eloquent\Collection
    */
   public static function get_tipos_organizaciones()
   {
     try {
-      $tipos = self::select('id', 'nombre')->orderBy('nombre', 'asc')->get();
-
-      if ($tipos->isEmpty()) {
-        Log::warning('No se encontraron tipos de organizaciones.');
-        $tipos = ['error' => ['error' => 'No hay tipos de organizaciones guardados.']];
-      }
-
-      return $tipos;
+      // Intenta ejecutar la consulta y devolver el resultado ordenado.
+      return self::orderBy('nombre', 'asc')->get();
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error(
+        'Error de base de datos al obtener los tipos de organización.',
+        [
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      // Devuelve una colección vacía para que la aplicación pueda continuar
+      return new Collection();
     } catch (\Exception $e) {
-      Log::error('Error al obtener tipos: ' . $e->getMessage());
-      $tipos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-      return $tipos;
+      Log::error(
+        'Error inesperado al obtener los tipos de organización.',
+        [
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      //Devuelve una colección vacía como medida de seguridad.
+      return new Collection();
     }
   }
 }

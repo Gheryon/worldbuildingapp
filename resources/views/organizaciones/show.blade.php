@@ -1,147 +1,180 @@
 @extends('layouts.index')
-@extends('layouts.navbar')
-@extends('layouts.menu')
 
 @section('title')
-<title id="title">{{$vista->nombre}}</title>
+<title id="title">{{$organizacion->nombre}}</title>
 @endsection
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-<a href="{{route('organizaciones.index')}}" class="btn btn-dark">Volver</a>
-<a href="{{route('organizacion.edit', ['id'=> $vista->id_organizacion] )}}" class="btn btn-dark ml-2">Editar</a>
+  <a href="{{route('organizaciones.index')}}" class="btn btn-dark">Volver</a>
+  <a href="{{route('organizacion.edit', ['id'=> $organizacion->id] )}}" class="btn btn-dark ml-2">Editar</a>
 </li>
 @endsection
 
 @section('content')
-<section class="content">
-  <div class="container margin-top-20 mt-5 page">
-    <div class="row article-content">
-      <div class="col-md contentApp" id="content-left">
-        <div class="col text-center">
-          <h1>{{$vista->nombre}} </h1>
+<section class="content mt-4">
+  <div class="container-fluid">
+    <div class="row">
+      {{-- Columna principal: información --}}
+      <div class="col-md-8">
+        <div class="card card-outline card-dark">
+          <div class="card-header">
+            <h1 class="card-title" style="font-size: 2rem;">
+              {{ $organizacion->nombre }}
+            </h1>
+          </div>
+          <div class="card-body">
+            @if ($organizacion->descripcion_breve)
+            <h2 class="border-bottom pb-2 mb-3">Descripción breve</h2>
+            <div class="ml-4 mb-3">{!! $organizacion->descripcion_breve !!}</div>
+            @endif
+
+            @if ($organizacion->historia)
+            <h2 class="border-bottom pb-2 mb-3">Historia</h2>
+            <div class="ml-4 mb-3">{!! $organizacion->historia !!}</div>
+            @endif
+
+            {{-- Sección de estructura y política --}}
+            @php
+            $hasInternal = $organizacion->estructura || $organizacion->geopolitica || $organizacion->militar;
+            @endphp
+
+            @if ($hasInternal)
+            <h2 class="border-bottom pb-2 mb-3">Estructura, política y militar</h2>
+
+
+            @if ($organizacion->estructura)
+            <h5><i class="fas fa-sitemap mr-2"></i>Estructura organizativa</h5>
+            <div class="ml-4 mb-3">{!! $organizacion->estructura !!}</div>
+            @endif
+
+            @if ($organizacion->geopolitica)
+            <h5><i class="fas fa-globe-americas mr-2"></i>Geopolítica</h5>
+            <div class="ml-4 mb-3">{!! $organizacion->geopolitica !!}</div>
+            @endif
+
+            @if ($organizacion->militar)
+            <h5><i class="fas fa-shield-alt mr-2"></i>Poder militar</h5>
+            <div class="ml-4 mb-3">{!! $organizacion->militar !!}</div>
+            @endif
+            @endif
+
+            {{-- Sección de sociedad y cultura --}}
+            @php
+            $hasSocial = $organizacion->demografia || $organizacion->cultura || $organizacion->religion || $organizacion->educacion;
+            @endphp
+
+            @if ($hasSocial)
+            <h2 class="border-bottom pb-2 mt-4 mb-3">Sociedad y cultura</h2>
+
+            @if ($organizacion->demografia)
+            <h5><i class="fas fa-users mr-2"></i>Demografía</h5>
+            <div class="ml-4 mb-3">{!! $organizacion->demografia !!}</div>
+            @endif
+
+            @if ($organizacion->cultura)
+            <h5><i class="fas fa-theater-masks mr-2"></i>Cultura y tradiciones</h5>
+            <div class="ml-4 mb-3">{!! $organizacion->cultura !!}</div>
+            @endif
+
+            @if ($organizacion->religion)
+            <h5><i class="fas fa-monument mr-2"></i>Presencia religiosa</h5>
+            <div class="ml-4 mb-3">{!! $organizacion->religion !!}</div>
+            @endif
+
+            @if ($organizacion->educacion)
+            <h5><i class="fas fa-graduation-cap mr-2"></i>Educación</h5>
+            <div class="ml-4 mb-3">{!! $organizacion->educacion !!}</div>
+            @endif
+            @endif
+
+            {{-- Sección de Economía y Recursos --}}
+            @php
+            $hasEco = $organizacion->tecnologia || $organizacion->economia || $organizacion->recursos_naturales || $organizacion->territorio;
+            @endphp
+
+            @if ($hasEco)
+            <h2 class="border-bottom pb-2 mt-4 mb-3">Recursos y Territorio</h2>
+
+            @if ($organizacion->territorio)
+            <h5><i class="fas fa-map mr-2"></i>Extensión y territorio</h5>
+            <div class="ml-4 mb-3">{!! $organizacion->territorio !!}</div>
+            @endif
+
+            @if ($organizacion->economia)
+            <h5><i class="fas fa-coins mr-2"></i>Economía y comercio</h5>
+            <div class="ml-4 mb-3">{!! $organizacion->economia !!}</div>
+            @endif
+
+            @if ($organizacion->recursos_naturales)
+            <h5><i class="fas fa-leaf mr-2"></i>Recursos naturales</h5>
+            <div class="ml-4 mb-3">{!! $organizacion->recursos_naturales !!}</div>
+            @endif
+
+            @if ($organizacion->tecnologia)
+            <h5><i class="fas fa-microchip mr-2"></i>Tecnología y ciencia</h5>
+            <div class="ml-4 mb-3">{!! $organizacion->tecnologia !!}</div>
+            @endif
+            @endif
+
+            @if ($organizacion->otros)
+            <h2 class="border-bottom pb-2 mt-4 mb-3">Otros detalles</h2>
+            <div class="ml-4">{!! $organizacion->otros !!}</div>
+            @endif
+          </div>{{-- fin card-body --}}
         </div>
-        
-        @if (isset($vista->descripcionBreve))
-          <h3 class="mt-3">Descripción breve</h3>
-          <p class="ml-2 mr-2 mt-1">{!!$vista->descripcionBreve!!}</p>
-        @endif
-
-        @if (isset($vista->historia))
-          <h2 class="mt-2">Historia</h2>
-          <p class="ml-2 mr-2 mt-1">{!!$vista->historia!!}</p>
-        @endif
-
-        @if (isset($vista->estructura))
-          <h3 class="mt-2">Estructura política</h3>
-          <p class="ml-2 mr-2 mt-1">{!!$vista->estructura!!}</p>
-        @endif
-        @if (isset($vista->politicaExteriorInterior))
-          <h3 class="mt-2">Política exterior e interior</h3>
-          <p class="ml-2 mr-2 mt-1">{!!$vista->politicaExteriorInterior!!}</p>
-        @endif
-        @if (isset($vista->militar))
-          <h3 class="mt-2">Militar</h3>
-          <p class="ml-2 mr-2 mt-1">{!!$vista->militar!!}</p>
-        @endif
-        @if (isset($vista->territorio))
-          <h3 class="mt-2">Territorio</h3>
-          <p class="ml-2 mr-2 mt-1">{!!$vista->territorio!!}</p>
-        @endif
-
-        @if (isset($vista->demografia))
-          <h3 class="mt-2">Demografía</h3>
-          <p class="ml-2 mr-2 mt-1">{!!$vista->demografia!!}</p>
-        @endif
-        @if (isset($vista->religion))
-          <h3 class="mt-2">Religión</h3>
-          <p class="ml-2 mr-2 mt-1">{!!$vista->religion!!}</p>
-        @endif
-        @if (isset($vista->educacion))
-          <h3 class="mt-2">Educación</h3>
-          <p class="ml-2 mr-2 mt-1">{!!$vista->educacion!!}</p>
-        @endif
-        @if (isset($vista->cultura))
-          <h3 class="mt-2">Elementos culturales</h3>
-          <p class="ml-2 mr-2 mt-1">{!!$vista->cultura!!}</p>
-        @endif
-        
-        @if (isset($vista->economia))
-          <h3 class="mt-2">Economía</h3>
-          <p class="ml-2 mr-2 mt-1">{!!$vista->economia!!}</p>
-        @endif
-        @if (isset($vista->recursosNaturales))
-          <h3 class="mt-2">Recursos naturales</h3>
-          <p class="ml-2 mr-2 mt-1"><{!!$vista->recursosNaturales!!}</p>
-        @endif
-
-        @if (isset($vista->otros))
-        <h2>Otros</h2>
-        <p class="ml-2 mr-2 mt-1">{!!$vista->otros!!}</p>
-        @endif
-        
       </div>
+
+      {{-- Columna lateral: ficha técnica --}}
       <div class="col-md-4">
-        <div class="card">
-          <div class="card-body contentApp" id="content-right">
+        <div class="card card-dark">
+          <div class="card-header">
+            <h3 class="card-title">Ficha de organización</h3>
+          </div>
+          <div class="card-body" id="content-right">
             <h3>Escudo</h3>
             <div class="row">
-              <img alt="escudo" id="escudo" class="img-fluid" src="{{asset("storage/escudos/{$vista->escudo}")}}" width="300" height="300">
+              <img alt="escudo" id="escudo" class="img-thumbnail shadow-sm mb-3" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" width="300" height="300">
             </div>
-            <h3 class="mt-2">Tipo</h3>
-            <p class="ml-1 mr-2">{{$tipo}}</p>
+            <strong class="mt-2">Tipo</strong>
+            <p class="text-muted">{{$organizacion->tipo->nombre}}</p>
 
-            @if (isset($vista->gentilicio))
-            <h3 class="mt-2">Gentilicio</h3>
-            <p class="ml-2 mr-2">{{$vista->gentilicio}}</p>
+            @if ($organizacion->gentilicio)
+            <strong class="mt-2">Gentilicio</strong>
+            <p class="text-muted">{{$organizacion->gentilicio}}</p>
             @endif
 
-            @if (isset($soberano->id))
-            <h3 class="mt-2">Actual soberano</h3>
-            <p class="ml-2 mr-2"><a href="{{route('personaje.show',$soberano->id)}}">{{$soberano->Nombre}}</a></p>
+            @if($organizacion->ruler->id!=0)
+            <strong>Líder:</strong>
+            <p class="text-muted"><a href="{{route('personaje.show', [$organizacion->ruler->id] )}}">{{$organizacion->ruler->nombre}}</a></p>
             @endif
 
-            @if (isset($vista->capital))
-            <h3 class="mt-2">Capital</h3>
-            <p class="ml-2 mr-2">{{$vista->capital}}</p>
+            @if($organizacion->owner->id!=0)
+            <strong>Controlado por:</strong>
+            <p class="text-muted">
+              <a href="{{ route('organizacion.show', $organizacion->owner->id) }}">{{ $organizacion->owner->nombre }}</a>
+            </p>
             @endif
 
-            @if ($vista->fundacion!=0)
-            <h3 class="mt-2">Fecha de fundación</h3>
-            <p class="ml-2 mr-2">{{$fundacion}}</p>
+            <strong>Fundación:</strong>
+            <p class="text-muted">{{ $fundacion }}</p>
+            @if ($organizacion->disolucion != 0)
+            <strong>Disolución:</strong>
+            <p class="text-muted">{{ $disolucion}} {{$organizacion->disolucion}}</p>
             @endif
 
-            @if ($vista->disolucion!=0)
-            <h3 class="mt-2">Fecha de disolución</h3>
-            <p class="ml-2 mr-2">{{$disolucion}}</p>
-            @endif
-
-            @if (isset($vista->lema))
-            <h3 class="mt-2">Lema</h3>
-            <p class="ml-2 mr-2">{{$vista->lema}}</p>
-            @endif
-
-            @if (isset($owner->id_organizacion))
-              <h3 class="mt-2">Bajo control de:</h3>
-              <p class="ml-1 mr-2"><a href="{{route('organizacion.show',$owner->id_organizacion)}}">{{$owner->nombre}}</a></p>
-            @endif
-            
-            @if (isset($religiones))
-            @if (filled($religiones))
-            <h3 class="mt-2">Religiones presentes</h3>
-            @foreach($religiones as $rel)
-            <p class="ml-1 mr-2"><a href="{{route('religion.show', [$rel->id] )}}">{{$rel->nombre}}</a></p>
+            @if($organizacion->religiones->isNotEmpty())
+            <strong>Religiones:</strong>
+            @foreach($organizacion->religiones as $religion)
+            <p class="ml-1 mr-2 mb-0"><a href="{{route('religion.show', [$religion->id] )}}">{{$religion->nombre}}</a></p>
             @endforeach
             @endif
-            @endif
 
-            @if (isset($subditos))
-              @if (filled($subditos))
-              <h3 class="mt-2">Súbditos</h3>
-              @foreach($subditos as $subdito)
-                <p class="ml-1 mr-2"><a href="{{route('organizacion.show', [$subdito->id_organizacion] )}}">{{$subdito->nombre}}</a></p>
-              @endforeach
-              @endif
+            @if($organizacion->subordinates->isNotEmpty())
+            <strong >Organizaciones subordinadas:</strong>
+            @foreach($organizacion->subordinates as $subordinate)
+            <p class="ml-1 mr-2 mb-0"><a href="{{route('organizacion.show', [$subordinate->id] )}}">{{$subordinate->nombre}}</a></p>
+            @endforeach
             @endif
           </div>
         </div>
