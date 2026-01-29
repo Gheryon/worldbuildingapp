@@ -25,12 +25,12 @@
           </div>
           <div class="card-body">
             @if ($organizacion->descripcion_breve)
-            <h2 class="border-bottom pb-2 mb-3">Descripción breve</h2>
+            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-align-left mr-2"></i>Descripción breve</h2>
             <div class="ml-4 mb-3">{!! $organizacion->descripcion_breve !!}</div>
             @endif
 
             @if ($organizacion->historia)
-            <h2 class="border-bottom pb-2 mb-3">Historia</h2>
+            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-scroll mr-2"></i>Historia</h2>
             <div class="ml-4 mb-3">{!! $organizacion->historia !!}</div>
             @endif
 
@@ -118,7 +118,7 @@
             @endif
 
             @if ($organizacion->otros)
-            <h2 class="border-bottom pb-2 mt-4 mb-3">Otros detalles</h2>
+            <h2 class="border-bottom pb-2 mt-4 mb-3"><i class="fas fa-plus-circle mr-2"></i>Otros detalles</h2>
             <div class="ml-4">{!! $organizacion->otros !!}</div>
             @endif
           </div>{{-- fin card-body --}}
@@ -136,42 +136,42 @@
             <div class="row">
               <img alt="escudo" id="escudo" class="img-thumbnail shadow-sm mb-3" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" width="300" height="300">
             </div>
-            <strong class="mt-2">Tipo</strong>
+            <strong class="mt-2"><i class="fas fa-landmark mr-1"></i>Tipo</strong>
             <p class="text-muted">{{$organizacion->tipo->nombre}}</p>
 
             @if ($organizacion->gentilicio)
-            <strong class="mt-2">Gentilicio</strong>
+            <strong class="mt-2"><i class="fas fa-user-tag mr-1"></i>Gentilicio</strong>
             <p class="text-muted">{{$organizacion->gentilicio}}</p>
             @endif
 
             @if($organizacion->ruler->id!=0)
-            <strong>Líder:</strong>
+            <strong class="mt-2"><i class="fas fa-chess-king mr-1"></i>Líder:</strong>
             <p class="text-muted"><a href="{{route('personaje.show', [$organizacion->ruler->id] )}}">{{$organizacion->ruler->nombre}}</a></p>
             @endif
 
             @if($organizacion->owner->id!=0)
-            <strong>Controlado por:</strong>
+            <strong><i class="fas fa-link mr-1"></i>Controlado por:</strong>
             <p class="text-muted">
               <a href="{{ route('organizacion.show', $organizacion->owner->id) }}">{{ $organizacion->owner->nombre }}</a>
             </p>
             @endif
 
-            <strong>Fundación:</strong>
+            <strong><i class="fas fa-calendar-plus mr-1"></i>Fundación:</strong>
             <p class="text-muted">{{ $fundacion }}</p>
             @if ($organizacion->disolucion != 0)
-            <strong>Disolución:</strong>
-            <p class="text-muted">{{ $disolucion}} {{$organizacion->disolucion}}</p>
+            <strong><i class="fas fa-calendar-times mr-1"></i>Disolución:</strong>
+            <p class="text-muted">{{ $disolucion}}</p>
             @endif
 
             @if($organizacion->religiones->isNotEmpty())
-            <strong>Religiones:</strong>
+            <strong class="mt-2"><i class="fas fa-praying-hands mr-1"></i>Religiones:</strong>
             @foreach($organizacion->religiones as $religion)
             <p class="ml-1 mr-2 mb-0"><a href="{{route('religion.show', [$religion->id] )}}">{{$religion->nombre}}</a></p>
             @endforeach
             @endif
 
             @if($organizacion->subordinates->isNotEmpty())
-            <strong >Organizaciones subordinadas:</strong>
+            <strong class="mt-3"><i class="fas fa-sitemap mr-1"></i>Organizaciones subordinadas:</strong>
             @foreach($organizacion->subordinates as $subordinate)
             <p class="ml-1 mr-2 mb-0"><a href="{{route('organizacion.show', [$subordinate->id] )}}">{{$subordinate->nombre}}</a></p>
             @endforeach
