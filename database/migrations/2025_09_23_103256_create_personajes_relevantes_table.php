@@ -14,10 +14,19 @@ return new class extends Migration
     Schema::create('personajes_relevantes', function (Blueprint $table) {
       $table->id();
 
-      $table->integer('relato')->nullable();
-      $table->foreign('relato')->references('id_articulo')->on('articulosgenericos');
-      $table->bigInteger('personaje')->nullable();
-      $table->foreign('personaje')->references('id')->on('personaje');
+      // Relación con el Artículo Genérico (Relato)
+      $table->foreignId('relato_id')
+        ->nullable()
+        ->constrained('articulos_genericos')
+        ->cascadeOnDelete();
+
+      // Relación con el Personaje
+      $table->foreignId('personaje_id')
+        ->nullable()
+        ->constrained('personajes') // Asegúrate de que coincida con el nombre real de tu tabla
+        ->cascadeOnDelete();
+
+      $table->timestamps(); // Recomendado para saber cuándo se vinculó
     });
   }
 

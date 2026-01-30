@@ -17,7 +17,9 @@ return new class extends Migration
 
       $table->id();
       $table->text('lista')->nullable();
-      $table->string('tipo');
+      $table->string('tipo', 64);
+
+      $table->timestamps();
     });
   }
 

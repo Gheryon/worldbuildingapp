@@ -3,6 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 return new class extends Migration
 {
@@ -11,14 +13,11 @@ return new class extends Migration
    */
   public function up(): void
   {
-    Schema::create('enlaces', function (Blueprint $table) {
+    Schema::create('tipo_construccion', function (Blueprint $table) {
+      $table->charset = 'utf8mb4';
+      $table->collation = 'utf8mb4_general_ci';
       $table->id();
-      $table->string('nombre');
-      $table->text('url');
-      $table->string('tipo');
-      // Auditoría y borrado lógico
-      $table->timestamps();
-      $table->softDeletes();
+      $table->string('nombre', 64);
     });
   }
 
@@ -27,6 +26,6 @@ return new class extends Migration
    */
   public function down(): void
   {
-    Schema::drop('enlaces');
+    Schema::dropIfExists('tipo_construccion');
   }
 };

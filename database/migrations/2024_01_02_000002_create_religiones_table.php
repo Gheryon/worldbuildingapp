@@ -16,9 +16,15 @@ return new class extends Migration
       $table->collation = 'utf8mb4_general_ci';
 
       $table->id();
-      $table->string('nombre');
+      $table->string('nombre')->index(); //índice para búsquedas rápidas
       $table->string('lema')->nullable();
       $table->string('escudo')->default('default.png');
+
+      $table->string('tipo_teismo', 128)->nullable();
+      $table->text('deidades')->nullable();
+      $table->string('estatus_legal', 128)->nullable();
+      $table->text('clase_sacerdotal')->nullable();
+
       $table->text('descripcion')->nullable();
       $table->text('historia')->nullable();
       $table->text('cosmologia')->nullable();
@@ -30,17 +36,10 @@ return new class extends Migration
       $table->text('sectas')->nullable();
       $table->text('otros')->nullable();
 
-      $table->integer('fundacion')->default(0);
-      $table->foreign('fundacion')->references('id')->on('fechas');
-      $table->integer('disolucion')->default(0);
-      $table->foreign('disolucion')->references('id')->on('fechas');
+      $table->foreignId('fundacion_id')->nullable()->constrained('fechas')->nullOnDelete();
+      $table->foreignId('disolucion_id')->nullable()->constrained('fechas')->nullOnDelete();
 
-      /*$table->foreignId('fundacion')->constrained(
-        table: 'fechas', indexName: 'id'
-      );
-      $table->foreignId('disolucion')->constrained(
-        table: 'fechas', indexName: 'id'
-      );*/
+      $table->timestamps();
     });
   }
 
