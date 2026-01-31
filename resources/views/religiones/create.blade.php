@@ -1,6 +1,4 @@
 @extends('layouts.index')
-@extends('layouts.navbar')
-@extends('layouts.menu')
 
 @section('title')
 <title id="title">Nueva religión</title>
@@ -8,7 +6,7 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-<a href="{{route('religiones.index')}}" class="btn btn-dark">Cancelar</a>
+  <a href="{{route('religiones.index')}}" class="btn btn-dark">Cancelar</a>
 </li>
 @endsection
 
@@ -26,132 +24,135 @@
     @csrf
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
-        <button type="submit" id="submit-crear-button" class="btn btn-success">Guardar</button>
+        <button type="submit" id="submit-crear-button" class="btn btn-success px-5 shadow-sm">Guardar</button>
       </div>
     </div>
-    <div class="row mt-3 mb-3 justify-content-md-center border">
-      <div class="col">
-        <div class="row mt-2">
-          <div class="col-md">
-            <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" name="nombre" class="form-control" id="nombre" placeholder="Nombre" required>
-            @error('nombre')
-            <small style="color: red">{{$message}}</small>
-            @enderror
+
+    {{-- Sección de datos básicos y escudo --}}
+    <div class="card card-outline card-dark mt-3">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-9">
+            <div class="row">
+              <div class="col-md">
+                <x-text-input name="nombre" label="Nombre" placeholder="Ej: Cristianismo, Judaísmo, etc." required />
+              </div>
+              <div class="col-md">
+                <x-text-input name="lema" label="Lema" placeholder="Ej: Justicia para todos." />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md">
+                <x-date-input-group name="fundacion" label="Fecha de fundación" />
+              </div>
+              <div class="col-md">
+                <x-date-input-group name="disolucion" label="Fecha de disolución" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3">
+                <div class="form-group mt-2">
+                  <label for="tipo_teismo">Tipo de Teísmo</label>
+                  <select name="tipo_teismo" id="tipo_teismo" class="form-control select2">
+                    <option value="" selected disabled>Selecciona una doctrina...</option>
+                    @foreach(\App\Models\Religion::getTiposTeismo() as $value => $label)
+                    <option value="{{ $value }}"
+                      {{ (old('tipo_teismo') == $value || (isset($religion) && $religion->tipo_teismo?->value == $value)) ? 'selected' : '' }}>
+                      {{ $label }}
+                    </option>
+                    @endforeach
+                  </select>
+                </div>
+              </div>
+              <div class="col-md">
+                <x-text-input name="deidades" label="Deidades principales" placeholder="Ej: Zeus, Poseidón, Hades." />
+              </div>
+              <div class="col-md">
+                <div class="form-group mt-2">
+                  <label for="estatus_legal" class="form-label">Estatus legal</label>
+                  <select class="form-select form-control" name="estatus_legal" id="estatus_legal" required>
+                    <option selected disabled value="">Elegir</option>
+                    @foreach(['Activa', 'Clandestina', 'Extinta', 'Perseguida'] as $status)
+                    <option value="{{ $status }}" {{ old('estatus_legal') == $status ? 'selected' : '' }}>{{ $status }}</option>
+                    @endforeach
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="col-md">
-            <label for="lema" class="form-label">Lema</label>
-            <input type="text" name="lema" class="form-control" id="lema" placeholder="Lema">
-            @error('lema')
-            <small style="color: red">{{$message}}</small>
+          <div class="col">
+            <label for="escudo" class="form-label">Escudo</label>
+            <img alt="escudo" id="escudo-preview" src="{{asset("storage/escudos/default.png")}}" class="img-thumbnail" width="185" height="180">
+            <input type="file" name="escudo" class="form-control form-control-sm @error('escudo') is-invalid @enderror" id="escudo">
+            @error('escudo')
+            <small class="invalid-feedback">{{$message}}</small>
             @enderror
           </div>
         </div>
-        <div class="row mt-2">
-          <div class="col-md">
-            <label for="afundacion" class="form-label">Fecha de fundacion</label>
-            <div class="input-group">
-              <input id="id_fundacion" type="hidden" name="id_fundacion" value="0">
-              <input type="number" id="dfundacion" name="dfundacion" class="form-control" placeholder="Día">
-              @error('dfundacion')
-              <small style="color: red">{{$message}}</small>
-              @enderror
-              <select id="mfundacion" name="mfundacion" class="form-control">
-                <option selected disabled value="">Mes</option>
-                <option value="0">Semana de año nuevo</option>
-                <option value="1">Enero</option>
-                <option value="2">Febrero</option>
-                <option value="3">Marzo</option>
-                <option value="4">Abril</option>
-                <option value="5">Mayo</option>
-                <option value="6">Junio</option>
-                <option value="7">Julio</option>
-                <option value="8">Agosto</option>
-                <option value="9">Septiembre</option>
-                <option value="10">Octubre</option>
-                <option value="11">Noviembre</option>
-                <option value="12">Diciembre</option>
-              </select>
-              <input type="number" id="afundacion" name="afundacion" class="form-control" placeholder="Año">
-              @error('afundacion')
-              <small style="color: red">{{$message}}</small>
-              @enderror
+      </div>
+    </div> {{-- Fin sección de datos básicos y escudo --}}
+
+    {{-- Campo de descripción breve --}}
+    <div class="card card-dark card-outline card-tabs mt-4">
+      <div class="card-body">
+        <x-textarea-input name="descripcion" label="Descripción" rows="2" />
+      </div>
+    </div>
+
+    {{-- Panel de pestañas --}}
+    <div class="card card-dark card-outline card-tabs mt-4">
+      <div class="card-header p-0 pt-1 border-bottom-0">
+        <ul class="nav nav-tabs" id="personajeTab" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="fe-tab" data-toggle="pill" href="#tab-fe" role="tab">Elementos de fe</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="politica-tab" data-toggle="pill" href="#tab-politica" role="tab">Política</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="historia-tab" data-toggle="pill" href="#tab-historia" role="tab">Historia y otros</a>
+          </li>
+        </ul>
+      </div>
+      <div class="card-body">
+        <div class="tab-content" id="personajeTabContent">
+
+          {{-- PESTAÑA 1: Geopolítica, militar, territorio y estructura --}}
+          <div class="tab-pane fade show active" id="tab-fe" role="tabpanel">
+            <div class="row">
+              <div class="col-md-6">
+                <x-textarea-input name="cosmologia" label="Cosmología" />
+                <x-textarea-input name="doctrina" label="Doctrina" />
+              </div>
+              <div class="col-md-6">
+                <x-textarea-input name="sagrado" label="Lugares y objetos sagrados" />
+                <x-textarea-input name="fiestas" label="Fiestas y rituales importantes" />
+              </div>
             </div>
           </div>
-          <div class="col-md">
-              <label for="adisolucion" class="form-label">Fecha de disolucion</label>
-            <div class="input-group">
-              <input id="id_disolucion" type="hidden" name="id_disolucion" value="0">
-              <input type="number" id="ddisolucion" name="ddisolucion" class="form-control" placeholder="Día">
-              @error('ddisolucion')
-              <small style="color: red">{{$message}}</small>
-              @enderror
-              <select id="mdisolucion" name="mdisolucion" class="form-select form-control">
-                <option selected disabled value="">Mes</option>
-                <option value="0">Semana de año nuevo</option>
-                <option value="1">Enero</option>
-                <option value="2">Febrero</option>
-                <option value="3">Marzo</option>
-                <option value="4">Abril</option>
-                <option value="5">Mayo</option>
-                <option value="6">Junio</option>
-                <option value="7">Julio</option>
-                <option value="8">Agosto</option>
-                <option value="9">Septiembre</option>
-                <option value="10">Octubre</option>
-                <option value="11">Noviembre</option>
-                <option value="12">Diciembre</option>
-              </select>
-              <input type="number" id="adisolucion" name="adisolucion" class="form-control" placeholder="Año">
-              @error('adisolucion')
-              <small style="color: red">{{$message}}</small>
-              @enderror
+
+          {{-- PESTAÑA 2: política, estructuras, sectas --}}
+          <div class="tab-pane fade" id="tab-politica" role="tabpanel">
+            <div class="row">
+              <div class="col-md-6">
+                <x-textarea-input name="politica" label="Influencia politica" />
+                <x-textarea-input name="sectas" label="Sectas" />
+              </div>
+              <div class="col-md-6">
+                <x-textarea-input name="estructura" label="Estructura religiosa" />
+                <x-textarea-input name="clase_sacerdotal" label="Clase sacerdotal" />
+              </div>
             </div>
+          </div>
+
+          {{-- PESTAÑA 3: Historia y otros --}}
+          <div class="tab-pane fade" id="tab-historia" role="tabpanel">
+            <x-textarea-input name="historia" label="Historia" class="summernote" rows="10" />
+            <x-textarea-input name="otros" label="Otros detalles adicionales" />
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <label for="escudo" class="form-label">Escudo</label>
-        <img alt="escudo" id="escudo-img" src="{{asset("storage/escudos/default.png")}}" class="img-fluid" style="width: 50%;">
-        <input type="file" name="escudo" class="form-control" id="escudo">
-        @error('escudo')
-        <small style="color: red">{{$message}}</small>
-        @enderror
-      </div>
-    </div>
-    <div class="row mt-2 mb-3">
-      <div class="col">
-      <label for="descripcion" class="form-label">Descripción</label>
-      <textarea name="descripcion" class="form-control summernote" id="descripcion" rows="2" aria-label="With textarea"></textarea>
-      </div>
-    </div>
-    <!----------------------------------------------->
-    <label for="historia" class="form-label">Historia</label>
-    <textarea name="historia" class="form-control summernote" id="historia" rows="8" aria-label="With textarea"></textarea>
-
-    <label for="cosmologia" class="form-label">Cosmología</label>
-    <textarea name="cosmologia" class="form-control summernote" id="cosmologia" rows="4" aria-label="With textarea"></textarea>
-
-    <label for="doctrina" class="form-label">Doctrina</label>
-    <textarea name="doctrina" class="form-control summernote" id="doctrina" rows="4" aria-label="With textarea"></textarea>
-    
-    <label for="sagrado" class="form-label">Lugares y objetos sagrados</label>
-    <textarea name="sagrado" class="form-control summernote" id="sagrado" rows="4" aria-label="With textarea"></textarea>
-    
-    <label for="fiestas" class="form-label">Fiestas y rituales importantes</label>
-    <textarea name="fiestas" class="form-control summernote" id="fiestas" rows="4" aria-label="With textarea"></textarea>
-    
-    <label for="politica" class="form-label">Influencia política</label>
-    <textarea name="politica" class="form-control summernote" id="politica" rows="4" aria-label="With textarea"></textarea>
-    
-    <label for="estructura" class="form-label">Estructura</label>
-    <textarea name="estructura" class="form-control summernote" id="estructura" rows="4" aria-label="With textarea"></textarea>
-
-    <label for="sectas" class="form-label">Sectas</label>
-    <textarea name="sectas" class="form-control summernote" id="sectas" rows="4" aria-label="With textarea"></textarea>
-    
-    <label for="otros" class="form-label">Otros</label>
-    <textarea name="otros" class="form-control summernote" id="otros" rows="4" aria-label="With textarea"></textarea>
+    </div>{{-- Fin panel de pestañas --}}
   </form>
 
 </section>
@@ -163,8 +164,20 @@
   $(function() {
     // Summernote
     $('.summernote').summernote({
+      height: 300
+    })
+
+    $('.summernote-lite').summernote({
       height: 150
     })
+
+    //Preview de escudo antes de subirla
+    document.getElementById('escudo').onchange = evt => {
+      const [file] = document.getElementById('escudo').files
+      if (file) {
+        document.getElementById('escudo-preview').src = URL.createObjectURL(file)
+      }
+    }
   });
 </script>
 @endsection

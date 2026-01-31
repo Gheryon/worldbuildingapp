@@ -141,13 +141,13 @@ Route::controller(App\Http\Controllers\PersonajeController::class)->group(functi
 
 /*******religiones routes********/
 Route::controller(App\Http\Controllers\ReligionesController::class)->group(function () {
-  Route::get('/religiones/index/{orden?}', 'index')->name('religiones.index');
+  Route::get('/religiones/index', 'index')->name('religiones.index');
   Route::get('/religiones/create', 'create')->name('religion.create');
   Route::post('/religiones/store', 'store')->name('religion.store');
   Route::get('/religiones/{id}/edit', 'edit')->name('religion.edit');
   Route::put('/religiones/{id}', 'update')->name('religion.update');
   Route::delete('/religiones/destroy', 'destroy')->name('religion.destroy');
-  Route::get('/religiones/index', 'search')->name('religiones.search');
+  Route::get('/religiones/{id}', 'show')->name('religion.show');
 });
 
 /*******timelines routes********/
@@ -175,5 +175,4 @@ Route::controller(App\Http\Controllers\VistaController::class)->group(function (
   Route::get('/lugares/{id}', 'show_lugar')->name('lugar.show');
   Route::get('/conflictos/{id}', 'show_conflicto')->name('conflicto.show');
   Route::get('/construcciones/{id}', 'show_construccion')->name('construccion.show');
-  Route::get('/religiones/{id}', 'show_religion')->name('religion.show');
 });

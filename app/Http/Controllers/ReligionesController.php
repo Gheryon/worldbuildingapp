@@ -15,16 +15,31 @@ class ReligionesController extends Controller
   /**
    * Display a listing of the resource.
    */
-  public function index($orden = 'asc')
+  public function index(Request $request)
   {
-    // Obtener todas las religiones almacenadas
-    $religiones=Religion::get_religiones();
+    $datosValidados = $request->validate([
+      'orden' => 'sometimes|string|in:asc,desc', // 'sometimes' permite que no esté presente.
+      'search' => 'sometimes|nullable|string|max:100',
+    ], [
+      'orden.in' => 'El orden debe ser ascendente (asc) o descendente (desc).',
+    ]);
 
-    return view('religiones.index', ['religiones' => $religiones, 'orden' => $orden]);
+    // Si la validación falla o el parámetro no está presente, se usan los valores por defecto.
+    $orden = $datosValidados['orden'] ?? 'asc';
+    $terminoBusqueda = $datosValidados['search'] ?? null;
+
+    // Obtener todas las religiones almacenadas
+    //$religiones = Religion::get_religiones();
+    $religiones = Religion::filtrar([
+      'orden'  => $orden,
+      'search' => $terminoBusqueda
+    ])->paginate(18);
+
+    return view('religiones.index', ['religiones' => $religiones, 'orden' => $request->orden ?? 'asc']);
   }
 
   /**
-   * Show the form for creating a new resource.
+   * Mostrar formulario para crear una nueva religión.
    */
   public function create()
   {
@@ -37,94 +52,62 @@ class ReligionesController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:256',
+      'nombre'        => 'required|max:255',
+      'estatus_legal' => 'required',
       'lema' => 'nullable|max:256',
-      'dfundacion' => 'nullable|integer|min:1|max:30',
-      'afundacion' => 'nullable|integer',
-      'ddisolucion' => 'nullable|integer|min:1|max:30',
-      'adisolucion' => 'nullable|integer',
-      'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
+      'tipo_teismo'   => 'nullable',
+      'escudo' => 'nullable|file|image|mimes:jpg,png,gif|max:10240',
+      // Componentes de fecha
+      'dia_fundacion' => 'nullable|integer|min:1|max:30',
+      'mes_fundacion' => 'nullable|integer',
+      'anno_fundacion' => 'nullable|integer',
+      'dia_disolucion' => 'nullable|integer|min:1|max:30',
+      'mes_disolucion' => 'nullable|integer',
+      'anno_disolucion' => 'nullable|integer',
     ]);
 
     try {
-      $religion = new Religion();
+      $religion = Religion::store_religion($request);
 
-      $religion->nombre = $request->nombre;
-      $religion->save();
-
-      $id_religion = DB::scalar("SELECT MAX(id) as id FROM religiones");
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ReligionesController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('religiones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      Log::error('ReligionesController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('religiones.index')->with('error', $excepcion->getMessage());
-    }
-
-    if ($request->filled('lema')) {
-      $religion->lema = $request->lema;
-    }
-    if ($request->filled('descripcion')) {
-      $religion->descripcion = app(ImagenController::class)->store_for_summernote($request->descripcion, "religiones", $id_religion);
-    }
-    if ($request->filled('historia')) {
-      $religion->Historia = app(ImagenController::class)->store_for_summernote($request->historia, "religiones", $id_religion);
-    }
-    if ($request->filled('cosmologia')) {
-      $religion->cosmologia = app(ImagenController::class)->store_for_summernote($request->cosmologia, "religiones", $id_religion);
-    }
-    if ($request->filled('doctrina')) {
-      $religion->doctrina = app(ImagenController::class)->store_for_summernote($request->doctrina, "religiones", $id_religion);
-    }
-    if ($request->filled('sagrado')) {
-      $religion->sagrado = app(ImagenController::class)->store_for_summernote($request->sagrado, "religiones", $id_religion);
-    }
-    if ($request->filled('fiestas')) {
-      $religion->fiestas = app(ImagenController::class)->store_for_summernote($request->fiestas, "religiones", $id_religion);
-    }
-    if ($request->filled('politica')) {
-      $religion->politica = app(ImagenController::class)->store_for_summernote($request->politica, "religiones", $id_religion);
-    }
-    if ($request->filled('estructura')) {
-      $religion->estructura = app(ImagenController::class)->store_for_summernote($request->estructura, "religiones", $id_religion);
-    }
-    if ($request->filled('sectas')) {
-      $religion->sectas = app(ImagenController::class)->store_for_summernote($request->sectas, "religiones", $id_religion);
-    }
-    if ($request->filled('otros')) {
-      $religion->otros = app(ImagenController::class)->store_for_summernote($request->otros, "religiones", $id_religion);
-    }
-
-    try {
-      //------------escudo----------//
-      if ($request->hasFile('escudo')) {
-        $path = $request->file('escudo')->store('escudos', 'public');
-        $religion->escudo = basename($path);
-      } else {
-        $religion->escudo = "default.png";
-      }
-
-      //------------fechas----------//
-      $religion->fundacion = app(ConfigurationController::class)->store_fecha($request->input('dfundacion', 0), $request->input('mfundacion', 0), $request->input('afundacion', 0), "religiones");
-      $religion->disolucion = app(ConfigurationController::class)->store_fecha($request->input('ddisolucion', 0), $request->input('mdisolucion', 0), $request->input('adisolucion', 0), "religiones");
-
-      $religion->save();
-      return redirect()->route('religiones.index')->with('message', 'Religión añadida correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ReligionesController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('religiones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      Log::error('ReligionesController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('religiones.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('religiones.index')
+        ->with('success', 'Religión ' . $religion->nombre . ' añadida correctamente.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error("Error de base de datos al añadir religión.", [
+        'entrada_input' => $request->all(),
+        'error' => $e->getMessage()
+      ]);
+      return redirect()->back()->withInput()->with('error', 'Error en la base de datos al crear la religión.');
+    } catch (\Exception $e) {
+      Log::critical("Error inesperado al añadir religión.", [
+        'entrada_input' => $request->all(),
+        'error' => $e->getMessage()
+      ]);
+      return redirect()->back()->withInput()->with('error', 'No se pudo crear: ' . $e->getMessage());
     }
   }
 
   /**
    * Display the specified resource.
    */
-  public function show(Religion $religion)
+  public function show($id)
   {
-    //
+    try {
+      // Cargamos la religión con sus fechas
+      $religion = Religion::with([
+        'fecha_fundacion',
+        'fecha_disolucion'
+      ])->findOrFail($id);
+
+      // Formateamos las fechas para la vista
+      $fundacion = Fecha::get_fecha_string($religion->fundacion);
+      $disolucion = Fecha::get_fecha_string($religion->disolucion);
+
+      return view('religiones.show', compact('religion', 'fundacion', 'disolucion'));
+    } catch (\Exception $e) {
+      Log::error("Error al mostrar religión: " . $e->getMessage());
+      return redirect()->route('religiones.index')
+        ->with('error', 'Religión no encontrada.');
+    }
   }
 
   /**
@@ -132,132 +115,60 @@ class ReligionesController extends Controller
    */
   public function edit($id)
   {
-    //obtener religion
-    $religion = Religion::get_religion($id);
-    if ($religion['error'] ?? false) {
-      return redirect()->route('religiones.index')->with('error', $religion['error']['error']);
-    }
+    try {
+      //obtener religion a editar
+      $religion = Religion::findOrFail($id);
 
-    $fecha_disolucion = 0;
-    $fecha_fundacion = 0;
-    if ($religion->fundacion != 0) {
-      $fecha_fundacion = Fecha::find($religion->fundacion);
-    } else {
-      $fecha_fundacion = Fecha::find(0);
+      //obtener fechas
+      $fundacion = Fecha::find($religion->fundacion_id);
+      $disolucion = Fecha::find($religion->disolucion_id);
+    
+      return view('religiones.edit', compact('religion', 'fundacion', 'disolucion'));
+    } catch (\Exception $e) {
+      // Si hay un error de lógica, redirigimos con un mensaje flash
+      return redirect()->route('religiones.index')
+        ->with('error', 'No se pudo cargar la religión: ' . $e->getMessage());
     }
-
-    if ($religion->disolucion != 0) {
-      $fecha_disolucion = Fecha::find($religion->disolucion);
-    } else {
-      $fecha_disolucion = Fecha::find(0);
-    }
-
-    return view('religiones.edit', ['religion' => $religion, 'fundacion' => $fecha_fundacion, 'disolucion' => $fecha_disolucion]);
   }
 
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request)
+  public function update(Request $request, $id)
   {
     $request->validate([
-      'nombre' => 'required|max:256',
+      'nombre'        => 'required|max:255',
+      'estatus_legal' => 'required',
       'lema' => 'nullable|max:256',
-      'dfundacion' => 'nullable|integer|min:1|max:30',
-      'afundacion' => 'nullable|integer',
-      'ddisolucion' => 'nullable|integer|min:1|max:30',
-      'adisolucion' => 'nullable|integer',
-      'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
+      'tipo_teismo'   => 'nullable',
+      'escudo' => 'nullable|file|image|mimes:jpg,png,gif|max:10240',
+      // Componentes de fecha
+      'dia_fundacion' => 'nullable|integer|min:1|max:30',
+      'mes_fundacion' => 'nullable|integer',
+      'anno_fundacion' => 'nullable|integer',
+      'dia_disolucion' => 'nullable|integer|min:1|max:30',
+      'mes_disolucion' => 'nullable|integer',
+      'anno_disolucion' => 'nullable|integer',
     ]);
 
-    //obtener religion
-    $religion = Religion::get_religion($request->id);
-    if ($religion['error'] ?? false) {
-      return redirect()->route('religiones.index')->with('error', $religion['error']['error']);
-    }
-
-    if ($request->filled('nombre')) {
-      $religion->nombre = $request->nombre;
-    }
-    if ($request->filled('lema')) {
-      $religion->lema = $request->lema;
-    }
-    if ($request->filled('descripcion')) {
-      $religion->descripcion = app(ImagenController::class)->update_for_summernote($request->descripcion, "religiones", $request->id);
-    }
-    if ($request->filled('historia')) {
-      $religion->historia = app(ImagenController::class)->update_for_summernote($request->historia, "religiones", $request->id);
-    }
-    if ($request->filled('cosmologia')) {
-      $religion->cosmologia = app(ImagenController::class)->update_for_summernote($request->cosmologia, "religiones", $request->id);
-    }
-    if ($request->filled('doctrina')) {
-      $religion->doctrina = app(ImagenController::class)->update_for_summernote($request->doctrina, "religiones", $request->id);
-    }
-    if ($request->filled('sagrado')) {
-      $religion->sagrado = app(ImagenController::class)->update_for_summernote($request->sagrado, "religiones", $request->id);
-    }
-    if ($request->filled('fiestas')) {
-      $religion->fiestas = app(ImagenController::class)->update_for_summernote($request->fiestas, "religiones", $request->id);
-    }
-    if ($request->filled('politica')) {
-      $religion->politica = app(ImagenController::class)->update_for_summernote($request->politica, "religiones", $request->id);
-    }
-    if ($request->filled('estructura')) {
-      $religion->estructura = app(ImagenController::class)->update_for_summernote($request->estructura, "religiones", $request->id);
-    }
-    if ($request->filled('sectas')) {
-      $religion->sectas = app(ImagenController::class)->update_for_summernote($request->sectas, "religiones", $request->id);
-    }
-    if ($request->filled('otros')) {
-      $religion->otros = app(ImagenController::class)->update_for_summernote($request->otros, "religiones", $request->id);
-    }
-
-    //------------fechas----------//
-    $religion->fundacion = $request->input('id_fundacion', 0);
-    $religion->disolucion = $request->input('id_disolucion', 0);
-
     try {
-      //------------escudo----------//
-      if ($request->hasFile('escudo')) {
-        //el escudo anterior hay que borrarlo salvo que sea default.png
-        if ($religion->escudo != "default.png") {
-          if (file_exists('storage/escudos/' . $religion->escudo)) {
-            unlink('storage/escudos/' . $religion->escudo);
-          }
-        }
-        $path = $request->file('escudo')->store('escudos', 'public');
-        $religion->escudo = basename($path);
-      }
+      $religion = Religion::findOrFail($id);//obtiene la religión en bbdd
+      $religion->update_religion($request); //se actualiza con el request
 
-      if ($request->input('dfundacion', 0) != 0) {
-        if ($religion->fundacion != 0) {
-          //la religion ya tenía fecha de fundacion antes de editar, se actualiza
-          app(ConfigurationController::class)->update_fecha($request->input('dfundacion', 0), $request->input('mfundacion', 0), $request->input('afundacion', 0), $religion->fundacion);
-        } else {
-          //la religion no tenía fecha de fundacion antes de editar, hay que añadirla a la db.
-          $religion->fundacion = app(ConfigurationController::class)->store_fecha($request->input('dfundacion', 0), $request->input('mfundacion', 0), $request->input('afundacion', 0), "religiones");
-        }
-      }
-
-      if ($request->input('ddisolucion', 0) != 0) {
-        if ($religion->disolucion != 0) {
-          //la religion ya tenía fecha de disolucion antes de editar
-          app(ConfigurationController::class)->update_fecha($request->input('ddisolucion', 0), $request->input('mdisolucion', 0), $request->input('adisolucion', 0), $religion->disolucion);
-        } else {
-          //la religion no tenía fecha de disolucion antes de editar, hay que añadirla a la db.
-          $religion->disolucion = app(ConfigurationController::class)->store_fecha($request->input('ddisolucion', 0), $request->input('mdisolucion', 0), $request->input('adisolucion', 0), "religiones");
-        }
-      }
-
-      $religion->save();
-      return redirect()->route('religiones.index')->with('message', 'Religión '.$religion->nombre.' editada correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ReligionesController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('religiones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo editar.');
-    } catch (Exception $excepcion) {
-      Log::error('ReligionesController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('religiones.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('religiones.index')
+        ->with('success', 'Religión ' . $religion->nombre . ' actualizada correctamente.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error("Error de base de datos al actualizar religión.", [
+        'entrada_input' => $request->all(),
+        'error' => $e->getMessage()
+      ]);
+      return redirect()->back()->withInput()->with('error', 'Error en la base de datos al actualizar la religión.');
+    } catch (\Exception $e) {
+      Log::critical("Error inesperado al actualizar religión.", [
+        'entrada_input' => $request->all(),
+        'error' => $e->getMessage()
+      ]);
+      return redirect()->back()->withInput()->with('error', 'No se pudo actualizar: ' . $e->getMessage());
     }
   }
 

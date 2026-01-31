@@ -25,9 +25,6 @@ return new class extends Migration
       // 'anno' puede ser negativo para eras antiguas (AC/BC)
       $table->integer('anno')->nullable();
 
-      // 'tabla' sirve para identificar a qué entidad pertenece esta fecha
-      $table->string('tabla', 128)->nullable();
-
       // Auditoría (opcional, pero recomendada)
       $table->timestamps();
 

@@ -1,94 +1,128 @@
 @extends('layouts.index')
-@extends('layouts.navbar')
-@extends('layouts.menu')
 
 @section('title')
-<title id="title">{{$vista->nombre}}</title>
+<title id="title">{{$religion->nombre}}</title>
 @endsection
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-<a href="{{route('religiones.index')}}" class="btn btn-dark">Volver</a>
-<a href="{{route('religion.edit', ['id'=> $vista->id] )}}" class="btn btn-dark ml-2">Editar</a>
+  <a href="{{route('religiones.index')}}" class="btn btn-dark">Volver</a>
+  <a href="{{route('religion.edit', ['id'=> $religion->id] )}}" class="btn btn-dark ml-2">Editar</a>
 </li>
 @endsection
 
 @section('content')
+<section class="content mt-4">
+  <div class="container-fluid">
+    <div class="row">
+      {{-- Columna principal: información --}}
+      <div class="col-md-8">
+        <div class="card card-outline card-dark">
+          <div class="card-header">
+            <h1 class="card-title" style="font-size: 2rem;">
+              {{ $religion->nombre }}
+            </h1>
+          </div>
+          <div class="card-body">
+            @if (isset($religion->descripcion))
+            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-align-left mr-2"></i>Descripción breve</h2>
+            <div class="ml-4 mb-3">{!!$religion->descripcion!!}</div>
+            @endif
 
-<section class="content">
-  <div class="container margin-top-20 mt-5 page">
-    <div class="row article-content">
-      <div class="col-md contentApp" id="content-left">
-        <div class="col text-center">
-          <h1>{{$vista->nombre}} </h1>
+            @if ($religion->historia)
+            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-scroll mr-2"></i>Historia</h2>
+            <div class="ml-4 mb-3">{!! $religion->historia !!}</div>
+            @endif
+
+            @if ($religion->cosmologia)
+            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-sun mr-2"></i>Cosmología</h2>
+            <p class="ml-4 mb-3">{!!$religion->cosmologia!!}</p>
+            @endif
+
+            @if (isset($religion->doctrina))
+            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-book-open mr-2"></i>Doctrina</h2>
+            <p class="ml-4 mb-3">{!!$religion->doctrina!!}</p>
+            @endif
+
+            @if ($religion->sagrado)
+            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-place-of-worship mr-2"></i>Lugares y objetos sagrados</h2>
+            <p class="ml-4 mb-3">{!!$religion->sagrado!!}</p>
+            @endif
+
+            @if ($religion->clase_sacerdotal)
+            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-hands-praying mr-2"></i>Clase sacerdotal</h2>
+            <p class="ml-4 mb-3">{!!$religion->clase_sacerdotal!!}</p>
+            @endif
+
+            @if ($religion->fiestas)
+            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-masks-theater mr-2"></i>Fiestas y rituales importantes</h2>
+            <p class="ml-4 mb-3">{!!$religion->fiestas!!}</p>
+            @endif
+
+            @if ($religion->politica)
+            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-crown mr-2"></i>Influencia política</h2>
+            <p class="ml-4 mb-3">{!!$religion->politica!!}</p>
+            @endif
+
+            @if ($religion->estructura)
+            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-sitemap mr-2"></i>Estructura</h2>
+            <p class="ml-4 mb-3">{!!$religion->estructura!!}</p>
+            @endif
+
+            @if ($religion->sectas)
+            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-users-cog mr-2"></i>Sectas</h2>
+            <p class="ml-4 mb-3">{!!$religion->sectas!!}</p>
+            @endif
+
+            @if ($religion->otros)
+            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-plus-circle mr-2"></i>Otros</h2>
+            <p class="ml-4 mb-3">{!!$religion->otros!!}</p>
+            @endif
+          </div>
         </div>
-        
-        @if (isset($vista->descripcion))
-          <h3 class="mt-3">Descripción breve</h3>
-          <p class="ml-2 mr-2">{!!$vista->descripcion!!}</p>
-        @endif
 
-        @if (isset($vista->historia))
-          <h3>Historia</h3>
-          <p class="ml-2 mr-2">{!!$vista->historia!!}</p>
-        @endif
-
-        @if (isset($vista->cosmologia))
-          <h3>Cosmología</h3>
-          <p class="ml-2 mr-2">{!!$vista->cosmologia!!}</p>
-        @endif
-        @if (isset($vista->doctrina))
-          <h3>Doctrina</h3>
-          <p class="ml-2 mr-2">{!!$vista->doctrina!!}</p>
-        @endif
-        @if (isset($vista->sagrado))
-          <h3>Lugares y objetos sagrados</h3>
-          <p class="ml-2 mr-2">{!!$vista->sagrado!!}</p>
-        @endif
-        @if (isset($vista->fiestas))
-          <h3>Fiestas y rituales importantes</h3>
-          <p class="ml-2 mr-2">{!!$vista->fiestas!!}</p>
-        @endif
-        @if (isset($vista->politica))
-          <h3>Influencia política</h3>
-          <p class="ml-2 mr-2">{!!$vista->politica!!}</p>
-        @endif
-        @if (isset($vista->estructura))
-          <h3>Estructura</h3>
-          <p class="ml-2 mr-2">{!!$vista->estructura!!}</p>
-        @endif
-        @if (isset($vista->sectas))
-          <h3>Sectas</h3>
-          <p class="ml-2 mr-2">{!!$vista->sectas!!}</p>
-        @endif
-
-        @if (isset($vista->otros))
-        <h3>Otros</h3>
-        <p class="ml-2 mr-2">{!!$vista->otros!!}</p>
-        @endif
-        
       </div>
+
+      {{-- Columna lateral: ficha técnica --}}
       <div class="col-md-4">
-        <div class="card">
-          <div class="card-body contentApp" id="content-right">
+        <div class="card card-dark">
+          <div class="card-header">
+            <h3 class="card-title">Ficha de religión</h3>
+          </div>
+          <div class="card-body" id="content-right">
             <h3>Escudo</h3>
             <div class="row">
-              <img alt="escudo" id="escudo" class="img-fluid" src="{{asset("storage/escudos/{$vista->escudo}")}}" width="300" height="300">
+              <img alt="escudo" id="escudo" class="img-thumbnail shadow-sm mb-3" src="{{asset("storage/escudos/{$religion->escudo}")}}" width="300" height="300">
             </div>
 
-            @if ($vista->fundacion!=0)
-            <h3 class="mt-2">Fecha de fundación</h3>
-            <p class="ml-2 mr-2">{{$fundacion}}</p>
+            @if (isset($religion->lema))
+            <strong><i class="fas fa-feather-alt mr-2"></i>Lema:</strong>
+            <p class="text-muted">{{$religion->lema}}</p>
             @endif
 
-            @if ($vista->disolucion!=0)
-            <h3 class="mt-2">Fecha de disolución</h3>
-            <p class="ml-2 mr-2">{{$disolucion}}</p>
+            @if ($religion->estatus_legal)
+            <strong><i class="fas fa-gavel mr-1"></i>Estatus legal:</strong>
+            <p class="text-muted">{{ $religion->estatus_legal }}</p>
             @endif
 
-            @if (isset($vista->lema))
-            <h3 class="mt-2">Lema</h3>
-            <p class="ml-2 mr-2">{{$vista->lema}}</p>
+            @if ($religion->tipo_teismo)
+            <strong><i class="fas fa-dharmachakra mr-1"></i>Tipo de teísmo:</strong>
+            <p class="text-muted">{{ $religion->tipo_teismo->label() }}</p>
+            @endif
+            
+            @if ($religion->deidades)
+            <strong><i class="fas fa-crown mr-1"></i>Deidades:</strong>
+            <p class="text-muted">{{ $religion->deidades }}</p>
+            @endif
+
+            @if ($religion->fundacion_id)
+            <strong><i class="fas fa-calendar-plus mr-1"></i>Fecha de fundación:</strong>
+            <p class="text-muted">{{ $fundacion }}</p>
+            @endif
+
+            @if ($religion->disolucion_id)
+            <strong><i class="fas fa-calendar-times mr-1"></i>Disolución:</strong>
+            <p class="text-muted">{{ $disolucion}}</p>
             @endif
           </div>
         </div>

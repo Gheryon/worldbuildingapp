@@ -12,13 +12,12 @@ class Fecha extends Model
   use HasFactory;
 
   protected $table = 'fechas';
-  public $timestamps = false;
+  public $timestamps = true;
 
   protected $fillable = [
     'dia',
     'mes',
     'anno',
-    'tabla',
   ];
 
   /**
@@ -30,7 +29,7 @@ class Fecha extends Model
   public static function get_fecha(int $id): ?Fecha
   {
     // Validación de entrada: un ID debe ser un entero positivo y mayor de 2, los id 1 y 2 son reservados.
-    if ($id <= 2) {
+    if ($id <= 1) {
       Log::warning("Intento de obtener una fecha con un ID inválido: {$id}.");
       return null;
     }
@@ -72,7 +71,7 @@ class Fecha extends Model
   public static function get_fecha_string(?int $id): string
   {
     // Si el ID es nulo o 0 (valor por defecto en tu lógica), evitamos la consulta
-    if (!$id || $id <= 2) {
+    if (!$id || $id <= 1) {
       return "Desconocida";
     }
 
@@ -84,7 +83,7 @@ class Fecha extends Model
       }
 
       //si dia y mes son 0, devolvemos solo el año
-      if($fecha->dia == 0 && $fecha->mes == 0) {
+      if ($fecha->dia == 0 && $fecha->mes == 0) {
         return $fecha->anno;
       }
 
@@ -99,29 +98,22 @@ class Fecha extends Model
    * Crea un nuevo registro de fecha y devuelve su ID. Si no se almacena ninguna fecha, devuelve 2.
    *
    * @param int $dia, $mes, $anno
-   * @param string $tabla Nombre de la tabla asociada (ej: 'organizaciones')
    * @return int ID de la fecha creada o 0 si los datos son vacíos.
    */
-  public static function store_fecha($dia = 0, $mes = 0, $anno = 0, $tabla)
+  public static function store_fecha($dia = 0, $mes = 0, $anno = 0)
   {
     // Si no se introduce ningún dato, la fecha es indeterminada, se devuelve 2.
     if ($anno == 0 && $mes == 0 && $dia == 0) {
-      return 2;
+      return null;
     }
 
-    try {
-      $fecha = self::create([
-        'dia'   => $dia,
-        'mes'   => $mes,
-        'anno'  => $anno,
-        'tabla' => $tabla
-      ]);
+    $fecha = self::create([
+      'dia'   => $dia,
+      'mes'   => $mes,
+      'anno'  => $anno,
+    ]);
 
-      return $fecha->id;
-    } catch (\Exception $e) {
-      Log::error("Error al crear fecha para la tabla {$tabla}: " . $e->getMessage());
-      return 2;
-    }
+    return $fecha->id;
   }
 
   /**
@@ -135,7 +127,7 @@ class Fecha extends Model
    */
   public static function update_fecha(int $dia, int $mes, ?int $anno, int $id): bool
   {
-    if ($id <= 2) {
+    if ($id <= 1) {
       Log::warning("Intento de actualizar fechas reservadas o inválidas.", [
         'id' => $id,
       ]);
