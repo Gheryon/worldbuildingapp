@@ -21,48 +21,6 @@ class Fecha extends Model
   ];
 
   /**
-   * Obtiene un registro de fecha específico por su ID. Si no se encuentra, devuelve null.
-   *
-   * @param int $id El ID de la fecha que se desea recuperar.
-   * @return \App\Models\Fecha|null El modelo de la Fecha si se encuentra, null en caso contrario o si hay un error.
-   */
-  public static function get_fecha(int $id): ?Fecha
-  {
-    // Validación de entrada: un ID debe ser un entero positivo y mayor de 2, los id 1 y 2 son reservados.
-    if ($id <= 1) {
-      Log::warning("Intento de obtener una fecha con un ID inválido: {$id}.");
-      return null;
-    }
-
-    try {
-      // Devuelve el modelo encontrado o null si no existe.
-      return self::find($id);
-    } catch (\Illuminate\Database\QueryException $e) {
-      // Captura de errores de la base de datos.
-      Log::error(
-        "Error de base de datos al buscar la fecha con ID: {$id}.",
-        [
-          'id' => $id,
-          'error' => $e->getMessage(),
-          'exception' => $e,
-        ]
-      );
-      return null;
-    } catch (\Exception $e) {
-      // Captura de otra excepción inesperada.
-      Log::critical(
-        "Error inesperado al buscar la fecha con ID: {$id}.",
-        [
-          'id' => $id,
-          'error' => $e->getMessage(),
-          'exception' => $e,
-        ]
-      );
-      return null;
-    }
-  }
-
-  /**
    * Obtiene una fecha en forma de cadena (dia/mes/anno) por su ID. Usada para mostrar fechas en vistas
    *
    * @param int|null $id El ID de la fecha.
@@ -120,12 +78,12 @@ class Fecha extends Model
    * Actualiza una fecha específica en la base de datos según su ID.
    *
    * @param int $id El ID de la fecha que se desea actualizar.
-   * @param int $dia El día de la fecha.
-   * @param int $mes El mes de la fecha.
+   * @param int $dia El día de la fecha (puede ser nulo).
+   * @param int $mes El mes de la fecha (puede ser nulo).
    * @param int|null $anno El año de la fecha (puede ser nulo).
    * @return bool True si la operación fue exitosa, false en caso de error.
    */
-  public static function update_fecha(int $dia, int $mes, ?int $anno, int $id): bool
+  public static function update_fecha(?int $dia, ?int $mes, ?int $anno, int $id): bool
   {
     if ($id <= 1) {
       Log::warning("Intento de actualizar fechas reservadas o inválidas.", [

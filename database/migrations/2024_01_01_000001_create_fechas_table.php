@@ -19,13 +19,13 @@ return new class extends Migration
       $table->id();
 
       // Columnas originales del SQL
-      $table->integer('dia')->default(0);
-      $table->integer('mes')->default(0);
+      $table->integer('dia')->nullable();
+      $table->integer('mes')->nullable();
 
       // 'anno' puede ser negativo para eras antiguas (AC/BC)
       $table->integer('anno')->nullable();
 
-      // Auditoría (opcional, pero recomendada)
+      // Auditoría
       $table->timestamps();
 
       // Índices para búsquedas rápidas por cronología
