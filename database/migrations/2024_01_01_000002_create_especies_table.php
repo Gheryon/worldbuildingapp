@@ -16,20 +16,24 @@ return new class extends Migration
 
       // Información básica y física
       $table->string('nombre', 256);
+      $table->string('reino', 128)->nullable()->comment('Ej: Animalia, Plantae, Fungi, etc.');
+      $table->string('clase_taxonomica', 64)->nullable()->comment('Ej: Mamífero, Reptil, Ave, etc.');
+      $table->string('locomocion', 128)->nullable()->comment('Ej: Terrestre, Acuática, Aérea, etc.');
+      $table->string('organizacion_social', 64)->nullable()->comment('Ej: Solitaria, Manada, Colonial');
       $table->string('edad', 64)->nullable()->comment('Esperanza de vida media');
+      $table->string('mortalidad', 64)->nullable();
       $table->string('peso', 64)->nullable();
       $table->string('altura', 64)->nullable();
       $table->string('longitud', 64)->nullable();
-      $table->string('estatus', 64)->nullable()->comment('Ej: Extinta, En peligro, Común');
-      $table->string('organizacion_social', 64)->nullable();
+      $table->string('estatus', 64)->nullable()->comment('Ej: Extinta, En peligro, Común');;
       $table->string('dieta', 64)->nullable();
       $table->string('rareza', 64)->nullable();
-      $table->string('esperanza_vida_max', 64)->nullable();
 
       // Bloques narrativos (Usamos mediumText para asegurar capacidad)
       $table->mediumText('anatomia')->nullable();
       $table->text('alimentacion')->nullable();
       $table->text('reproduccion')->nullable();
+      $table->text('dimorfismo_sexual')->nullable();
       $table->text('distribucion')->nullable();
       $table->mediumText('habilidades')->nullable();
       $table->text('domesticacion')->nullable();
