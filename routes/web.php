@@ -92,6 +92,7 @@ Route::controller(App\Http\Controllers\EspecieController::class)->group(function
   Route::get('/especies/{id}/edit', 'edit')->name('especie.edit');
   Route::put('/especies/{id}', 'update')->name('especie.update');
   Route::delete('/especie/destroy', 'destroy')->name('especie.destroy');
+  Route::get('/especies/{id}', 'show')->name('especie.show');
 });
 
 /*******imagenes routes********/
@@ -170,7 +171,6 @@ Route::controller(App\Http\Controllers\ArticuloController::class)->group(functio
 
 /*******vistas routes********/
 Route::controller(App\Http\Controllers\VistaController::class)->group(function () {
-  Route::get('/especies/{id}', 'show_especie')->name('especie.show');
   Route::get('/asentamientos/{id}', 'show_asentamiento')->name('asentamiento.show');
   Route::get('/lugares/{id}', 'show_lugar')->name('lugar.show');
   Route::get('/conflictos/{id}', 'show_conflicto')->name('conflicto.show');

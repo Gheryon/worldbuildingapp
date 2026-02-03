@@ -6,14 +6,31 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-<a href="{{route('especie.create')}}" class="btn btn-dark">Nueva especie</a>
+  <a href="{{route('especie.create')}}" class="btn btn-dark">Nueva especie</a>
 </li>
+
+<x-order-input name="orden" label="Orden" :orden="$orden" />
+
 <li class="nav-item ml-2">
-<select id="order" class="form-control ml-2" name="order">
-  <option selected disabled value="ASC">Orden</option>
-  <option value="asc">Ascendente</option>
-  <option value="desc">Descendente</option>
-</select>
+  <a href="{{ route('especies.index') }}" class="btn btn-outline-dark ml-2" title="Limpiar filtros">
+    <i class="fas fa-sync-alt"></i>
+  </a>
+</li>
+@endsection
+
+
+@section('navbar-search')
+<li class="nav-item">
+  <form class="form-inline ml-2" action="{{route('especies.index')}}" method="GET">
+    <div class="input-group">
+      <input type="search" name="search" class="form-control" placeholder="Nombre a buscar">
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-default">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
+    </div>
+  </form>
 </li>
 @endsection
 
@@ -46,9 +63,8 @@
             <input type="hidden" name="id_borrar" id="id_borrar">
             <input type="hidden" name="tipo" id="tipo">
             <input type="hidden" name="nombre_borrado" id="nombre_borrado">
-            <button type="button" id="cancelar-borrar-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+            <button type="button" id="cancelar-borrar-button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
             <button type="submit" id="confirmar-borrar-button" class="btn btn-danger">Eliminar</button>
-            <button type="button" id="cerrar-borrar-button" class="btn btn-primary" data-dismiss="modal" style="display:none">Cerrar</button>
           </form>
         </div>
       </div>
@@ -57,37 +73,25 @@
 </div>
 
 <div class="row">
-@if (Arr::has($especies, 'error.error'))
-  {{Arr::get($especies, 'error.error')}}
-@else
-  @if($especies->count()>0)
-    @foreach($especies as $especie)
-    <div class="col-4 col-sm-6 col-md-4 col-lg-3">
-      <div class="card card-dark card-outline">
-        <div class="card-body box-profile">
-          <h3 class="profile-username text-center">{{$especie->nombre}}</h3>
-        </div>
-        <!-- /.card-body -->
-        <div class="card-footer">
-          <div class="row text-right">
-            <a href="{{route('especie.show',$especie->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-            <a href="{{route('especie.edit',$especie->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-            <button data-id="{{$especie->id}}" data-nombre="{{$especie->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-especie"><i class="fas fa-trash mr-1"></i></button>
-          </div>
-        </div>
-      </div>
+  @forelse($especies as $especie)
+  <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+    <x-especie-card :especie="$especie" />
+  </div>
+  @empty
+  <div class="col-12 text-center mt-5">
+    <div class="callout callout-info">
+      <h5>No se encontraron especies</h5>
+      <p>Intenta ajustar los filtros o crea una nueva.</p>
+      <a href="{{route('especie.create')}}" class="btn btn-dark text-light">Crear nueva especie</a>
     </div>
-    @endforeach
-  @else
-  <div class="col-12">
-    <h5 class="card-title">No hay especies almacenadas</h5>
   </div>
-    </br>
-  <div class="col-12 mt-3">
-    <a href="{{route('especie.create')}}" class="btn btn-dark">Añadir nueva especie</a>
+  @endforelse
+</div>
+
+<div class="row">
+  <div class="col-12 d-flex justify-content-center mt-4">
+    {{ $especies->appends(request()->query())->links('pagination::bootstrap-4') }}
   </div>
-  @endif
-@endif
 </div>
 @endsection
 
@@ -96,12 +100,24 @@
 <script>
   $(function() {
 
-    $(document).on('change', '#order', function(){
-      orden=this.value;
-      let url = "{{ route('especies.index', ['orden'=>'_orden']) }}";
-      url = url.replace('_orden', orden);
-      document.location.href=url;
-    });
+    function redirigirConFiltros() {
+      const orden = $('#order').val();
+      const search = $('input[name="search"]').val();
+
+      // Creamos el objeto de parámetros de búsqueda
+      const params = new URLSearchParams();
+
+      // Solo agregamos los parámetros si tienen un valor útil
+      if (orden) params.append('orden', orden);
+      if (search) params.append('search', search); //Mantiene la búsqueda al filtrar
+
+      // Generamos la URL base desde Laravel
+      const baseUrl = "{{ route('especies.index') }}";
+      const urlFinal = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+      document.location.href = urlFinal;
+    }
+
+    $(document).on('change', '#order', redirigirConFiltros);
   });
 </script>
 @endsection

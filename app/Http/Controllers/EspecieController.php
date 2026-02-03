@@ -14,12 +14,27 @@ class EspecieController extends Controller
   /**
    * Display a listing of the resource.
    */
-  public function index($orden = 'asc')
+  public function index(Request $request)
   {
-    //obtener especies almacenadas
-    $especies = Especie::get_especies();
+    $datosValidados = $request->validate([
+      'orden' => 'sometimes|string|in:asc,desc', // 'sometimes' permite que no esté presente.
+      'search' => 'sometimes|nullable|string|max:100',
+    ], [
+      'orden.in' => 'El orden debe ser ascendente (asc) o descendente (desc).',
+    ]);
 
-    return view('especies.index', ['especies' => $especies, 'orden' => $orden]);
+    // Si la validación falla o el parámetro no está presente, se usan los valores por defecto.
+    $orden = $datosValidados['orden'] ?? 'asc';
+    $terminoBusqueda = $datosValidados['search'] ?? null;
+
+    // Obtener todas las especies almacenadas
+    //$especies = Especie::get_especies();
+    $especies = Especie::filtrar([
+      'orden'  => $orden,
+      'search' => $terminoBusqueda
+    ])->paginate(18);
+
+    return view('especies.index', ['especies' => $especies, 'orden' => $request->orden ?? 'asc']);
   }
 
   /**
@@ -36,83 +51,45 @@ class EspecieController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:256',
-      'estatus' => 'required'
+      'nombre' => 'required|max:255',
+      'estatus' => 'required',
     ]);
 
     try {
-      $especie=new Especie();
-      
-      $especie->nombre=$request->nombre;
-      $especie->save();
-  
-      $id_especie=DB::scalar("SELECT MAX(id) as id FROM especies");
-    } catch(\Illuminate\Database\QueryException $excepcion){
-      Log::error('EspecieController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('especies.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
-    }catch(Exception $excepcion){
-      Log::error('EspecieController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('especies.index')->with('error', $excepcion->getMessage());
-    }
+      $especie = Especie::store_especie($request);
 
-    if ($request->filled('edad')) {
-      $especie->edad = $request->edad;
-    }
-    if ($request->filled('estatus')) {
-      $especie->estatus = $request->estatus;
-    }
-    if ($request->filled('peso')) {
-      $especie->peso = $request->peso;
-    }
-    if ($request->filled('altura')) {
-      $especie->altura = $request->altura;
-    }
-    if ($request->filled('longitud')) {
-      $especie->longitud = $request->longitud;
-    }
-    if ($request->filled('anatomia')) {
-      $especie->anatomia = app(ImagenController::class)->store_for_summernote($request->anatomia, "especies", $id_especie);
-    }
-    if ($request->filled('alimentacion')) {
-      $especie->alimentacion = app(ImagenController::class)->store_for_summernote($request->alimentacion, "especies", $id_especie);
-    }
-    if ($request->filled('reproduccion')) {
-      $especie->reproduccion = app(ImagenController::class)->store_for_summernote($request->reproduccion, "especies", $id_especie);
-    }
-    if ($request->filled('distribucion')) {
-      $especie->distribucion = app(ImagenController::class)->store_for_summernote($request->distribucion, "especies", $id_especie);
-    }
-    if ($request->filled('habilidades')) {
-      $especie->habilidades = app(ImagenController::class)->store_for_summernote($request->habilidades, "especies", $id_especie);
-    }
-    if ($request->filled('domesticacion')) {
-      $especie->domesticacion = app(ImagenController::class)->store_for_summernote($request->domesticacion, "especies", $id_especie);
-    }
-    if ($request->filled('explotacion')) {
-      $especie->explotacion = app(ImagenController::class)->store_for_summernote($request->explotacion, "especies", $id_especie);
-    }
-    if ($request->filled('otros')) {
-      $especie->otros = app(ImagenController::class)->store_for_summernote($request->otros, "especies", $id_especie);
-    }
-
-    try {
-      $especie->save();
-      return redirect()->route('especies.index')->with('message', 'Especie ' . $especie->nombre . ' añadida correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('EspecieController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('especies.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      Log::error('EspecieController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('especies.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('especies.index')
+        ->with('success', 'Especie ' . $especie->nombre . ' añadida correctamente.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error("Error de base de datos al añadir especie.", [
+        'entrada_input' => $request->all(),
+        'error' => $e->getMessage()
+      ]);
+      return redirect()->back()->withInput()->with('error', 'Error en la base de datos al crear la especie.');
+    } catch (\Exception $e) {
+      Log::critical("Error inesperado al añadir especie.", [
+        'entrada_input' => $request->all(),
+        'error' => $e->getMessage()
+      ]);
+      return redirect()->back()->withInput()->with('error', 'No se pudo crear: ' . $e->getMessage());
     }
   }
 
   /**
    * Display the specified resource.
    */
-  public function show(Request $request)
+  public function show($id)
   {
-    //
+    try {
+      // Cargamos la especie con sus fechas
+      $especie = Especie::findOrFail($id);
+
+      return view('especies.show', compact('especie'));
+    } catch (\Exception $e) {
+      Log::error("Error al mostrar especie: " . $e->getMessage());
+      return redirect()->route('especies.index')
+        ->with('error', 'Especie no encontrada.');
+    }
   }
 
   /**
@@ -120,81 +97,45 @@ class EspecieController extends Controller
    */
   public function edit($id)
   {
-    //obtener especie
-    $especie = Especie::get_personaje($id);
-    if ($especie['error'] ?? false) {
-      return redirect()->route('especies.index')->with('error', $especie['error']['error']);
+    try {
+      //obtener especie
+      $especie = Especie::findOrFail($id);
+      return view('especies.edit', compact('especie'));
+    } catch (\Exception $e) {
+      // Si hay un error de lógica, redirigimos con un mensaje flash
+      return redirect()->route('especies.index')
+        ->with('error', 'No se pudo cargar la especie: ' . $e->getMessage());
     }
-    return view('especies.edit', ['especie' => $especie]);
   }
 
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, Especie $especie)
+  public function update(Request $request, $id)
   {
     $request->validate([
-      'nombre' => 'required|max:256',
-      'estatus' => 'required'
+      'nombre' => 'required|max:255',
+      'estatus' => 'required',
     ]);
 
-    //obtener especie
-    $especie = Especie::get_personaje($request->id);
-    if ($especie['error'] ?? false) {
-      return redirect()->route('especies.index')->with('error', $especie['error']['error']);
-    }
-
-    $especie->nombre = $request->nombre;
-
-    if ($request->filled('edad')) {
-      $especie->edad = $request->edad;
-    }
-    if ($request->filled('estatus')) {
-      $especie->estatus = $request->estatus;
-    }
-    if ($request->filled('peso')) {
-      $especie->peso = $request->peso;
-    }
-    if ($request->filled('altura')) {
-      $especie->altura = $request->altura;
-    }
-    if ($request->filled('longitud')) {
-      $especie->longitud = $request->longitud;
-    }
-    if ($request->filled('anatomia')) {
-      $especie->anatomia = app(ImagenController::class)->update_for_summernote($request->anatomia, "especies", $request->id);
-    }
-    if ($request->filled('alimentacion')) {
-      $especie->alimentacion = app(ImagenController::class)->update_for_summernote($request->alimentacion, "especies", $request->id);
-    }
-    if ($request->filled('reproduccion')) {
-      $especie->reproduccion = app(ImagenController::class)->update_for_summernote($request->reproduccion, "especies", $request->id);
-    }
-    if ($request->filled('distribucion')) {
-      $especie->distribucion = app(ImagenController::class)->update_for_summernote($request->distribucion, "especies", $request->id);
-    }
-    if ($request->filled('habilidades')) {
-      $especie->habilidades = app(ImagenController::class)->update_for_summernote($request->habilidades, "especies", $request->id);
-    }
-    if ($request->filled('domesticacion')) {
-      $especie->domesticacion = app(ImagenController::class)->update_for_summernote($request->domesticacion, "especies", $request->id);
-    }
-    if ($request->filled('explotacion')) {
-      $especie->explotacion = app(ImagenController::class)->update_for_summernote($request->explotacion, "especies", $request->id);
-    }
-    if ($request->filled('otros')) {
-      $especie->otros = app(ImagenController::class)->update_for_summernote($request->otros, "especies", $request->id);
-    }
-
     try {
-      $especie->save();
-      return redirect()->route('especies.index')->with('message', 'Especie ' . $especie->nombre . ' editada correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('EspecieController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('especies.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      Log::error('EspecieController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('especies.index')->with('error', $excepcion->getMessage());
+      $especie = Especie::findOrFail($id);
+      $especie->update_especie($request);
+
+      return redirect()->route('especies.index')
+        ->with('success', 'Especie ' . $especie->nombre . ' actualizada correctamente.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error("Error de base de datos al actualizar especie.", [
+        'entrada_input' => $request->all(),
+        'error' => $e->getMessage()
+      ]);
+      return redirect()->back()->withInput()->with('error', 'Error en la base de datos al actualizar la especie.');
+    } catch (\Exception $e) {
+      Log::critical("Error inesperado al actualizar especie.", [
+        'entrada_input' => $request->all(),
+        'error' => $e->getMessage()
+      ]);
+      return redirect()->back()->withInput()->with('error', 'No se pudo actualizar: ' . $e->getMessage());
     }
   }
 
@@ -203,29 +144,24 @@ class EspecieController extends Controller
    */
   public function destroy(Request $request)
   {
+    $id = $request->id_borrar;
+
     try {
-      //borrado de las imagenes que pueda haber de summernote
-      $imagenes = DB::table('imagenes')
-        ->select('id', 'nombre')
-        ->where('table_owner', '=', 'especies')
-        ->where('owner', '=', $request->id_borrar)->get();
+      $especie = Especie::findOrFail($id);
+      $nombre = $especie->nombre;
 
-      foreach ($imagenes as $imagen) {
-        if (file_exists(public_path("/storage/imagenes/" . $imagen->nombre))) {
-          unlink(public_path("/storage/imagenes/" . $imagen->nombre));
-          //Storage::delete(asset($imagen->nombre));
-        }
-        imagen::destroy($imagen->id);
-      }
-      Especie::destroy($request->id_borrar);
+      $especie->delete_especie();
 
-      return redirect()->route('especies.index')->with('message', $request->nombre_borrado . ' borrado correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('EspecieController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('especies.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo borrar.');
-    } catch (Exception $excepcion) {
-      Log::error('EspecieController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('especies.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('especies.index')
+        ->with('success', "La especie '{$nombre}' y sus recursos han sido eliminados.");
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+      return redirect()->route('especies.index')
+        ->with('error', 'La especie que intenta eliminar no existe.');
+    } catch (\Exception $e) {
+      Log::error("Error crítico al eliminar especie ID {$id}: " . $e->getMessage());
+
+      return redirect()->route('especies.index')
+        ->with('error', 'No se pudo completar la eliminación debido a un error interno.');
     }
   }
 }

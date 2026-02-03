@@ -36,17 +36,6 @@ $(document).ready(function () {
     $('#descripcion').summernote('reset');
   });
 
-  //lleva el id a borrar al modal de confirmacion de las vistas index
-  $(document).on('click', '.borrar', (e) => {
-    const elemento=$(this)[0].activeElement;
-    const nombre = elemento.getAttribute('data-nombre');
-    const id = elemento.getAttribute('data-id');
-
-    $('#id_borrar').val(id);
-    $('#nombre-borrar').html(nombre);
-    $('#nombre_borrado').val(nombre);
-  });
-
   //lleva datos al modal editar enlace
   $(document).on('click', '.editar-enlace', (e) => {
     const elemento=$(this)[0].activeElement;
@@ -73,4 +62,29 @@ $(document).ready(function () {
     $('#nombres_editar').val(nombre);
   });
 
+  //lleva el id a borrar al modal de confirmacion de las vistas index
+  $(document).on('click', '.borrar', function(e) {
+    const btn = $(this); 
+    
+    const nombre = btn.data('nombre'); // jQuery busca automáticamente 'data-nombre'
+    const id = btn.data('id');
+
+    // Referencias al modal
+    const $modal = $('#eliminar-especie');
+
+    // Llenamos los campos usando IDs únicos para evitar colisiones
+    $modal.find('#id_borrar').val(id);
+    $modal.find('#nombre-borrar').text(nombre); 
+    $modal.find('#nombre_borrado').val(nombre);
+    
+    if(tipo) {
+        $modal.find('#tipo').val(tipo);
+    }
+  });
+
+  //evita el doble envio en el formulario de borrar
+  $('#form-confirmar-borrar').on('submit', function() {
+    const $btn = $(this).find('#confirmar-borrar-button');
+    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Eliminando...');
+});
 });
