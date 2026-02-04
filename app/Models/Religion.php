@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Collection;
 use App\Services\ImageService;
 use App\Enums\TipoTeismo;
@@ -210,15 +211,15 @@ class Religion extends Model
       }
 
       //Procesar Fechas, si existe fundacion_id o disolucion_id se actualiza, si no se crea
-      if($this->fundacion_id){
+      if ($this->fundacion_id) {
         Fecha::update_fecha($request->dia_fundacion, $request->mes_fundacion, $request->anno_fundacion, $this->fundacion_id);
-      }else{
+      } else {
         $this->fundacion_id = Fecha::store_fecha($request->dia_fundacion, $request->mes_fundacion, $request->anno_fundacion);
       }
 
-      if($this->disolucion_id){
+      if ($this->disolucion_id) {
         Fecha::update_fecha($request->dia_disolucion, $request->mes_disolucion, $request->anno_disolucion, $this->disolucion_id);
-      }else{
+      } else {
         $this->disolucion_id = Fecha::store_fecha($request->dia_disolucion, $request->mes_disolucion, $request->anno_disolucion);
       }
 
@@ -246,5 +247,49 @@ class Religion extends Model
       return $nombreArchivo;
     }
     return "default.png";
+  }
+
+  /**
+   * Elimina la religión y sus recursos asociados (imágenes).
+   * * @return void
+   */
+  public function delete_religion()
+  {
+    return DB::transaction(function () {
+      // Obtener y eliminar imágenes físicas del disco
+      $imagenes = DB::table('imagenes')
+        ->where('table_owner', 'religiones')
+        ->where('owner', $this->id)
+        ->get();
+
+      foreach ($imagenes as $imagen) {
+        $path = public_path("/storage/imagenes/{$imagen->nombre}");
+        if (file_exists($path)) {
+          unlink($path);
+        }
+      }
+
+      //Limpiar registros de la tabla imagenes
+      DB::table('imagenes')
+        ->where('table_owner', 'religiones')
+        ->where('owner', $this->id)
+        ->delete();
+
+         //Borrar el escudo físico sin borrar el default
+      if ($this->escudo && $this->escudo !== 'default.png') {
+        Storage::disk('public')->delete('escudos/' . $this->escudo);
+      }
+
+      //eliminar fechas
+      if ($this->fundacion_id) {
+        Fecha::destroy($this->fundacion_id);
+      }
+      if ($this->disolucion_id) {
+        Fecha::destroy($this->disolucion_id);
+      }
+
+      // Eliminar la religion
+      return $this->delete();
+    });
   }
 }

@@ -37,38 +37,6 @@
 </div>
 <hr>
 
-<!-- Modal -->
-<div class="modal fade" id="eliminar-religion" tabindex="-1" role="dialog" aria-labelledby="Confirmar eliminacion" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="card card-danger">
-        <div class="card-header">
-          <h5 class="card-title" id="confirmar_eliminacion">Confirmar eliminación</h5>
-          <button data-dismiss="modal" aria-label="close" class="close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <p> ¿Borrar religion: <span id="nombre-borrar"> </span>?</p>
-          </div>
-        </div>
-        <div class="card-footer">
-          <form id="form-confirmar-borrar" class="col-md-auto" action="{{route('religion.destroy')}}" method="POST">
-            @csrf
-            @method('DELETE')
-            <input type="hidden" name="id_borrar" id="id_borrar">
-            <input type="hidden" name="tipo" id="tipo">
-            <input type="hidden" name="nombre_borrado" id="nombre_borrado">
-            <button type="button" id="cancelar-borrar-button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-            <button type="submit" id="confirmar-borrar-button" class="btn btn-danger">Eliminar</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="row">
   @forelse($religiones as $religion)
   <div class="col-6 col-sm-6 col-md-6 col-lg-6">
@@ -96,6 +64,18 @@
   </div>
   @endforelse
 </div>
+
+<div class="row">
+  <div class="col-12 d-flex justify-content-center mt-4">
+    {{ $religiones->appends(request()->query())->links('pagination::bootstrap-4') }}
+  </div>
+</div>
+
+<x-modal-delete 
+    id="eliminar-religion" 
+    :route="route('religion.destroy')" 
+    message="Estás a punto de eliminar la siguiente religión de forma permanente:"
+/>
 @endsection
 
 @section('specific-scripts')

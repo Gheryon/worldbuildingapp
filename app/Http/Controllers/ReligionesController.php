@@ -177,6 +177,26 @@ class ReligionesController extends Controller
    */
   public function destroy(Request $request)
   {
+    $id = $request->id_borrar;
+
+    try {
+      $religion = Religion::findOrFail($id);
+      $nombre = $religion->nombre;
+
+      $religion->delete_religion();
+
+      return redirect()->route('religiones.index')
+        ->with('success', "La religión '{$nombre}' y sus recursos han sido eliminados.");
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+      return redirect()->route('religiones.index')
+        ->with('error', 'La religión que intenta eliminar no existe.');
+    } catch (\Exception $e) {
+      Log::error("Error crítico al eliminar religión ID {$id}: " . $e->getMessage());
+
+      return redirect()->route('religiones.index')
+        ->with('error', 'No se pudo completar la eliminación debido a un error interno.');
+    }
+
     try {
       $fundacion = DB::scalar("SELECT fundacion FROM religiones where id = ?", [$request->id_borrar]);
       $disolucion = DB::scalar("SELECT disolucion FROM religiones where id = ?", [$request->id_borrar]);
