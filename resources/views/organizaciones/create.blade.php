@@ -60,20 +60,20 @@
                 @enderror
               </div>
               <div class="col-md">
-                <label for="select_ruler" class="form-label">Soberano</label>
-                <select class="form-select form-control" name="select_ruler" id="select_ruler">
+                <label for="select_lider" class="form-label">Soberano</label>
+                <select class="form-select form-control" name="select_lider" id="select_lider">
                   <option selected disabled value="">Elegir</option>
-                  @foreach($personajes as $personaje)
-                  <option value="{{$personaje->id}}">{{$personaje->nombre}}</option>
+                  @foreach($personajes as $id => $nombre)
+                  <option value="{{$id}}">{{$nombre}}</option>
                   @endforeach
                 </select>
               </div>
               <div class="col-md">
-                <label for="select_owner" class="form-label">Controlado por</label>
-                <select class="form-select form-control" name="select_owner" id="select_owner">
+                <label for="select_organizacion_padre" class="form-label">Controlado por</label>
+                <select class="form-select form-control" name="select_organizacion_padre" id="select_organizacion_padre">
                   <option selected disabled value="">Elegir</option>
-                  @foreach($paises as $pais)
-                  <option value="{{$pais->id}}">{{$pais->nombre}}</option>
+                  @foreach($paises as $id => $nombre)
+                  <option value="{{$id}}">{{$nombre}}</option>
                   @endforeach
                 </select>
               </div>
@@ -94,8 +94,8 @@
                 <div class="form-group">
                   <label for="religiones" class="form-label mt-2">Religiones presentes</label>
                   <select class="select2" multiple="multiple" name="religiones[]" id="religiones" data-placeholder="Selecciona religiones...">
-                    @foreach($religiones as $religion)
-                    <option value="{{$religion->id}}" {{ (is_array(old('religiones')) && in_array($religion->id, old('religiones'))) ? 'selected' : '' }}>{{$religion->nombre}}</option>
+                    @foreach($religiones as $id => $nombre)
+                    <option value="{{$id}}" {{ (is_array(old('religiones')) && in_array($id, old('religiones'))) ? 'selected' : '' }}>{{$nombre}}</option>
                     @endforeach
                   </select>
                 </div>

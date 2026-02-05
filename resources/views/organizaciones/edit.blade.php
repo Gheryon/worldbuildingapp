@@ -52,7 +52,7 @@
                   <option selected disabled value="">Elegir</option>
                   @if($tipo_organizacion->count()>0)
                   @foreach($tipo_organizacion as $tipo)
-                  <option value="{{$tipo->id}}" {{ $organizacion->id_tipo_organizacion == $tipo->id ? 'selected' : '' }}>{{$tipo->nombre}}</option>
+                  <option value="{{$tipo->id}}" {{ old('select_tipo', $organizacion->tipo_organizacion_id) == $tipo->id ? 'selected' : '' }}>{{$tipo->nombre}}</option>
                   @endforeach
                   @endif
                 </select>
@@ -61,30 +61,30 @@
                 @enderror
               </div>
               <div class="col-md">
-                <label for="select_ruler" class="form-label">Soberano</label>
-                <select class="form-select form-control" name="select_ruler" id="select_ruler">
+                <label for="select_lider" class="form-label">Soberano</label>
+                <select class="form-select form-control" name="select_lider" id="select_lider">
                   <option selected disabled value="">Elegir</option>
-                  @foreach($personajes as $personaje)
-                  <option value="{{$personaje->id}}" {{ $organizacion->id_ruler == $personaje->id ? 'selected' : '' }}>{{$personaje->nombre}}</option>
+                  @foreach($personajes as $id => $nombre)
+                  <option value="{{$id}}" {{ old('select_lider', $organizacion->lider_id) == $id ? 'selected' : '' }}>{{$nombre}}</option>
                   @endforeach
                 </select>
               </div>
               <div class="col-md">
-                <label for="select_owner" class="form-label">Controlado por</label>
-                <select class="form-select form-control" name="select_owner" id="select_owner">
+                <label for="select_organizacion_padre" class="form-label">Controlado por</label>
+                <select class="form-select form-control" name="select_organizacion_padre" id="select_organizacion_padre">
                   <option selected disabled value="">Elegir</option>
-                  @foreach($paises as $pais)
-                  <option value="{{$pais->id}}" {{ $organizacion->id_owner == $pais->id ? 'selected' : '' }}>{{$pais->nombre}}</option>
+                  @foreach($paises as $id => $nombre)
+                  <option value="{{$id}}" {{ old('select_organizacion_padre', $organizacion->organizacion_padre_id) == $id ? 'selected' : '' }}>{{$nombre}}</option>
                   @endforeach
                 </select>
               </div>
             </div>
             <div class="row">
               <div class="col-md">
-                <x-date-input-group name="fundacion" label="Fecha de fundación" :id="$organizacion->fundacion" :dia="$fundacion->dia ?? ''" :mes="$fundacion->mes ?? ''" :anno="$fundacion->anno ?? ''" />
+                <x-date-input-group name="fundacion" label="Fecha de fundación" :id="$organizacion->fundacion_id" :dia="$organizacion->fecha_fundacion->dia ?? ''" :mes="$organizacion->fecha_fundacion->mes ?? ''" :anno="$organizacion->fecha_fundacion->anno ?? ''"/>
               </div>
               <div class="col-md">
-                <x-date-input-group name="disolucion" label="Fecha de disolución" :id="$organizacion->disolucion" :dia="$disolucion->dia ?? ''" :mes="$disolucion->mes ?? ''" :anno="$disolucion->anno ?? ''" />
+                <x-date-input-group name="disolucion" label="Fecha de disolución" :id="$organizacion->disolucion_id" :dia="$organizacion->fecha_disolucion->dia ?? ''" :mes="$organizacion->fecha_disolucion->mes ?? ''" :anno="$organizacion->fecha_disolucion->anno ?? ''" />
               </div>
             </div>
             <div class="row">
@@ -95,9 +95,15 @@
                 <div class="form-group">
                   <label for="religiones" class="form-label mt-2">Religiones presentes</label>
                   <select class="select2" multiple="multiple" name="religiones[]" id="religiones" data-placeholder="Selecciona religiones...">
-                    @foreach($religiones as $religion)
-                    <option value="{{$religion->id}}" {{ (collect($religiones_p)->contains('religion', $religion->id)) ? 'selected' : '' }}>>{{$religion->nombre}}</option>
+                    @php
+                    // Determinamos los IDs seleccionados: prioridad a old() tras error de validación,
+                    // si no, usamos los IDs que ya tiene la organización en la BD.
+                    $selectedIds = old('religiones', $organizacion->religiones->pluck('id')->toArray());
+                    @endphp
+                    @foreach($religiones as $id => $nombre)
+                    <option value="{{$id}}" {{ in_array($id, $selectedIds) ? 'selected' : '' }}>{{$nombre}}</option>
                     @endforeach
+
                   </select>
                 </div>
               </div>
@@ -147,7 +153,7 @@
             <div class="row">
               <div class="col-md-6">
                 <x-textarea-input name="geopolitica" label="Política exterior e interior" :value="$organizacion->geopolitica" />
-                <x-textarea-input name="militar" label="Militar" />
+                <x-textarea-input name="militar" label="Militar" :value="$organizacion->militar" />
               </div>
               <div class="col-md-6">
                 <x-textarea-input name="territorio" label="Territorio y fronteras" :value="$organizacion->territorio" />

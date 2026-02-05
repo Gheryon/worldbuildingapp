@@ -60,14 +60,14 @@ class OrganizacionController extends Controller
     // Obtener todos los tipos de organizacion almacenados
     $tipo_organizacion = tipo_organizacion::get_tipos_organizaciones();
 
-    // Obtener todos los personajes almacenados
-    $personajes = personaje::get_personajes_id_nombre();
+    // Obtener id y nombre de todos los personajes almacenados
+    $personajes = personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
-    //obtener todas las religiones
-    $religiones = Religion::get_religiones();
+    //obtener id y nombre de todas las religiones
+    $religiones = Religion::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
     // Obtener todos los paises almacenados, sólo id y nombre
-    $paises = Organizacion::get_organizaciones_id_nombre();
+    $paises = Organizacion::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
     return view('organizaciones.create', compact('tipo_organizacion', 'paises', 'personajes', 'religiones'));
   }
@@ -82,16 +82,21 @@ class OrganizacionController extends Controller
       'lema' => 'nullable|max:512',
       'gentilicio' => 'nullable|max:128',
       'capital' => 'nullable|max:128',
-      'escudo' => 'file|image|mimes:jpg,png,gif|max:10240',
-      'dfundacion' => 'nullable|integer|min:1|max:30',
-      'ddisolucion' => 'nullable|integer|min:1|max:30',
+      'escudo' => 'nullable|file|image|mimes:jpg,png,gif|max:10240',
+      //selects
       'religiones' => 'nullable|array',
       'religiones.*' => 'exists:religiones,id',
       'select_tipo' => 'required|exists:tipo_organizacion,id',
-      'select_ruler' => 'nullable',
-      'select_ruler.*' => 'exists:personajes,id',
-      'select_owner' => 'nullable',
-      'select_owner.*' => 'exists:organizaciones,id',
+      'select_lider' => 'nullable|exists:personajes,id',
+      'select_organizacion_padre' => 'nullable',
+      'select_organizacion_padre.*' => 'exists:organizaciones,id',
+      //fechas
+      'dia_fundacion' => 'nullable|integer|min:1|max:30',
+      'mes_fundacion' => 'nullable|integer',
+      'anno_fundacion' => 'nullable|integer',
+      'dia_disolucion' => 'nullable|integer|min:1|max:30',
+      'mes_disolucion' => 'nullable|integer',
+      'anno_disolucion' => 'nullable|integer',
     ]);
 
     try {
@@ -135,19 +140,18 @@ class OrganizacionController extends Controller
     try {
       // Cargamos la organización con sus fechas, tipo, religiones y ruler
       $organizacion = Organizacion::with([
-        'fecha_fundacion',
-        'fecha_disolucion',
         'religiones',
         'tipo',
-        'ruler',
-        'subordinates'=> function ($query) {
-                $query->orderBy('nombre', 'asc');
-            }
+        'lider',
+        'organizacion_padre',
+        'subordinates' => function ($query) {
+          $query->orderBy('nombre', 'asc');
+        }
       ])->findOrFail($id);
 
       // Formateamos las fechas para la vista
-      $fundacion = Fecha::get_fecha_string($organizacion->fundacion);
-      $disolucion = Fecha::get_fecha_string($organizacion->disolucion);
+      $fundacion = Fecha::get_fecha_string($organizacion->fundacion_id);
+      $disolucion = Fecha::get_fecha_string($organizacion->disolucion_id);
 
       return view('organizaciones.show', compact('organizacion', 'fundacion', 'disolucion'));
     } catch (\Exception $e) {
@@ -164,28 +168,21 @@ class OrganizacionController extends Controller
   {
     try {
       // Obtener la organizacion a editar
-      $organizacion = Organizacion::findOrFail($id);
+      $organizacion = Organizacion::with(['religiones', 'fecha_fundacion', 'fecha_disolucion'])->findOrFail($id);
 
       // Obtener todos los tipos de organizacion almacenados
       $tipo_organizacion = tipo_organizacion::get_tipos_organizaciones();
 
       // Obtener todos los personajes almacenados
-      $personajes = personaje::get_personajes_id_nombre();
+      $personajes = personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
-      // Obtener todos los paises almacenados
-      $paises = Organizacion::get_organizaciones_id_nombre();
+      //obtener id y nombre de todas las religiones
+      $religiones = Religion::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
-      //obtener todas las religiones
-      $religiones = Religion::get_religiones();
+      // Obtener todos los paises almacenados, sólo id y nombre
+      $paises = Organizacion::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
-      //Obtener religiones presentes en la organizacion
-      $religiones_p = Organizacion::get_religiones_presentes($id);
-
-      //obtener fechas
-      $fundacion = Fecha::find($organizacion->fundacion);
-      $disolucion = Fecha::find($organizacion->disolucion);
-
-      return view('organizaciones.edit', compact('organizacion', 'fundacion', 'disolucion', 'tipo_organizacion', 'personajes', 'paises', 'religiones', 'religiones_p'));
+      return view('organizaciones.edit', compact('organizacion', 'tipo_organizacion', 'personajes', 'paises', 'religiones'));
     } catch (\Exception $e) {
       // Si hay un error de lógica, redirigimos con un mensaje flash
       return redirect()->route('organizaciones.index')
@@ -203,16 +200,21 @@ class OrganizacionController extends Controller
       'lema' => 'nullable|max:512',
       'gentilicio' => 'nullable|max:128',
       'capital' => 'nullable|max:128',
-      'escudo' => 'sometimes|file|image|mimes:jpg,png,gif|max:10240',
-      'dfundacion' => 'nullable|integer|min:1|max:30',
-      'ddisolucion' => 'nullable|integer|min:1|max:30',
+      'escudo' => 'nullable|file|image|mimes:jpg,png,gif|max:10240',
+      //selects
       'religiones' => 'nullable|array',
       'religiones.*' => 'exists:religiones,id',
       'select_tipo' => 'required|exists:tipo_organizacion,id',
-      'select_ruler' => 'nullable',
-      'select_ruler.*' => 'exists:personajes,id',
-      'select_owner' => 'nullable',
-      'select_owner.*' => 'exists:organizaciones,id',
+      'select_lider' => 'nullable|exists:personajes,id',
+      'select_organizacion_padre' => 'nullable',
+      'select_organizacion_padre.*' => 'exists:organizaciones,id',
+      //fechas
+      'dia_fundacion' => 'nullable|integer|min:1|max:30',
+      'mes_fundacion' => 'nullable|integer',
+      'anno_fundacion' => 'nullable|integer',
+      'dia_disolucion' => 'nullable|integer|min:1|max:30',
+      'mes_disolucion' => 'nullable|integer',
+      'anno_disolucion' => 'nullable|integer',
     ]);
 
     try {

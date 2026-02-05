@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Collection;
 use App\Services\ImageService;
 
 class Organizacion extends Model
@@ -16,13 +15,14 @@ class Organizacion extends Model
 
   protected $table = 'organizaciones';
   protected $primaryKey = 'id';
-  public $timestamps = false;
+  public $timestamps = true;
 
   protected $fillable = [
     'nombre',
     'gentilicio',
-    'capital',
     'escudo',
+    'estatus',
+    'capital_nombre',
     'descripcion_breve',
     'lema',
     'demografia',
@@ -38,19 +38,21 @@ class Organizacion extends Model
     'economia',
     'recursos_naturales',
     'otros',
-    'id_ruler',
-    'id_owner',
-    'id_tipo_organizacion',
-    'fundacion',
-    'disolucion',
+    'lider_id',
+    'asentamiento_id',
+    'organizacion_padre_id',
+    'tipo_organizacion_id',
+    'fundacion_id',
+    'disolucion_id',
   ];
 
   protected $casts = [
-    'fundacion' => 'integer',
-    'disolucion' => 'integer',
-    'id_ruler' => 'integer',
-    'id_owner' => 'integer',
-    'id_tipo_organizacion' => 'integer',
+    'fundacion_id' => 'integer',
+    'disolucion_id' => 'integer',
+    'lider_id' => 'integer',
+    'asentamiento_id' => 'integer',
+    'organizacion_padre_id' => 'integer',
+    'tipo_organizacion_id' => 'integer',
   ];
 
   /**
@@ -58,7 +60,7 @@ class Organizacion extends Model
    */
   public function fecha_fundacion(): BelongsTo
   {
-    return $this->belongsTo(Fecha::class, 'fundacion', 'id');
+    return $this->belongsTo(Fecha::class, 'fundacion_id'); //en laravel 10 no hace falta especificar la clave foránea si sigue la convención
   }
 
   /**
@@ -66,7 +68,7 @@ class Organizacion extends Model
    */
   public function fecha_disolucion(): BelongsTo
   {
-    return $this->belongsTo(Fecha::class, 'disolucion', 'id');
+    return $this->belongsTo(Fecha::class, 'disolucion_id');
   }
 
   /**
@@ -82,23 +84,23 @@ class Organizacion extends Model
    */
   public function tipo(): BelongsTo
   {
-    return $this->belongsTo(tipo_organizacion::class, 'id_tipo_organizacion');
+    return $this->belongsTo(tipo_organizacion::class, 'tipo_organizacion_id');
   }
 
   /**
-   * Relación con el personaje que gobierna (ruler).
+   * Relación con el personaje que gobierna (lider).
    */
-  public function ruler(): BelongsTo
+  public function lider(): BelongsTo
   {
-    return $this->belongsTo(personaje::class, 'id_ruler');
+    return $this->belongsTo(personaje::class, 'lider_id');
   }
 
   /**
-   * Relación con la organización de la que depende (owner).
+   * Relación con la organización de la que depende (organizacion_padre).
    */
-  public function owner(): BelongsTo
+  public function organizacion_padre(): BelongsTo
   {
-    return $this->belongsTo(Organizacion::class, 'id_owner');
+    return $this->belongsTo(Organizacion::class, 'organizacion_padre_id');
   }
 
   /**
@@ -106,7 +108,7 @@ class Organizacion extends Model
    */
   public function subordinates(): \Illuminate\Database\Eloquent\Relations\HasMany
   {
-    return $this->hasMany(Organizacion::class, 'id_owner', 'id');
+    return $this->hasMany(Organizacion::class, 'organizacion_padre_id', 'id');
   }
 
   /**
@@ -114,13 +116,12 @@ class Organizacion extends Model
    */
   public function scopeFiltrar($query, $filtros)
   {
-    return $query->leftJoin('tipo_organizacion', 'organizaciones.id_tipo_organizacion', '=', 'tipo_organizacion.id')
+    return $query->leftJoin('tipo_organizacion', 'organizaciones.tipo_organizacion_id', '=', 'tipo_organizacion.id')
       ->select(
         'organizaciones.id',
         'organizaciones.nombre',
-        'organizaciones.descripcion_breve',
         'organizaciones.escudo',
-        'organizaciones.id_tipo_organizacion',
+        'organizaciones.tipo_organizacion_id',
         DB::raw('COALESCE(tipo_organizacion.nombre, "Tipo de organización desconocido") as tipo')
       )
       ->where('organizaciones.id', '!=', 0)
@@ -128,7 +129,7 @@ class Organizacion extends Model
         $q->where('organizaciones.nombre', 'LIKE', "%{$search}%");
       })
       ->when($filtros['tipo'] ?? null, function ($q, $tipo) {
-        if ($tipo > 0) $q->where('organizaciones.id_tipo_organizacion', $tipo);
+        if ($tipo > 0) $q->where('organizaciones.tipo_organizacion_id', $tipo);
       })
       ->orderBy('organizaciones.nombre', $filtros['orden'] ?? 'asc');
   }
@@ -145,11 +146,11 @@ class Organizacion extends Model
       $organizacion = self::create([
         'nombre' => $request->nombre,
         'gentilicio' => $request->gentilicio,
-        'capital' => $request->capital,
+        'capital_nombre' => $request->capital,
         'lema' => $request->lema,
-        'id_ruler' => $request->select_ruler,
-        'id_owner' => $request->select_owner,
-        'id_tipo_organizacion' => $request->select_tipo,
+        'lider_id' => $request->select_lider,
+        'organizacion_padre_id' => $request->select_organizacion_padre,
+        'tipo_organizacion_id' => $request->select_tipo,
         'escudo' => 'default.png', // Valor temporal, se actualizará después
       ]);
 
@@ -180,27 +181,29 @@ class Organizacion extends Model
           //$organizacion->$columna = app(ImagenController::class)
           //->store_for_summernote($request->$input, "organizaciones", $organizacion->id);
           $organizacion->$columna = $imageService->processSummernoteImages(
-            $request->$columna,
+            $request->$input,
             "organizaciones",
             $organizacion->id
           );
         }
       }
 
-      // Manejo de Fechas
-      $organizacion->fundacion = Fecha::store_fecha(
-        $request->input('dfundacion', 0),
-        $request->input('mfundacion', 0),
-        $request->input('afundacion', 0),
-        'organizaciones'
-      );
+      //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
+      if ($request->filled('anno_fundacion')) {
+        $organizacion->fundacion_id = Fecha::store_fecha(
+          $request->dia_fundacion,
+          $request->mes_fundacion,
+          $request->anno_fundacion
+        );
+      }
 
-      $organizacion->disolucion = Fecha::store_fecha(
-        $request->input('ddisolucion', 0),
-        $request->input('mdisolucion', 0),
-        $request->input('adisolucion', 0),
-        'organizaciones'
-      );
+      if ($request->filled('anno_disolucion')) {
+        $organizacion->disolucion_id = Fecha::store_fecha(
+          $request->dia_disolucion,
+          $request->mes_disolucion,
+          $request->anno_disolucion
+        );
+      }
 
       // Guardado de Religiones (Tabla pivote)
       if ($request->filled('religiones')) {
@@ -233,11 +236,11 @@ class Organizacion extends Model
       $this->fill([
         'nombre'               => $request->nombre,
         'gentilicio'           => $request->gentilicio,
-        'capital'              => $request->capital,
+        'capital_nombre'              => $request->capital,
         'lema'                 => $request->lema,
-        'id_ruler'             => $request->select_ruler,
-        'id_owner'             => $request->select_owner,
-        'id_tipo_organizacion' => $request->select_tipo,
+        'lider_id'             => $request->select_lider,
+        'organizacion_padre_id' => $request->select_organizacion_padre,
+        'tipo_organizacion_id' => $request->select_tipo,
       ]);
 
       //Manejo del escudo (Solo si se sube uno nuevo)
@@ -280,19 +283,22 @@ class Organizacion extends Model
       }
 
       //Actualizado de fechas
-      $this->fundacion = Fecha::store_fecha(
-        $request->input('dfundacion', 0),
-        $request->input('mfundacion', 0),
-        $request->input('afundacion', 0),
-        'organizaciones'
-      );
+      //Procesar Fechas, si existe fundacion_id o disolucion_id se actualiza, si no se crea. Si no hay año no se guarda fecha
+      if ($this->fundacion_id) {
+        Fecha::update_fecha($request->dia_fundacion, $request->mes_fundacion, $request->anno_fundacion, $this->fundacion_id);
+      } else {
+        if ($request->filled('anno_fundacion')) {
+          $this->fundacion_id = Fecha::store_fecha($request->dia_fundacion, $request->mes_fundacion, $request->anno_fundacion);
+        }
+      }
 
-      $this->disolucion = Fecha::store_fecha(
-        $request->input('ddisolucion', 0),
-        $request->input('mdisolucion', 0),
-        $request->input('adisolucion', 0),
-        'organizaciones'
-      );
+      if ($this->disolucion_id) {
+        Fecha::update_fecha($request->dia_disolucion, $request->mes_disolucion, $request->anno_disolucion, $this->disolucion_id);
+      } else {
+        if ($request->filled('anno_disolucion')) {
+          $this->disolucion_id = Fecha::store_fecha($request->dia_disolucion, $request->mes_disolucion, $request->anno_disolucion);
+        }
+      }
 
       //Sincronizar religiones
       $this->religiones()->sync($request->input('religiones', []));
@@ -357,82 +363,5 @@ class Organizacion extends Model
       //Eliminar la organización
       return $this->delete();
     });
-  }
-
-  /**
-   * Obtiene id y nombre de las organizaciones con id diferente de 0, ordenados por nombre.
-   *
-   * @return \Illuminate\Database\Eloquent\Collection
-   */
-  public static function get_organizaciones_id_nombre()
-  {
-    try {
-      // Intenta ejecutar la consulta y devolver el resultado ordenado.
-      return self::select('id', 'nombre')
-        ->where('organizaciones.id', '!=', 0)
-        ->orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $e) {
-      Log::error(
-        'Error de base de datos al obtener organizaciones.',
-        [
-          'error' => $e->getMessage(),
-          'exception' => $e,
-        ]
-      );
-      // Devuelve una colección vacía para que la aplicación pueda continuar
-      return new Collection();
-    } catch (\Exception $e) {
-      Log::error(
-        'Error inesperado al obtener organizaciones.',
-        [
-          'error' => $e->getMessage(),
-          'exception' => $e,
-        ]
-      );
-      //Devuelve una colección vacía como medida de seguridad.
-      return new Collection();
-    }
-  }
-
-  /**
-   * Obtiene los id de las religiones presentes en una organizacion en un determinado bando.
-   *
-   * @return \Illuminate\Database\Eloquent\Collection
-   */
-  public static function get_religiones_presentes($id)
-  {
-    try {
-      $religiones = DB::table('religion_presence')->select('religion')->where('organizacion', '=', $id)->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('Organizacion->get_religiones_presentes: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $religiones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (\Exception $excepcion) {
-      Log::error('Organizacion->get_religiones_presentes: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $religiones = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-    return $religiones;
-  }
-
-  /**
-   * Obtiene una organización por su ID.
-   *
-   * @param int $id
-   * @return \App\Models\organizacion|null
-   */
-  public static function get_organizacion($id)
-  {
-    try {
-      $organizacion = self::findorfail($id);
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $excepcion) {
-      Log::error("organizacion->get_organizacion: Organización no encontrada con ID: " . $id);
-      $organizacion = ['error' => ['error' => "Organización no encontrada con ID: " . $id]];
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error("organizacion->get_organizacion: Error de base de datos al obtener organización con ID: " . $id . " - " . $excepcion->getMessage());
-      $organizacion = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (\Exception $excepcion) {
-      Log::error("organizacion->get_organizacion: Error general al obtener organización con ID: " . $id . " - " . $excepcion->getMessage());
-      $organizacion = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-    return $organizacion;
   }
 }

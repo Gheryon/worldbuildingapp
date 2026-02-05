@@ -47,37 +47,6 @@
   <h1 class="text-center mb-4">Instituciones</h1>
 <hr>
 
-<!-- Modal -->
-<div class="modal fade" id="eliminar-organizacion" tabindex="-1" role="dialog" aria-labelledby="Confirmar eliminacion" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="card card-danger">
-        <div class="card-header">
-          <h5 class="card-title" id="confirmar_eliminacion">Confirmar eliminación</h5>
-          <button data-dismiss="modal" aria-label="close" class="close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <p> ¿Borrar organizacion: <span id="nombre-borrar"> </span>?</p>
-          </div>
-        </div>
-        <div class="card-footer">
-          <form id="form-confirmar-borrar" class="col-md-auto" action="{{route('organizacion.destroy')}}" method="POST">
-            @csrf
-            @method('DELETE')
-            <input type="hidden" name="id_borrar" id="id_borrar">
-            <input type="hidden" name="nombre_borrado" id="nombre_borrado">
-            <button type="button" id="cancelar-borrar-button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-            <button type="submit" id="confirmar-borrar-button" class="btn btn-danger">Eliminar</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="row">
   @forelse($organizaciones as $organizacion)
   <div class="col-sm-12 col-md-6 col-lg-3 col-xl-2">
@@ -119,6 +88,12 @@
     {{ $organizaciones->appends(request()->query())->links('pagination::bootstrap-4') }}
   </div>
 </div>
+
+<x-modal-delete 
+    id="eliminar-organizacion" 
+    :route="route('organizacion.destroy')" 
+    message="Estás a punto de eliminar la siguiente organización de forma permanente:"
+/>
 @endsection
 
 @section('specific-scripts')

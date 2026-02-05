@@ -136,29 +136,36 @@
             <div class="row">
               <img alt="escudo" id="escudo" class="img-thumbnail shadow-sm mb-3" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" width="300" height="300">
             </div>
-            <strong class="mt-2"><i class="fas fa-landmark mr-1"></i>Tipo</strong>
+            <strong class="mt-2"><i class="fas fa-tags mr-1"></i>Tipo</strong>
             <p class="text-muted">{{$organizacion->tipo->nombre}}</p>
+
+            @if ($organizacion->capital_nombre)
+            <strong class="mt-2"><i class="fa-solid fa-building-columns mr-1"></i>Capital</strong>
+            <p class="text-muted">{{$organizacion->capital_nombre}}</p>
+            @endif
 
             @if ($organizacion->gentilicio)
             <strong class="mt-2"><i class="fas fa-user-tag mr-1"></i>Gentilicio</strong>
             <p class="text-muted">{{$organizacion->gentilicio}}</p>
             @endif
 
-            @if($organizacion->ruler->id!=0)
+            @if($organizacion->lider_id)
             <strong class="mt-2"><i class="fas fa-chess-king mr-1"></i>Líder:</strong>
-            <p class="text-muted"><a href="{{route('personaje.show', [$organizacion->ruler->id] )}}">{{$organizacion->ruler->nombre}}</a></p>
+            <p class="text-muted"><a href="{{route('personaje.show', [$organizacion->lider->id] )}}">{{$organizacion->lider->nombre}}</a></p>
             @endif
 
-            @if($organizacion->owner->id!=0)
+            @if($organizacion->organizacion_padre_id)
             <strong><i class="fas fa-link mr-1"></i>Controlado por:</strong>
             <p class="text-muted">
-              <a href="{{ route('organizacion.show', $organizacion->owner->id) }}">{{ $organizacion->owner->nombre }}</a>
+              <a href="{{ route('organizacion.show', $organizacion->organizacion_padre->id) }}">{{ $organizacion->organizacion_padre->nombre }}</a>
             </p>
             @endif
 
+            @if ($organizacion->fundacion_id)
             <strong><i class="fas fa-calendar-plus mr-1"></i>Fundación:</strong>
             <p class="text-muted">{{ $fundacion }}</p>
-            @if ($organizacion->disolucion != 0)
+            @endif
+            @if ($organizacion->disolucion_id)
             <strong><i class="fas fa-calendar-times mr-1"></i>Disolución:</strong>
             <p class="text-muted">{{ $disolucion}}</p>
             @endif
