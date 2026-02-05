@@ -256,26 +256,11 @@ class Religion extends Model
   public function delete_religion()
   {
     return DB::transaction(function () {
-      // Obtener y eliminar imágenes físicas del disco
-      $imagenes = DB::table('imagenes')
-        ->where('table_owner', 'religiones')
-        ->where('owner', $this->id)
-        ->get();
+      //Borrar imágenes de Summernote usando el servicio
+      $imageService = new ImageService();
+      $imageService->deleteImagesByOwner('religiones', $this->id);
 
-      foreach ($imagenes as $imagen) {
-        $path = public_path("/storage/imagenes/{$imagen->nombre}");
-        if (file_exists($path)) {
-          unlink($path);
-        }
-      }
-
-      //Limpiar registros de la tabla imagenes
-      DB::table('imagenes')
-        ->where('table_owner', 'religiones')
-        ->where('owner', $this->id)
-        ->delete();
-
-         //Borrar el escudo físico sin borrar el default
+      //Borrar el escudo físico sin borrar el default
       if ($this->escudo && $this->escudo !== 'default.png') {
         Storage::disk('public')->delete('escudos/' . $this->escudo);
       }
