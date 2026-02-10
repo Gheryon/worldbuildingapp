@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Imagen;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 
 class ImageService
@@ -15,10 +16,10 @@ class ImageService
     if (empty($content)) return $content;
 
     //asegurar que existe el directorio
-    $storagePath = public_path("storage/imagenes/");
-    if (!File::exists($storagePath)) {
-      File::makeDirectory($storagePath, 0755, true);
-    }
+    //$storagePath = public_path("storage/imagenes/");
+    //if (!File::exists($storagePath)) {
+    //  File::makeDirectory($storagePath, 0755, true);
+    //}
 
     $dom = new \DomDocument();
     //Mantener UTF-8 y evitar errores de HTML5
@@ -36,10 +37,11 @@ class ImageService
         $imageData = base64_decode($data);
         //generar nombre único
         $imageName = time() . "_obj_" . $idOwner . "_" . $item . '.png';
-        $path = public_path("storage/imagenes/" . $imageName);
+        //$path = public_path("storage/imagenes/" . $imageName);
 
         // Guardar archivo físico
-        file_put_contents($path, $imageData);
+        //file_put_contents($path, $imageData);
+        Storage::disk('public')->put("imagenes/" . $imageName, $imageData);
 
         // Actualizar el HTML para que apunte a la URL pública
         $newUrl = asset("storage/imagenes/" . $imageName);
@@ -73,11 +75,8 @@ class ImageService
       ->get();
 
     foreach ($imagenes as $imagen) {
-      // Ruta absoluta al archivo físico
-      $filePath = public_path("storage/imagenes/" . $imagen->nombre);
-
-      if (file_exists($filePath)) {
-        unlink($filePath); // Borra el archivo del servidor
+      if (Storage::disk('public')->exists("imagenes/" . $imagen->nombre)) {
+        Storage::disk('public')->delete("imagenes/" . $imagen->nombre);
       }
 
       $imagen->delete(); // Borra el registro de la BD

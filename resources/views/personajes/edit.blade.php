@@ -44,15 +44,18 @@
               <div class="col-md">
                 <x-text-input name="apellidos" label="apellidos" :value="$personaje->apellidos" placeholder="Ej: García López, Sánchez, etc." />
               </div>
+              <div class="col-md-4">
+                <x-text-input name="apodo" label="Apodo" :value="$personaje->apodo" placeholder="Ej: El Veloz, El Sabio, etc." />
+              </div>
             </div>
 
             <div class="row mt-2">
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <label for="sexo">Sexo</label>
-                <select class="form-control" name="sexo" id="sexo" required>
+                <select class="form-control mt-2" name="sexo" id="sexo" required>
                   <option selected disabled value="">Elegir</option>
-                  <option {{ $personaje->sexo == 'Hombre' ? 'selected' : '' }}>Hombre</option>
-                  <option {{ $personaje->sexo == 'Mujer' ? 'selected' : '' }}>Mujer</option>
+                  <option {{ old('sexo', $personaje->sexo) == 'Hombre' ? 'selected' : '' }}>Hombre</option>
+                  <option {{ old('sexo', $personaje->sexo) == 'Mujer' ? 'selected' : '' }}>Mujer</option>
                 </select>
                 @error('sexo')
                 <span class="invalid-feedback" role="alert">
@@ -64,10 +67,10 @@
                 <label for="select_especie">Especie</label>
                 @if(isset($especies) && count($especies) > 0)
                 {{-- Caso exitoso: Hay especies disponibles --}}
-                <select class="form-control @error('select_especie') is-invalid @enderror" name="select_especie" id="select_especie" required>
+                <select class="form-control @error('select_especie') is-invalid @enderror mt-2" name="select_especie" id="select_especie" required>
                   <option value="" selected disabled>Elegir una especie</option>
-                  @foreach($especies as $especie)
-                  <option value="{{ $especie->id }}" {{ $personaje->id_foranea_especie == $especie->id ? 'selected' : '' }}>{{ $especie->nombre }}</option>
+                  @foreach($especies as $id => $nombre)
+                  <option value="{{ $id }}" {{ $personaje->especie_id == $id ? 'selected' : '' }}>{{ $nombre }}</option>
                   @endforeach
                 </select>
                 @else
@@ -87,15 +90,18 @@
                 @enderror
               </div>
               <div class="col-md">
-                <x-text-input name="lugar_nacimiento" label="Lugar de nacimiento" :value="$personaje->lugarNacimiento" placeholder="Lugar de nacimiento" />
+                <x-text-input name="lugar_nacimiento" label="Lugar de nacimiento" :value="$personaje->lugar_nacimiento" placeholder="Lugar de nacimiento" disabled/>
+              </div>
+              <div class="col-md">
+                <x-text-input name="profesion" label="Profesión" :value="$personaje->profesion" placeholder="Ej: Alquimista, guerrero, etc." />
               </div>
             </div>
             <div class="row mt-2">
               <div class="col-md-4">
-                <x-date-input-group name="nacimiento" label="Fecha de nacimiento" :id="$personaje->nacimiento" :dia="$nacimiento->dia ?? ''" :mes="$nacimiento->mes ?? ''" :anno="$nacimiento->anno ?? ''" />
+                <x-date-input-group name="nacimiento" label="Fecha de nacimiento" :id="$personaje->nacimiento_id" :dia="$personaje->fecha_nacimiento->dia ?? ''" :mes="$personaje->fecha_nacimiento->mes ?? ''" :anno="$personaje->fecha_nacimiento->anno ?? ''" />
               </div>
               <div class="col-md-4">
-                <x-date-input-group name="fallecimiento" label="Fecha de fallecimiento" :id="$personaje->fallecimiento" :dia="$fallecimiento->dia ?? ''" :mes="$fallecimiento->mes ?? ''" :anno="$fallecimiento->anno ?? ''" />
+                <x-date-input-group name="fallecimiento" label="Fecha de fallecimiento" :id="$personaje->fallecimiento_id" :dia="$personaje->fecha_fallecimiento->dia ?? ''" :mes="$personaje->fecha_fallecimiento->mes ?? ''" :anno="$personaje->fecha_fallecimiento->anno ?? ''" />
               </div>
               <div class="col-md">
                 <x-text-input name="causa_fallecimiento" label="Causa de fallecimiento" :value="$personaje->causa_fallecimiento" placeholder="Ej: Enfermedad, accidente, asesinato..."/>
@@ -117,7 +123,7 @@
     {{-- Descripción breve --}}
     <div class="card card-dark card-outline mt-4">
       <div class="card-body">
-        <x-textarea-input name="descripcion_short" label="Descripción breve" :value="$personaje->descripcion_short" rows="2" />
+        <x-textarea-input name="descripcion_corta" label="Descripción breve" :value="$personaje->descripcion_corta" rows="2" />
       </div>
     </div>
 
@@ -143,7 +149,7 @@
           <div class="tab-pane fade show active" id="tab-fisico" role="tabpanel">
             <div class="row">
               <div class="col-md-6">
-                <x-textarea-input name="descripcion" label="Descripción física" :value="$personaje->descripcion" />
+                <x-textarea-input name="descripcion_fisica" label="Descripción física" :value="$personaje->descripcion_fisica" />
                 <x-textarea-input name="salud" label="Salud" :value="$personaje->salud" />
                 <x-textarea-input name="personalidad" label="Personalidad" :value="$personaje->personalidad" />
               </div>
@@ -165,7 +171,7 @@
 
           {{-- PESTAÑA 3 --}}
           <div class="tab-pane fade" id="tab-historia" role="tabpanel">
-            <x-textarea-input name="historia" label="Historia" :value="$personaje->historia" class="summernote" rows="10" />
+            <x-textarea-input name="biografia" label="Historia" :value="$personaje->biografia" class="summernote" rows="10" />
             <x-textarea-input name="otros" label="Otros detalles" :value="$personaje->otros" />
           </div>
         </div>

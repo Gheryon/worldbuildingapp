@@ -12,8 +12,8 @@
   <select id="filter_especie" class="form-control ml-2" name="filter_especie">
     <option selected disabled value="0">Filtrar especie</option>
     <option value="0" {{ $especie_id == 0 ? 'selected' : '' }}>Todas</option>
-    @foreach($especies as $especie)
-    <option value="{{$especie->id}}" {{ $especie_id == $especie->id ? 'selected' : '' }}>{{$especie->nombre}}</option>
+    @foreach($especies as $id => $nombre)
+    <option value="{{$id}}" {{ $especie_id == $id ? 'selected' : '' }}>{{$nombre}}</option>
     @endforeach
   </select>
 </li>
@@ -46,36 +46,6 @@
 
 @section('content')
 <h1 class="text-center mb-4">Personajes</h1>
-
-<div class="modal fade" id="eliminar-personaje" tabindex="-1" role="dialog" aria-labelledby="eliminar-personaje" aria-hidden="true">
-  <div class="modal-dialog modal-sm" role="document">
-    <div class="modal-content">
-      <div class="card card-danger">
-        <div class="card-header">
-          <h3 class="card-title">Eliminar personaje</h3>
-          <button data-dismiss="modal" aria-label="close" class="close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <form id="form-borrar-personaje" class="text-center" action="{{route('personaje.destroy')}}" method="POST">
-          @csrf
-          @method('DELETE')
-          <div class="card-body">
-            <div class="input-group mb-3">
-              <p> ¿Borrar personaje: <span id="nombre-borrar"> </span>?</p>
-              <input type="hidden" id="id_borrar" name="id_borrar">
-              <input type="hidden" name="nombre_borrado" id="nombre_borrado">
-            </div>
-          </div>
-          <div class="card-footer text-right">
-            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cerrar</button>
-            <button type="submit" class="btn bg-gradient-danger">Eliminar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="row">
   @forelse($personajes as $personaje)
@@ -130,7 +100,11 @@
   </div>
 </div>
 
-
+<x-modal-delete 
+    id="eliminar-personaje" 
+    :route="route('personaje.destroy')" 
+    message="Estás a punto de eliminar el siguiente personaje de forma permanente:"
+/>
 @endsection
 
 @section('specific-scripts')

@@ -19,6 +19,7 @@ return new class extends Migration
       $table->string('apellidos', 256)->nullable();
       $table->string('nombre_familia', 256)->nullable()->comment('Nombre de la casa o clan');
       $table->string('apodo', 128)->nullable();
+      $table->string('profesion', 128)->nullable();
       $table->string('sexo', 32)->nullable();
       $table->string('causa_fallecimiento', 256)->nullable();
 
@@ -61,6 +62,10 @@ return new class extends Migration
 
       // Multimedia y Otros
       $table->string('retrato', 255)->default('default.png');
+
+      // Auditoría
+      $table->timestamps();
+      $table->softDeletes();
     });
   }
 

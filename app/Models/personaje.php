@@ -6,52 +6,52 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\Eloquent\Collection;
-use App\Http\Controllers\ImagenController;
-use App\Http\Controllers\ConfigurationController;
+use App\Services\ImageService;
 
 class personaje extends Model
 {
   use HasFactory;
 
-  protected $table = 'personaje';
+  protected $table = 'personajes';
   protected $primaryKey = 'id';
-  public $timestamps = false;
+  public $timestamps = true;
 
   protected $fillable = [
     'nombre',
     'nombre_familia',
     'apellidos',
+    'apodo',
+    'profesion',
     'lugar_nacimiento',
-    'nacimiento',
-    'fallecimiento',
     'causa_fallecimiento',
-    'descripcion',
-    'descripcion_short',
+    'descripcion_fisica',
+    'descripcion_corta',
     'personalidad',
     'salud',
+    'personalidad',
     'deseos',
     'miedos',
     'magia',
     'educacion',
-    'historia',
+    'biografia',
     'religion',
     'familia',
     'politica',
     'retrato',
-    'id_foranea_especie',
+    'especie_id',
+    'nacimiento_id',
+    'fallecimiento_id',
     'sexo',
     'otros'
   ];
 
   protected $casts = [
-    'nacimiento' => 'integer',
-    'fallecimiento' => 'integer',
+    'nacimiento_id' => 'integer',
+    'fallecimiento_id' => 'integer',
     'lugar_nacimiento' => 'integer',
-    'id_foranea_especie' => 'integer',
+    'especie_id' => 'integer',
   ];
 
   /**
@@ -59,23 +59,23 @@ class personaje extends Model
    */
   public function especie(): BelongsTo
   {
-    return $this->belongsTo(Especie::class, 'id_foranea_especie', 'id');
+    return $this->belongsTo(Especie::class, 'especie_id');
   }
 
   /**
    * Obtiene la información de la fecha de nacimiento (tabla fechas).
    */
-  public function fechaNacimiento(): BelongsTo
+  public function fecha_nacimiento(): BelongsTo
   {
-    return $this->belongsTo(Fecha::class, 'nacimiento', 'id');
+    return $this->belongsTo(Fecha::class, 'nacimiento_id');
   }
 
   /**
    * Obtiene la información de la fecha de fallecimiento (tabla fechas).
    */
-  public function fechaFallecimiento(): BelongsTo
+  public function fecha_fallecimiento(): BelongsTo
   {
-    return $this->belongsTo(Fecha::class, 'fallecimiento', 'id');
+    return $this->belongsTo(Fecha::class, 'fallecimiento_id');
   }
 
   /**
@@ -83,7 +83,36 @@ class personaje extends Model
    */
   public function organizacionesGobernadas(): HasMany
   {
-    return $this->hasMany(Organizacion::class, 'id_ruler', 'id');
+    return $this->hasMany(Organizacion::class, 'lider_id', 'id');
+  }
+
+  public function lugar_nacimiento()
+  {
+    return $this->morphTo();
+  }
+
+  /**
+   * Scope para filtrar y ordenar personajes.
+   */
+  public function scopeFiltrar($query, $filtros)
+  {
+    return $query->leftJoin('especies', 'personajes.especie_id', '=', 'especies.id')
+      ->select(
+        'personajes.id',
+        'personajes.nombre',
+        'personajes.retrato',
+        'personajes.sexo',
+        'personajes.especie_id',
+        DB::raw('COALESCE(especies.nombre, "Especie desconocida") as especie')
+      )
+      ->where('personajes.id', '!=', 0)
+      ->when($filtros['search'] ?? null, function ($q, $search) {
+        $q->where('personajes.nombre', 'LIKE', "%{$search}%");
+      })
+      ->when($filtros['especie'] ?? null, function ($q, $especie) {
+        if ($especie > 0) $q->where('personajes.especie_id', $especie);
+      })
+      ->orderBy('personajes.nombre', $filtros['orden'] ?? 'asc');
   }
 
   /**
@@ -114,31 +143,30 @@ class personaje extends Model
   public static function store_personaje($request)
   {
     return DB::transaction(function () use ($request) {
-      $personaje = new self();
-
-      // Asignación de campos básicos
-      $personaje->nombre = $request->nombre;
-      $personaje->apellidos = $request->apellidos;
-      $personaje->nombre_familia = $request->nombre_familia;
-      $personaje->lugar_nacimiento = $request->lugar_nacimiento;
-      $personaje->causa_fallecimiento = $request->causa_fallecimiento;
-      $personaje->id_foranea_especie = $request->select_especie;
-      $personaje->sexo = $request->sexo;
-
-      // Obtener ID de organización necesario para el procesador de imágenes
-      $id_org = DB::table('organizaciones')->max('id_organizacion') ?? 0;
+      $personaje =self::create([
+        'nombre' => $request->nombre,
+        'apellidos' => $request->apellidos,
+        'nombre_familia' => $request->nombre_familia,
+        'apodo' => $request->apodo,
+        'profesion' => $request->profesion,
+        //'lugar_nacimiento' => $request->lugar_nacimiento,//aún sin implementar
+        'causa_fallecimiento' => $request->causa_fallecimiento,
+        'especie_id' => $request->select_especie,
+        'sexo' => $request->sexo
+      ]);
 
       // Procesado de campos de Summernote
+      $imageService = new ImageService();
       $camposRichText = [
-        'descripcion' => 'descripcion',
-        'descripcion_short' => 'descripcion_short',
+        'descripcion_fisica' => 'descripcion_fisica',
+        'descripcion_corta' => 'descripcion_corta',
         'salud' => 'salud',
         'personalidad' => 'personalidad',
         'deseos' => 'deseos',
         'miedos' => 'miedos',
         'magia' => 'magia',
         'educacion' => 'educacion',
-        'historia' => 'historia',
+        'biografia' => 'biografia',
         'religion' => 'religion',
         'familia' => 'familia',
         'politica' => 'politica',
@@ -147,8 +175,11 @@ class personaje extends Model
 
       foreach ($camposRichText as $columna => $input) {
         if ($request->filled($input)) {
-          $personaje->$columna = app(ImagenController::class)
-            ->store_for_summernote($request->$input, "personajes", $id_org);
+          $personaje->$columna = $imageService->processSummernoteImages(
+            $request->$input,
+            "personajes",
+            $personaje->id
+          );
         }
       }
 
@@ -159,21 +190,23 @@ class personaje extends Model
       } else {
         $personaje->retrato = "default.png";
       }
+      
+      //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
+      if ($request->filled('anno_nacimiento')) {
+        $personaje->nacimiento_id = Fecha::store_fecha(
+          $request->dia_nacimiento,
+          $request->mes_nacimiento,
+          $request->anno_nacimiento
+        );
+      }
 
-      // Manejo de Fechas
-      $personaje->nacimiento = app(ConfigurationController::class)->store_fecha(
-        $request->input('dnacimiento', 0),
-        $request->input('mnacimiento', 0),
-        $request->input('anacimiento', 0),
-        "personajes"
-      );
-
-      $personaje->fallecimiento = app(ConfigurationController::class)->store_fecha(
-        $request->input('dfallecimiento', 0),
-        $request->input('mfallecimiento', 0),
-        $request->input('afallecimiento', 0),
-        "personajes"
-      );
+      if ($request->filled('anno_fallecimiento')) {
+        $personaje->fallecimiento_id = Fecha::store_fecha(
+          $request->dia_fallecimiento,
+          $request->mes_fallecimiento,
+          $request->anno_fallecimiento
+        );
+      }
 
       $personaje->save();
 
@@ -190,27 +223,31 @@ class personaje extends Model
   public function update_personaje($request)
   {
     return DB::transaction(function () use ($request) {
-
       // Asignación de campos básicos
-      $this->nombre = $request->nombre;
-      $this->apellidos = $request->apellidos;
-      $this->nombre_familia = $request->nombre_familia;
-      $this->lugar_nacimiento = $request->lugar_nacimiento;
-      $this->causa_fallecimiento = $request->causa_fallecimiento;
-      $this->id_foranea_especie = $request->select_especie;
-      $this->sexo = $request->sexo;
+    $this->fill([
+      'nombre' => $request->nombre,
+      'apellidos' => $request->apellidos,
+      'nombre_familia' => $request->nombre_familia,
+      'apodo' => $request->apodo,
+      'profesion' => $request->profesion,
+      //'lugar_nacimiento' => $request->lugar_nacimiento,//aún sin implementar
+      'causa_fallecimiento' => $request->causa_fallecimiento,
+      'especie_id' => $request->select_especie,
+      'sexo' => $request->sexo
+    ]);
 
       // Procesado de campos de Summernote
+      $imageService = new ImageService();
       $camposRichText = [
-        'descripcion' => 'descripcion',
-        'descripcion_short' => 'descripcion_short',
+        'descripcion_fisica' => 'descripcion_fisica',
+        'descripcion_corta' => 'descripcion_corta',
         'salud' => 'salud',
         'personalidad' => 'personalidad',
         'deseos' => 'deseos',
         'miedos' => 'miedos',
         'magia' => 'magia',
         'educacion' => 'educacion',
-        'historia' => 'historia',
+        'biografia' => 'biografia',
         'religion' => 'religion',
         'familia' => 'familia',
         'politica' => 'politica',
@@ -219,8 +256,11 @@ class personaje extends Model
 
       foreach ($camposRichText as $columna => $input) {
         if ($request->filled($input)) {
-          $this->$columna = app(ImagenController::class)
-            ->store_for_summernote($request->$input, "personajes", $this->id);
+          $this->$columna = $imageService->processSummernoteImages(
+            $request->$input,
+            "personajes",
+            $this->id
+          );
         }
       }
 
@@ -233,114 +273,26 @@ class personaje extends Model
         $this->retrato = basename($path);
       }
 
-      // Manejo de Fechas (Delegado al ConfigurationController)
-      $config = app(ConfigurationController::class);
+      //Actualizado de fechas
+      //Procesar Fechas, si existe nacimiento_id o fallecimiento_id se actualiza, si no se crea. Si no hay año no se guarda fecha
+      if ($this->nacimiento_id) {
+        Fecha::update_fecha($request->dia_nacimiento, $request->mes_nacimiento, $request->anno_nacimiento, $this->nacimiento_id);
+      } else {
+        if ($request->filled('anno_nacimiento')) {
+          $this->nacimiento_id = Fecha::store_fecha($request->dia_nacimiento, $request->mes_nacimiento, $request->anno_nacimiento);
+        }
+      }
 
-      $this->nacimiento = ($request->input('anacimiento', 0) != 0)
-        ? ($this->nacimiento != 0 // ya existía una fecha, se actualiza, sino, se añade una nueva
-          ? $config->update_fecha($request->dnacimiento, $request->mnacimiento, $request->anacimiento, $this->nacimiento)
-          : $config->store_fecha($request->dnacimiento, $request->mnacimiento, $request->anacimiento, "personajes"))
-        : $this->nacimiento; //Si no hay datos, se mantiene el actual
-
-      $this->fallecimiento = ($request->input('afallecimiento', 0) != 0)
-        ? ($this->fallecimiento != 0 // ya existía una fecha, se actualiza, sino, se añade una nueva
-          ? $config->update_fecha($request->dfallecimiento, $request->mfallecimiento, $request->afallecimiento, $this->fallecimiento)
-          : $config->store_fecha($request->dfallecimiento, $request->mfallecimiento, $request->afallecimiento, "personajes"))
-        : $this->fallecimiento; //Si no hay datos, se mantiene el actual
+      if ($this->fallecimiento_id) {
+        Fecha::update_fecha($request->dia_fallecimiento, $request->mes_fallecimiento, $request->anno_fallecimiento, $this->fallecimiento_id);
+      } else {
+        if ($request->filled('anno_fallecimiento')) {
+          $this->fallecimiento_id = Fecha::store_fecha($request->dia_fallecimiento, $request->mes_fallecimiento, $request->anno_fallecimiento);
+        }
+      }
 
       return $this->save();
     });
-  }
-
-  /**
-   * Obtiene los personajes con id diferente de 0, ordenados por nombre.
-   *
-   * @return \Illuminate\Database\Eloquent\Collection
-   */
-  public static function get_personajes($orden = 'asc', $tipo = '0', $perPage = 18)
-  {
-    try {
-      // Validar que el orden sea un valor permitido para evitar inyecciones
-      $direccionesValidas = ['asc', 'desc'];
-      $dir = in_array(strtolower($orden), $direccionesValidas) ? $orden : 'asc';
-
-      // Usamos leftJoin para no excluir personajes si la especie no existe (como el ID 0)
-      $query = self::leftJoin('especies', 'personaje.id_foranea_especie', '=', 'especies.id')
-        ->select(
-          'personaje.id',
-          'personaje.nombre',
-          'personaje.retrato',
-          'personaje.sexo',
-          'personaje.id_foranea_especie',
-          // Si el nombre de la especie es nulo (caso ID 0), devolvemos 'Sistema/Desconocido'
-          DB::raw('COALESCE(especies.nombre, "Especie desconocida") as especie')
-        )->where('personaje.id', '!=', 0);
-
-      // Si tipo es 0, devuelve todos. Si es > 0, se filtra por especie.
-      if ($tipo > 0) {
-        $query->where('personaje.id_foranea_especie', $tipo);
-      }
-
-      return $query->orderBy('personaje.nombre', $dir)->paginate($perPage);
-    } catch (\Illuminate\Database\QueryException $e) {
-      Log::error(
-        "Error de base de datos al obtener la lista de personajes.",
-        [
-          'orden' => $orden,
-          'tipo' => $tipo,
-          'error' => $e->getMessage(),
-          'exception' => $e,
-        ]
-      );
-      // Devolvemos una colección vacía para que la aplicación no se rompa.
-      return collect();
-    } catch (\Exception $e) {
-      // Captura cualquier otra excepción inesperada.
-      Log::critical(
-        "Error inesperado al obtener la lista de personajes.",
-        [
-          'orden' => $orden,
-          'tipo' => $tipo,
-          'error' => $e->getMessage(),
-          'exception' => $e,
-        ]
-      );
-      return collect();
-    }
-  }
-
-  /**
-   * Obtiene id y nombre de los personajes con id diferente de 0, ordenados por nombre.
-   *
-   * @return \Illuminate\Database\Eloquent\Collection
-   */
-  public static function get_personajes_id_nombre()
-  {
-    try {
-      // Intenta ejecutar la consulta y devolver el resultado ordenado.
-      return self::select('id', 'Nombre')
-        ->where('personaje.id', '!=', 0)->orderBy('Nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $e) {
-      Log::error(
-        'Error de base de datos al obtener personajes.',
-        [
-          'error' => $e->getMessage(),
-          'exception' => $e,
-        ]
-      );
-      // Devuelve una colección vacía para que la aplicación pueda continuar
-      return new Collection();
-    } catch (\Exception $e) {
-      Log::error(
-        'Error inesperado al obtener los personajes.',
-        [
-          'error' => $e->getMessage(),
-          'exception' => $e,
-        ]
-      );
-      //Devuelve una colección vacía como medida de seguridad.
-      return new Collection();
-    }
   }
 
   /**
@@ -365,45 +317,12 @@ class personaje extends Model
       }
 
       //Borrar imágenes de Summernote relacionadas
-      $imagenes = DB::table('imagenes')
-        ->where('table_owner', 'personajes')
-        ->where('owner', $this->id)
-        ->get();
-
-      foreach ($imagenes as $imagen) {
-        $rutaCompleta = public_path("storage/imagenes/" . $imagen->nombre);
-        if (file_exists($rutaCompleta)) {
-          unlink($rutaCompleta);
-        }
-        DB::table('imagenes')->where('id', $imagen->id)->delete();
-      }
+      $imageService = new ImageService();
+      $imageService->deleteImagesByOwner('personajes', $this->id);
 
       //Borrar el personaje
       return $this->delete();
     });
   }
 
-  /**
-   * Scope para filtrar y ordenar personajes.
-   */
-  public function scopeFiltrar($query, $filtros)
-  {
-    return $query->leftJoin('especies', 'personaje.id_foranea_especie', '=', 'especies.id')
-      ->select(
-        'personaje.id',
-        'personaje.nombre',
-        'personaje.retrato',
-        'personaje.sexo',
-        'personaje.id_foranea_especie',
-        DB::raw('COALESCE(especies.nombre, "Especie desconocida") as especie')
-      )
-      ->where('personaje.id', '!=', 0)
-      ->when($filtros['search'] ?? null, function ($q, $search) {
-        $q->where('personaje.nombre', 'LIKE', "%{$search}%");
-      })
-      ->when($filtros['especie'] ?? null, function ($q, $especie) {
-        if ($especie > 0) $q->where('personaje.id_foranea_especie', $especie);
-      })
-      ->orderBy('personaje.nombre', $filtros['orden'] ?? 'asc');
-  }
 }

@@ -43,8 +43,7 @@ class PersonajeController extends Controller
       'search' => $terminoBusqueda
     ])->paginate(18);
 
-    //$personajes = personaje::get_personajes($orden, $especie);
-    $especies = Especie::get_especies();
+    $especies = Especie::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
     return view('personajes.index', compact('personajes', 'especies', 'orden', 'especie_id', 'terminoBusqueda'));
   }
@@ -57,7 +56,7 @@ class PersonajeController extends Controller
   public function create()
   {
     //obtener todas las especies
-    $especies = Especie::get_especies();
+    $especies = Especie::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
     return view('personajes.create', compact('especies'));
   }
@@ -85,7 +84,7 @@ class PersonajeController extends Controller
       $personaje = personaje::store_personaje($request);
 
       return redirect()->route('personajes.index')
-        ->with('success', 'Personaje ' . $personaje->nombre . 'añadido correctamente.');
+        ->with('success', 'Personaje ' . $personaje->nombre . ' añadido correctamente.');
     } catch (\Illuminate\Database\QueryException $e) {
       Log::error(
         "Error de base de datos al añadir personaje.",
@@ -119,22 +118,22 @@ class PersonajeController extends Controller
   public function show($id)
   {
     // Cargamos el personaje con sus relaciones para evitar el problema N+1
-    $personaje = personaje::with(['especie', 'fechaNacimiento', 'fechaFallecimiento'])
+    $personaje = personaje::with(['especie'])
       ->findOrFail($id);
 
-    //obtener fechas
-    $nacimiento = Fecha::get_fecha_string($personaje->nacimiento);
-    $fallecimiento = Fecha::get_fecha_string($personaje->fallecimiento);
+    //obtener fechas en formato string
+    $nacimiento = Fecha::get_fecha_string($personaje->nacimiento_id);
+    $fallecimiento = Fecha::get_fecha_string($personaje->fallecimiento_id);
 
     // Cálculo de la edad, por defecto "Desconocida"
     $edad = "Desconocida";
-    if ($personaje->nacimiento) {
+    if ($personaje->nacimiento_id) {
       //Si no se ha fallecido, se obtiene la fecha actual del mundo
-      if ($personaje->fallecimiento)
-        $fechaFin = $personaje->fechaFallecimiento;
+      if ($personaje->fallecimiento_id)
+        $fechaFin = Fecha::find($personaje->fallecimiento_id);
       else
         $fechaFin = Fecha::get_fecha_mundo();
-      $edad = $personaje->getEdadAttribute($personaje->fechaNacimiento, $fechaFin);
+      $edad = $personaje->getEdadAttribute(Fecha::find($personaje->nacimiento_id), $fechaFin);
     }
 
     return view('personajes.show', [
@@ -153,16 +152,12 @@ class PersonajeController extends Controller
   {
     try {
       //obtener personaje
-      $personaje = personaje::findOrFail($id);
+      $personaje = personaje::with(['fecha_nacimiento', 'fecha_fallecimiento'])->findOrFail($id);
 
       //obtener todas las especies
-      $especies = Especie::get_especies();
+      $especies = Especie::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
-      //obtener fechas
-      $nacimiento = Fecha::find($personaje->nacimiento);
-      $fallecimiento = Fecha::find($personaje->fallecimiento);
-
-      return view('personajes.edit', compact('personaje', 'especies', 'nacimiento', 'fallecimiento'));
+      return view('personajes.edit', compact('personaje', 'especies'));
     } catch (\Exception $e) {
       // Si hay un error de lógica, redirigimos con un mensaje flash
       return redirect()->route('personajes.index')
@@ -209,7 +204,7 @@ class PersonajeController extends Controller
   {
     // Validamos que el ID venga en la petición
     $request->validate([
-      'id_borrar' => 'required|integer|exists:personaje,id'
+      'id_borrar' => 'required|integer|exists:personajes,id'
     ]);
 
     try {

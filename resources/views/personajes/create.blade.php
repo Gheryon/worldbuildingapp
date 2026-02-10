@@ -34,33 +34,36 @@
         <div class="row">
           <div class="col-md-9">
             <div class="row">
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <x-text-input name="nombre" label="Nombre" placeholder="Ej: Aria, Nicanor, etc." required />
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <x-text-input name="nombre_familia" label="Nombre de familia o clan" placeholder="Ej: Cervantes, Fernández, etc." />
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <x-text-input name="apellidos" label="Apellidos" placeholder="Ej: García López, Sánchez, etc." />
+              </div>
+              <div class="col-md-3">
+                <x-text-input name="apodo" label="Apodo" placeholder="Ej: El Veloz, El Sabio, etc." />
               </div>
             </div>
             <div class="row mt-3">
-              <div class="col-md-4">
+              <div class="col-md-2">
                 <label for="sexo">Sexo</label>
-                <select class="form-control" name="sexo" id="sexo" required>
+                <select class="form-control mt-2" name="sexo" id="sexo" required>
                   <option selected disabled value="">Elegir</option>
                   <option {{ old('sexo') == 'Hombre' ? 'selected' : '' }}>Hombre</option>
                   <option {{ old('sexo') == 'Mujer' ? 'selected' : '' }}>Mujer</option>
                 </select>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <label for="select_especie">Especie</label>
                 @if(isset($especies) && count($especies) > 0)
                 {{-- Caso exitoso: Hay especies disponibles --}}
-                <select class="form-control @error('select_especie') is-invalid @enderror" name="select_especie" id="select_especie" required>
+                <select class="form-control @error('select_especie') is-invalid @enderror mt-2" name="select_especie" id="select_especie" required>
                   <option value="" selected disabled>Elegir una especie</option>
-                  @foreach($especies as $especie)
-                  <option value="{{ $especie->id }}" {{ old('select_especie') == $especie->id ? 'selected' : '' }}>{{ $especie->nombre }}</option>
+                  @foreach($especies as $id => $nombre)
+                  <option value="{{ $id }}" {{ old('select_especie') == $id ? 'selected' : '' }}>{{ $nombre }}</option>
                   @endforeach
                 </select>
                 @else
@@ -79,16 +82,19 @@
                 </span>
                 @enderror
               </div>
-              <div class="col-md-4">
-                <x-text-input name="lugar_nacimiento" label="Lugar de nacimiento" placeholder="Ej: Córdoba, Minas Tirith." required />
+              <div class="col-md">
+                <x-text-input name="lugar_nacimiento" label="Lugar de nacimiento" placeholder="Ej: Córdoba, Minas Tirith." disabled/>
+              </div>
+              <div class="col-md">
+                <x-text-input name="profesion" label="Profesión" placeholder="Ej: Alquimista, guerrero, etc." />
               </div>
             </div>
             <div class="row mt-2">
               <div class="col-md-4">
-                <x-date-input-group name="nacimiento" label="Fecha de nacimiento" idPrefix="nac" />
+                <x-date-input-group name="nacimiento" label="Fecha de nacimiento"/>
               </div>
               <div class="col-md-4">
-                <x-date-input-group name="fallecimiento" label="Fecha de fallecimiento" idPrefix="fal" />
+                <x-date-input-group name="fallecimiento" label="Fecha de fallecimiento"/>
               </div>
               <div class="col-md">
                 <label for="causa_fallecimiento" class="form-label mt-2">Causa de fallecimiento</label>
@@ -113,7 +119,7 @@
     {{-- Campo de descripción breve --}}
     <div class="card card-dark card-outline card-tabs mt-4">
       <div class="card-body">
-        <x-textarea-input name="descripcion_short" label="Descripción breve" rows="2" />
+        <x-textarea-input name="descripcion_corta" label="Descripción breve" rows="2" />
       </div>
     </div>
 
@@ -161,7 +167,7 @@
 
           {{-- PESTAÑA 3: Historia y Otros --}}
           <div class="tab-pane fade" id="tab-historia" role="tabpanel">
-            <x-textarea-input name="historia" label="Historia" class="summernote" rows="10" />
+            <x-textarea-input name="biografia" label="Historia" class="summernote" rows="10" />
             <x-textarea-input name="otros" label="Otros detalles adicionales" />
           </div>
         </div>

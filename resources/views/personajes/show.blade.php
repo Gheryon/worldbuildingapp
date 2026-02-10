@@ -25,9 +25,9 @@
             </h1>
           </div>
           <div class="card-body">
-            @if ($personaje->descripcion_short)
+            @if ($personaje->descripcion_corta)
             <h3>Descripción breve</h3>
-            <div class="mb-4">{!! $personaje->descripcion_short !!}</div>
+            <div class="mb-4">{!! $personaje->descripcion_corta !!}</div>
             @endif
 
             {{-- Sección de Detalles Biográficos --}}
@@ -81,7 +81,7 @@
             <div class="ml-2">{!! $personaje->historia !!}</div>
             @endif
 
-        
+
             {{-- Sección de Aspectos Sociales y Otros --}}
             @php
             $hasSocials = $personaje->religion || $personaje->familia || $personaje->politica;
@@ -89,7 +89,7 @@
 
             @if ($hasSocials)
             <h2 class="border-bottom pb-2 mb-3">Aspectos sociales y culturales</h2>
-            
+
             @if ($personaje->religion)
             <h5><i class="fa-solid fa-monument mr-2"></i>Religión</h5>
             <div class="ml-4 mb-3">{!! $personaje->religion !!}</div>
@@ -106,8 +106,8 @@
             @endif
             @endif
 
-             @if ($personaje->otros)
-            <h2 class="border-bottom pb-2 mt-4 mb-3">Otros aspectos</h2>
+            @if ($personaje->otros)
+            <h2 class="border-bottom pb-2 mt-4 mb-3"><i class="fas fa-plus-circle mr-2"></i> Otros aspectos</h2>
             <div class="ml-2">{!! $personaje->otros !!}</div>
             @endif
           </div>
@@ -126,9 +126,14 @@
               style="max-height: 400px; width: 100%; object-fit: cover;">
 
             <div class="text-left mt-3">
+              @if (isset($personaje->apodo))
+              <strong><i class="fas fa-feather-alt mr-2"></i>Apodo:</strong>
+              <p class="text-muted">{{$personaje->apodo}}</p>
+              @endif
+
               <strong><i class="fas fa-dna mr-1"></i> Especie:</strong>
               <p class="text-muted">
-                <a href="{{ route('especie.show', $personaje->id_foranea_especie) }}">{{ $especie }}</a>
+                <a href="{{ route('especie.show', $personaje->especie_id) }}">{{ $personaje->especie->nombre }}</a>
               </p>
 
               <strong><i class="fas fa-venus-mars mr-1"></i> Sexo:</strong>
@@ -139,16 +144,19 @@
               <p class="text-muted">{{ $personaje->lugar_nacimiento }}</p>
               @endif
 
-              @if ($personaje->nacimiento)
+              @if ($personaje->nacimiento_id)
               <strong><i class="fa-solid fa-baby mr-1"></i>Fecha de nacimiento</strong>
               <p class="ml-2 mr-2">{{$nacimiento}}</p>
               @endif
 
-              @if ($personaje->fallecimiento)
+              @if ($personaje->fallecimiento_id)
               <strong><i class="fa-solid fa-skull-crossbones mr-1"></i>Fecha de fallecimiento</strong>
               <p class="ml-2 mr-2">{{$fallecimiento}}</p>
               @endif
 
+              <strong><i class="fas fa-birthday-cake mr-1"></i> Edad:</strong>
+              <p class="text-muted">{{ $edad }}</p>
+              
               @if($personaje->causa_fallecimiento)
               <div class="alert alert-secondary py-2 mt-2">
                 <strong><i class="fas fa-cross mr-1"></i> Causa de fallecimiento:</strong><br>
@@ -156,8 +164,6 @@
               </div>
               @endif
 
-              <strong><i class="fas fa-birthday-cake mr-1"></i> Edad:</strong>
-              <p class="text-muted">{{ $edad }}</p>
             </div>
           </div>
         </div>
