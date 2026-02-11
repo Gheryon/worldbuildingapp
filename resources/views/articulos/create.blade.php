@@ -4,71 +4,84 @@
 <title id="title">Nuevo artículo</title>
 @endsection
 
-@section('navbar-buttons')
-<li class="nav-item ml-2">
-<a href="{{route('articulos')}}" class="btn btn-dark">Cancelar</a>
-</li>
-@endsection
-
 @section('content')
-<div class="row">
-  <h1>Nuevo artículo</h1>
-</div>
-<hr>
-
-<!-- Main content -->
-<section class="content">
+<div class="container-fluid mt-4">
   <form id="form-create" action="{{route('articulos.store')}}" method="post">
     @csrf
-    <div class="row mb-3 justify-content-center">
-      <button type="submit" class="btn btn-success ml-1" id="guardar">Guardar</button>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="h3">Crear Nuevo Artículo</h1>
+      <div>
+        <a href="{{route('articulos.index')}}" class="btn btn-outline-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-dark shadow-sm" id="guardar">
+          <i class="fas fa-save mr-1"></i> Guardar artículo
+        </button>
+      </div>
     </div>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="card card-outline">
-            <div class="card-header">
-              <div class="row mb-2">
-                <div class="col">
-                  <label for="nombre" class="form-label">Nombre</label>
-                  <input type="text" name="nombre" class="form-control" id="nombre" placeholder="Nombre" required>
-                  @error('nombre')
-                  <small style="color: red">{{$message}}</small>
-                  @enderror
-                </div>
-                <div class="col-4">
-                  <label for="tipo" class="form-label">Tipo</label>
-                  <select class="form-control" name="tipo" id="tipo" required>
-                    <option selected disabled value="">Elegir</option>
-                    <option>Referencia</option>
-                    <option>Canon</option>
-                  </select>
-                  @error('tipo')
-                  <small style="color: red">{{$message}}</small>
-                  @enderror
-                </div>
-              </div>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-              <label for="contenido" class="form-label">Contenido</label>
-              <textarea class="form-control summernote" id="contenido" name="contenido" rows="8" aria-label="With textarea" required></textarea>
-                @error('contenido')
-                <small style="color: red">{{$message}}</small>
-                @enderror
-            </div>
-            <div class="card-footer">
-            </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-8 mb-3">
+            <label for="nombre" class="form-label fw-bold">Nombre del artículo</label>
+            <input type="text" name="nombre"
+              class="form-control @error('nombre') is-invalid @enderror"
+              id="nombre" value="{{ old('nombre') }}"
+              placeholder="Ej: El Imperio de Eldoria" required>
+            @error('nombre')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
-        </div><!-- /.col-->
-      </div><!-- ./row -->
-    </div> <!-- /container -->
+
+          <div class="col-md-4 mb-3">
+            <label for="tipo" class="form-label fw-bold">Tipo de contenido</label>
+            <select class="form-control @error('tipo') is-invalid @enderror" name="tipo" id="tipo" required>
+              <option selected disabled value="">Elegir...</option>
+              <option value="Referencia" {{ old('tipo') == 'Referencia' ? 'selected' : '' }}>Referencia</option>
+              <option value="Canon" {{ old('tipo') == 'Canon' ? 'selected' : '' }}>Canon</option>
+            </select>
+            @error('tipo')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <label for="contenido" class="form-label fw-bold">Contenido</label>
+            <textarea class="form-control summernote" id="contenido" name="contenido" required>{{ old('contenido') }}</textarea>
+            @error('contenido')
+            <div class="text-danger small mt-1">{{ $message }}</div>
+            @enderror
+          </div>
+        </div>
+      </div>
+    </div>
   </form>
-</section>
-<!-- /.content -->
+</div>
+
 @endsection
 
 @section('specific-scripts')
 <!--<script src="../js/summernote-bs4.min.js"></script>-->
 <script src="{{asset('dist/js/common.js')}}"></script>
+<script>
+  $(document).ready(function() {
+    // Prevención de pérdida de datos
+    let formChanged = false;
+    $('#form-create').on('change', 'input, select, textarea', function() {
+      formChanged = true;
+    });
+
+    $(window).on('beforeunload', function() {
+      if (formChanged) {
+        return "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?";
+      }
+    });
+
+    $('#form-create').on('submit', function() {
+      $(window).off('beforeunload'); // Desactivar alerta al enviar el formulario
+    });
+  });
+</script>
 @endsection

@@ -9,119 +9,91 @@
   <a href="{{route('articulos.create')}}" class="btn btn-dark">Nuevo articulo</a>
 </li>
 <li class="nav-item">
-  <select id="filtro" class="form-control ml-2" name="filtro">
+  <select id="filtro_tipo" class="form-control ml-2" name="filtro_tipo">
     <option selected disabled value="ASC">Filtro</option>
-    <option value="all">Todos</option>
-    <option value="Referencia">Referencia</option>
-    <option value="Canon">Canon</option>
+    <option value="all" {{ $tipo == "all" ? 'selected' : '' }}>Todos</option>
+    <option value="Referencia" {{ $tipo == "Referencia" ? 'selected' : '' }}>Referencia</option>
+    <option value="Canon" {{ $tipo == "Canon" ? 'selected' : '' }}>Canon</option>
   </select>
 </li>
+<x-order-input name="orden" label="Orden A-Z" :orden="$orden" />
+
+<x-order-date-input :fecha="$fecha" />
+
 <li class="nav-item ml-2">
-  <select id="order" class="form-control ml-2" name="order">
-    <option selected disabled value="ASC">Orden</option>
-    <option value="asc">Ascendente</option>
-    <option value="desc">Descendente</option>
-  </select>
+  <a href="{{ route('articulos.index') }}" class="btn btn-outline-dark ml-2" title="Limpiar filtros">
+    <i class="fas fa-sync-alt"></i>
+  </a>
 </li>
 @endsection
 
 @section('navbar-search')
 <li class="nav-item">
-  <form class="form-inline ml-2" action="{{route('articulos.search')}}" method="GET">
-    <div class="input-group">
-      <input type="search" name="search" class="form-control" placeholder="Nombre a buscar">
-      <div class="input-group-append">
-        <button type="submit" class="btn btn-default">
-          <i class="fa fa-search"></i>
-        </button>
-      </div>
+  <form class="form-inline ml-2" action="{{route('articulos.index')}}" method="GET" value="{{ request('search') }}>
+    <div class=" input-group">
+    <input type="search" name="search" class="form-control" placeholder="Nombre a buscar">
+    <div class="input-group-append">
+      <button type="submit" class="btn btn-default">
+        <i class="fa fa-search"></i>
+      </button>
+    </div>
     </div>
   </form>
 </li>
 @endsection
 
 @section('content')
-<div class="modal fade" id="eliminar-articulo" tabindex="-1" role="dialog" aria-labelledby="confirmar_eliminacion" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="card card-danger">
-        <div class="card-header">
-          <h5 class="card-title" id="confirmar_eliminacion">Confirmar eliminación</h5>
-          <button data-dismiss="modal" aria-label="close" class="close">
-            <span aria-hidden="true">&times;</span>
+<table class="table table-bordered table-striped table-hover">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th style="width: 100px;">Tipo</th>
+      <th style="width: 200px;">Última modificación</th>
+      <th class="text-center" style="width: 150px;">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    @forelse($articulos as $articulo)
+    <tr>
+      <td class="align-middle">{{ $articulo->nombre }}</td>
+      <td class="align-middle">
+        <span class="badge {{ $articulo->tipo === 'Canon' ? 'badge-primary' : 'badge-secondary' }}">
+          {{ $articulo->tipo }}
+        </span>
+      </td>
+      <td class="align-middle text-muted small">
+        {{ $articulo->updated_at->diffForHumans() }} 
+      </td>
+      <td class="text-center">
+        <div class="btn-group" role="group">
+          <a href="{{ route('articulos.show', $articulo->id) }}" class="btn btn-sm btn-info" title="Ver">
+            <i class="fas fa-eye"></i>
+          </a>
+          <a href="{{ route('articulos.edit', $articulo->id) }}" class="btn btn-sm btn-success" title="Editar">
+            <i class="fas fa-pencil-alt"></i>
+          </a>
+          <button data-id="{{ $articulo->id }}" data-nombre="{{ $articulo->nombre }}"
+            class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#eliminar-articulo" title="Borrar">
+            <i class="fas fa-trash"></i>
           </button>
         </div>
-        <div class="card-body">
-          <div class="row">
-            <p> ¿Borrar artículo: <span id="nombre-borrar"> </span>?</p>
-          </div>
-        </div>
-        <div class="card-footer">
-          <form id="form-confirmar-borrar" class="col-md-auto" action="{{route('articulos.destroy')}}" method="POST">
-            @csrf
-            @method('DELETE')
-            <input type="hidden" name="id_borrar" id="id_borrar">
-            <input type="hidden" name="tipo" id="tipo">
-            <input type="hidden" name="nombre_borrado" id="nombre_borrado">
-            <button type="button" id="cancelar-borrar-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
-            <button type="submit" id="confirmar-borrar-button" class="btn btn-danger">Eliminar</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+      </td>
+    </tr>
+    @empty
+    <tr>
+      <td colspan="3" class="text-center py-4">
+        <p class="text-muted mb-3">No hay artículos almacenados</p>
+        <a href="{{ route('articulos.create') }}" class="btn btn-dark btn-sm">Añadir nuevo artículo</a>
+      </td>
+    </tr>
+    @endforelse
+  </tbody>
+</table>
 
-<div class="row">
-  <div class="col-md-12">
-    @if (Arr::has($articulos, 'error.error'))
-    <div class="text-center">
-      {{Arr::get($articulos, 'error.error')}}
-    </div>
-    @else
-    @if($articulos->count()>0)
-    <table class="table table-bordered table-sm table-striped table-hoover">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>tipo</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @foreach($articulos as $articulo)
-        <tr>
-          <td>{{$articulo->nombre}}</td>
-          <td>{{$articulo->tipo}}</td>
-          <td style="text-align:center">
-            <div class="btn-group" role="group" aria-label="Basic example">
-              <a href="{{route('articulos.show',$articulo->id_articulo)}}" role="button" title="Ver" class="btn btn-info detalles">
-                <i class="fas fa-id-card mr-1"></i>
-              </a>
-              <a href="{{route('articulos.edit',$articulo->id_articulo)}}" role="button" title="Editar" class="btn btn-success"><i class="fas fa-pencil-alt"></i></a>
-              <button data-id="{{$articulo->id_articulo}}" data-nombre="{{$articulo->nombre}}" type="button" title="borrar" class="borrar btn btn-danger" data-toggle="modal" data-target="#eliminar-articulo"><i class="fas fa-trash"></i></button>
-            </div>
-          </td>
-        </tr>
-        @endforeach
-      </tbody>
-      @else
-      <div class="col-12">
-        <h5 class="card-title">No hay artículos almacenados</h5>
-      </div>
-      </br>
-      <div class="col-12 mt-3">
-        <a href="{{route('articulos.create')}}" class="btn btn-dark">Añadir nuevo articulo</a>
-      </div>
-      @endif
-    </table>
-
-    @endif
-  </div>
-  <!-- /.col -->
-
-</div>
-
+<x-modal-delete
+  id="eliminar-articulo"
+  :route="route('articulos.destroy')"
+  message="Estás a punto de eliminar el siguiente articulo de forma permanente:" />
 @endsection
 
 @section('specific-scripts')
@@ -129,22 +101,30 @@
 <script src="{{asset('dist/js/config.js')}}"></script>
 <script>
   $(function() {
-    $(document).on('change', '#filtro', function() {
-      filtro = this.value;
-      orden = "{{$orden}}";
-      let url = "{{ route('articulos', ['orden'=>'_orden', 'filtro'=>'_filtro']) }}";
-      url = url.replace('_filtro', filtro);
-      url = url.replace('_orden', orden);
-      document.location.href = url;
-    });
-    $(document).on('change', '#order', function() {
-      orden = this.value;
-      filtro = "{{$filtro_o}}";
-      let url = "{{ route('articulos', ['orden'=>'_orden', 'filtro'=>'_filtro']) }}";
-      url = url.replace('_orden', orden);
-      url = url.replace('_filtro', filtro);
-      document.location.href = url;
-    });
+
+    function redirigirConFiltros() {
+      const orden = $('#order').val();
+      const tipo = $('#filtro_tipo').val();
+      const fecha = $('#filtro_fecha').val();
+      const search = $('input[name="search"]').val();
+
+      // Creamos el objeto de parámetros de búsqueda
+      const params = new URLSearchParams();
+
+      // Solo agregamos los parámetros si tienen un valor útil
+      if (orden) params.append('orden', orden);
+      if (tipo && tipo !== 'all') params.append('tipo', tipo);
+      if (fecha) params.append('fecha', fecha);
+      if (search) params.append('search', search); //Mantiene la búsqueda al filtrar
+
+      // Generamos la URL base desde Laravel
+      const baseUrl = "{{ route('articulos.index') }}";
+      const urlFinal = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+      //console.log(orden, tipo, urlFinal);
+      document.location.href = urlFinal;
+    }
+
+    $(document).on('change', '#order, #filtro_tipo, #filtro_fecha', redirigirConFiltros);
   });
 </script>
 @endsection

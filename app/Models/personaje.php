@@ -304,11 +304,11 @@ class personaje extends Model
   {
     return DB::transaction(function () {
       //Borrar fechas relacionadas si existen
-      if ($this->nacimiento != 0) {
-        Fecha::destroy($this->nacimiento);
+      if ($this->nacimiento_id) {
+        Fecha::destroy($this->nacimiento_id);
       }
-      if ($this->fallecimiento != 0) {
-        Fecha::destroy($this->fallecimiento);
+      if ($this->fallecimiento_id) {
+        Fecha::destroy($this->fallecimiento_id);
       }
 
       //Borrar el retrato físico sin borrar el default

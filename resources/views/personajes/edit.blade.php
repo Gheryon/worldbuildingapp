@@ -185,17 +185,9 @@
 @endsection
 
 @section('specific-scripts')
+<script src="{{asset('dist/js/common.js')}}"></script>
 <script>
   $(function() {
-    // Summernote
-    $('.summernote').summernote({
-      height: 300
-    })
-
-    $('.summernote-lite').summernote({
-      height: 150
-    })
-
     //Preview de retrato antes de subirla
     document.getElementById('retrato').onchange = evt => {
       const [file] = document.getElementById('retrato').files

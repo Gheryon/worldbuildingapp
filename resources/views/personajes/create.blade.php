@@ -168,7 +168,7 @@
           {{-- PESTAÑA 3: Historia y Otros --}}
           <div class="tab-pane fade" id="tab-historia" role="tabpanel">
             <x-textarea-input name="biografia" label="Historia" class="summernote" rows="10" />
-            <x-textarea-input name="otros" label="Otros detalles adicionales" />
+            <x-textarea-input name="otros" label="Otros detalles adicionales" class="summernote-lite" />
           </div>
         </div>
       </div>
@@ -181,17 +181,9 @@
 @endsection
 
 @section('specific-scripts')
+<script src="{{asset('dist/js/common.js')}}"></script>
 <script>
   $(function() {
-    // Summernote
-    $('.summernote').summernote({
-      height: 300
-    })
-
-    $('.summernote-lite').summernote({
-      height: 150
-    })
-
     //Preview de retrato antes de subirla
     document.getElementById('retrato').onchange = evt => {
       const [file] = document.getElementById('retrato').files
@@ -199,7 +191,6 @@
         document.getElementById('retrato-preview').src = URL.createObjectURL(file)
       }
     }
-
   });
 </script>
 @endsection

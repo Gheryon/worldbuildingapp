@@ -132,6 +132,22 @@ section{
     box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25);
 }
 
+/*===============para summernote=======================*/
+/*hace que las imágenes y videos se adapten al ancho del contenedor*/
+.article-body .note-video-clip {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+}
+
+/* Evita que las tablas de worldbuilding se rompan en móviles */
+.article-body table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 /*================Para multiselect y select2====================*/
 /* Ajuste para que el borde resalte según el enfoque de AdminLTE */
 /* Altura y alineación del contenedor principal */

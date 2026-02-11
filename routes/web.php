@@ -25,7 +25,6 @@ Route::controller(App\Http\Controllers\ArticuloController::class)->group(functio
   Route::get('/articulos/{id}/edit', 'edit')->name('articulos.edit');
   Route::put('/articulos/{id}', 'update')->name('articulos.update');
   Route::delete('/articulos/destroy', 'destroy')->name('articulos.destroy');
-  Route::get('/articulos', 'search')->name('articulos.search');
 });
 
 /*******asentamientos routes********/
@@ -166,7 +165,6 @@ Route::controller(App\Http\Controllers\ArticuloController::class)->group(functio
   Route::get('/relatos/{id}/edit', 'edit_relato')->name('relatos.edit');
   Route::put('/relatos/{id}', 'update_relato')->name('relatos.update');
   Route::delete('/relatos/destroy', 'destroy_relato')->name('relatos.destroy');
-  Route::get('/relatos', 'search_relatos')->name('relatos.search');
 });
 
 /*******vistas routes********/

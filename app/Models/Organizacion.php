@@ -338,11 +338,11 @@ class Organizacion extends Model
   {
     return DB::transaction(function () {
       //Borrar fechas asociadas
-      if ($this->fundacion != 0) {
-        Fecha::destroy($this->fundacion);
+      if ($this->fundacion_id) {
+        Fecha::destroy($this->fundacion_id);
       }
-      if ($this->disolucion != 0) {
-        Fecha::destroy($this->disolucion);
+      if ($this->disolucion_id) {
+        Fecha::destroy($this->disolucion_id);
       }
 
       //Borrar escudo si no es el por defecto

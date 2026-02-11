@@ -5,15 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use App\Services\ImageService;
 use Exception;
 
 class articulo extends Model
 {
   use HasFactory;
 
-  protected $table = 'articulosgenericos';
-  protected $primaryKey = 'id_articulo';
-  public $timestamps = false;
+  protected $table = 'articulos_genericos';
+  protected $primaryKey = 'id';
+  public $timestamps = true;
 
   protected $fillable = [
     'nombre',
@@ -22,33 +24,103 @@ class articulo extends Model
   ];
 
   /**
-   * Obtiene los articulos donde tipo != relato, ordenados por nombre.
-   *
-   * @return \Illuminate\Database\Eloquent\Collection
+   * Scope para filtrar y ordenar articulos.
    */
-  public static function get_articulos($orden, $filtro)
+  public function scopeFiltrar($query, $filtros)
   {
-    try {
-      if($filtro == 'all') {
-        $articulos = self::where('tipo', '!=', 'relato')
-          ->select('id_articulo', 'nombre', 'tipo')
-          ->orderBy('nombre', $orden)
-          ->get();
-      } else {
-        $articulos = self::where('tipo', '=', $filtro)
-          ->select('id_articulo', 'nombre', 'tipo')
-          ->orderBy('nombre', $orden)
-          ->get();
-      }
-      if ($articulos->isEmpty()) {
-        Log::warning('articulo->get_articulos: No se encontraron articulos con tipo = ' . $filtro . '.');
-        $articulos = ['error' => ['error' => 'No hay articulos guardados.']];
-      }
-    } catch (\Exception $e) {
-      Log::error('articulo->get_articulos: Error al obtener articulos: ' . $e->getMessage());
-      $articulos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    }
-    return $articulos;
+    return $query->select(
+      'articulos_genericos.id',
+      'articulos_genericos.nombre',
+      'articulos_genericos.tipo',
+      'articulos_genericos.updated_at'
+    )
+      ->when($filtros['search'] ?? null, function ($q, $search) {
+        $q->where('articulos_genericos.nombre', 'LIKE', "%{$search}%");
+      })
+      ->when($filtros['tipo'] ?? null, function ($q, $tipo) {
+        if ($tipo !== 'all') $q->where('articulos_genericos.tipo', $tipo);
+      })
+      // Prioridad de ordenación
+      ->when($filtros['fecha'] ?? null, function ($q, $fecha) {
+        // Si el usuario eligió un orden por fecha, se aplica este
+        $q->orderBy('articulos_genericos.updated_at', $fecha);
+      }, function ($q) use ($filtros) {
+        // Si NO hay filtro de fecha, ordenamos por nombre por defecto
+        $q->orderBy('articulos_genericos.nombre', $filtros['orden'] ?? 'asc');
+      });
+  }
+
+  /**
+   * Almacena un nuevo articulo en la base de datos.
+   *
+   * @param \Illuminate\Http\Request $request
+   * @return \App\Models\articulo
+   */
+  public static function store_articulo($request)
+  {
+    return DB::transaction(function () use ($request) {
+      $articulo = self::create([
+        'nombre' => $request->nombre,
+        'tipo' => $request->tipo
+      ]);
+
+      // Procesado de campos de Summernote
+      $imageService = new ImageService();
+      $articulo->contenido = $imageService->processSummernoteImages(
+        $request->contenido,
+        "articulos",
+        $articulo->id
+      );
+
+      $articulo->save();
+
+      return $articulo;
+    });
+  }
+
+  /**
+   * Actualiza un articulo existente en la base de datos.
+   *
+   * @param \Illuminate\Http\Request $request
+   * @return \App\Models\articulo
+   */
+  public function update_articulo($request)
+  {
+    return DB::transaction(function () use ($request) {
+      $this->fill([
+        'nombre' => $request->nombre,
+        'tipo' => $request->tipo
+      ]);
+
+      // Procesado de campos de Summernote
+      $imageService = new ImageService();
+      $this->contenido = $imageService->processSummernoteImages(
+        $request->contenido,
+        "articulos",
+        $this->id
+      );
+
+      $this->save();
+
+      return $this;
+    });
+  }
+
+  /**
+   * Elimina el articulo y sus datos relacionados.
+   *
+   * @return bool|null
+   */
+  public function eliminar_articulo()
+  {
+    return DB::transaction(function () {
+      //Borrar imágenes de Summernote relacionadas
+      $imageService = new ImageService();
+      $imageService->deleteImagesByOwner('articulos', $this->id);
+
+      //Borrar el articulo
+      return $this->delete();
+    });
   }
 
   /**
