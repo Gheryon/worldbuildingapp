@@ -92,7 +92,7 @@
         </li>
         <li class="nav-header">OTROS</li>
         <li class="nav-item">
-          <a href="{{route('articulos')}}" class="nav-link">
+          <a href="{{route('articulos.index')}}" class="nav-link">
             <i class="nav-icon fa-solid fa-book-open"></i>
             <p>
               Apuntes

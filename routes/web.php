@@ -18,7 +18,7 @@ Route::get('/', function () {
 
 /*******articulos routes********/
 Route::controller(App\Http\Controllers\ArticuloController::class)->group(function () {
-  Route::get('/articulos/index/{orden?}/{filtro?}', 'index')->name('articulos');
+  Route::get('/articulos/index', 'index')->name('articulos.index');
   Route::get('/articulos/create', 'create')->name('articulos.create');
   Route::post('/articulos/articulos', 'store')->name('articulos.store');
   Route::get('/articulos/{id}', 'show')->name('articulos.show');

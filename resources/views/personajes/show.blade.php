@@ -76,9 +76,9 @@
             @endif
             @endif
 
-            @if ($personaje->historia)
-            <h2 class="border-bottom pb-2 mt-4 mb-3">Historia</h2>
-            <div class="ml-2">{!! $personaje->historia !!}</div>
+            @if ($personaje->biografia)
+            <h2 class="border-bottom pb-2 mt-4 mb-3"><i class="fas fa-scroll mr-2"></i>Historia</h2>
+            <div class="ml-2">{!! $personaje->biografia !!}</div>
             @endif
 
 
