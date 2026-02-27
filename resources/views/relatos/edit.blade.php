@@ -1,6 +1,4 @@
 @extends('layouts.index')
-@extends('layouts.navbar')
-@extends('layouts.menu')
 
 @section('title')
 <title id="title">Editar {{$relato->nombre}}</title>
@@ -8,84 +6,101 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-<a href="{{route('relatos')}}" class="btn btn-dark">Cancelar</a>
+  <a href="{{route('relatos.index')}}" class="btn btn-dark">Cancelar</a>
 </li>
 @endsection
 
 @section('content')
-<div class="row">
-  <h1 id="title-h1">Editar artículo {{$relato->nombre}}</h1>
-</div>
-<hr>
-
-<!-- Main content -->
-<section class="content">
-  <form id="form-edit"  action="{{route('relatos.update', $relato->id_articulo )}}" method="post">
+<div class="container-fluid mt-4">
+  <form id="form-edit" action="{{route('relatos.update', $relato->id )}}" method="post">
     @csrf
     @method('PUT')
-    <div class="row mb-3 justify-content-center">
-      <button type="submit" class="btn btn-success ml-1" id="guardar-button">Guardar</button>
-    </div>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="card card-outline">
-            <div class="card-header">
-              <div class="row mb-2">
-                <div class="col">
-                  <label for="nombre" class="form-label">Nombre</label>
-                  <input type="text" value="{{$relato->nombre}}" name="nombre" class="form-control" id="nombre" placeholder="Nombre" required>
-                  @error('nombre')
-                  <small style="color: red">{{$message}}</small>
-                  @enderror
-                </div>
-                <div class="col-md-4">
-                  <label for="personajes" class="form-label">Personajes relevantes</label>
-                  <select class="form-select form-control" multiple="multiple" data-placeholder="Personajes" name="personajes[]" id="personajes" style="width: 100%;">
-                    <option selected disabled value="">Elegir</option>
-                    @if (Arr::has($personajes, 'error.error'))
-                    <option disabled value="">Se produjo un error en la base de datos</option>
-                    @else
-                      @if($personajes->isEmpty())
-                      <option disabled value="">No hay personajes guardados.</option>
-                      @else
-                      @foreach($personajes as $persona)
-                    <option value="{{ $persona->id }}" {{ in_array($persona->id, $personajes_r->pluck('personaje')->toArray()) ? 'selected' : '' }}>{{ $persona->Nombre }}</option>
-                      @endforeach
-                      @endif
-                    @endif
-                  </select>
-                  @error('personajes')
-                  <small style="color: red">{{$message}}</small>
-                  @enderror
-                </div>
-              </div>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-              <label for="contenido" class="form-label">Contenido</label>
-              <textarea class="form-control summernote" id="contenido" name="contenido" rows="8" aria-label="With textarea">{!!$relato->contenido!!}</textarea>
-                @error('contenido')
-                <small style="color: red">{{$message}}</small>
-                @enderror
-            </div>
-            <div class="card-footer">
-            </div>
-          </div>
-        </div><!-- /.col-->
-      </div><!-- ./row -->
-    </div> <!-- /container -->
-  </form>
-</section>
-<!-- /.content -->
 
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="h3">Editar {{$relato->nombre}}</h1>
+      <div>
+        <a href="{{route('relatos.index')}}" class="btn btn-outline-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-dark shadow-sm" id="guardar">
+          <i class="fas fa-save mr-1"></i> Guardar
+        </button>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-8 mb-3">
+            <label for="nombre" class="form-label fw-bold">Nombre</label>
+            <input type="text" name="nombre"
+              class="form-control @error('nombre') is-invalid @enderror"
+              id="nombre" value="{{ old('nombre', $relato->nombre) }}"
+              placeholder="Ej: El Imperio de Eldoria" required>
+            @error('nombre')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="personajes" class="form-label">Personajes relevantes</label>
+            <select class="form-select form-control" multiple="multiple" data-placeholder="Personajes" name="personajes[]" id="personajes" style="width: 100%;">
+              @php
+              // 1. Prioridad: lo que el usuario acaba de marcar (si hubo error de validación)
+              // 2. Si no, los IDs que ya existen en la relación del modelo
+              $selectedIds = old('personajes', $relato->personajes_relevantes->pluck('id')->toArray());
+              @endphp
+              @foreach($personajes as $id => $nombre)
+              <option value="{{$id}}" {{ in_array($id, $selectedIds) ? 'selected' : '' }}>{{$nombre}}</option>
+              @endforeach
+            </select>
+            @error('personajes')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <label for="contenido" class="form-label fw-bold">Contenido</label>
+            <textarea class="form-control summernote" id="contenido" name="contenido" required>{{ old('contenido', $relato->contenido) }}</textarea>
+            @error('contenido')
+            <div class="text-danger small mt-1">{{ $message }}</div>
+            @enderror
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
 @endsection
 
 @section('specific-scripts')
 <script src="{{asset('dist/js/common.js')}}"></script>
+
 <script>
-  $(function() {
-    $('#tipo').val('{{$relato->tipo}}');
+  $(document).ready(function() {
+    $('#personajes').select2({
+      theme: 'bootstrap4', // Importante, pues la version bootstrap actual es la 4
+      //placeholder: $('#personajes').data('placeholder'),
+      allowClear: true,
+      width: '100%',
+      containerCssClass: ':all:'
+    });
+
+    // Prevención de pérdida de datos
+    let formChanged = false;
+    $('#form-edit').on('change', 'input, select, textarea', function() {
+      formChanged = true;
+    });
+
+    $(window).on('beforeunload', function() {
+      if (formChanged) {
+        return "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?";
+      }
+    });
+
+    $('#form-edit').on('submit', function() {
+      $(window).off('beforeunload'); // Desactivar alerta al enviar el formulario
+    });
   });
 </script>
 @endsection

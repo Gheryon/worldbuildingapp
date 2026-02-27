@@ -1,6 +1,4 @@
 @extends('layouts.index')
-@extends('layouts.navbar')
-@extends('layouts.menu')
 
 @section('title')
 <title id="title">Worldbuilding app</title>
@@ -10,155 +8,65 @@
 @endsection
 
 @section('content')
-<section class="content">
-  <div class="container-fluid mt-2">
-    <div class="row mt-5">
-      <div class="col">
-        <!-- small box -->
-        <div class="small-box bg-dark">
-          <div class="inner">
-            <h3>Instituciones</h3>
-          </div>
-          <div class="icon">
-            <i class="fa-solid fa-building-columns"></i>
-          </div>
-          <a href="{{route('organizaciones.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
-      <div class="col">
-        <!-- small box -->
-        <div class="small-box bg-dark">
-          <div class="inner">
-            <h3>Personajes</h3>
-          </div>
-          <div class="icon">
-            <i class="fa-solid fa-people-group"></i>
-          </div>
-          <a href="{{route('personajes.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
-      <div class="col">
-        <!-- small box -->
-        <div class="small-box bg-dark">
-          <div class="inner">
-            <h3>Religiones</h3>
-          </div>
-          <div class="icon">
-            <i class="fa-solid fa-place-of-worship"></i>
-          </div>
-          <a href="{{route('religiones.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
-      <div class="col">
-        <!-- small box -->
-        <div class="small-box bg-dark">
-          <div class="inner">
-            <h3>Especies</h3>
-          </div>
-          <div class="icon">
-            <i class="fa-solid fa-dna"></i>
-          </div>
-          <a href="{{route('especies.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
-      <div class="col">
-        <!-- small box -->
-        <div class="small-box bg-dark">
-          <div class="inner">
-            <h3>Asentamientos</h3>
-          </div>
-          <div class="icon">
-            <i class="fa-solid fa-house"></i>
-          </div>
-          <a href="{{route('asentamientos.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
-      <div class="col">
-        <!-- small box -->
-        <div class="small-box bg-dark">
-          <div class="inner">
-            <h3>Lugares</h3>
-          </div>
-          <div class="icon">
-            <i class="fa-solid fa-mountain-sun"></i>
-          </div>
-          <a href="{{route('lugares.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
-      <div class="col">
-        <!-- small box -->
-        <div class="small-box bg-dark">
-          <div class="inner">
-            <h3>Construcciones</h3>
-          </div>
-          <div class="icon">
-            <i class="fa-solid fa-building"></i>
-          </div>
-          <a href="{{route('construcciones.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
-      <div class="col">
-        <!-- small box -->
-        <div class="small-box bg-dark">
-          <div class="inner">
-            <h3>Conflictos</h3>
-          </div>
-          <div class="icon">
-            <i class="fa-solid fa-shield-halved"></i>
-          </div>
-          <a href="{{route('conflictos.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
-      <div class="col">
-        <!-- small box -->
-        <div class="small-box bg-dark">
-          <div class="inner">
-            <h3>Cronologías</h3>
-          </div>
-          <div class="icon">
-            <i class="fas fa-columns"></i>
-          </div>
-          <a href="{{route('timelines.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
-      <div class="col">
-        <!-- small box -->
-        <div class="small-box bg-dark">
-          <div class="inner">
-            <h3>Apuntes</h3>
-          </div>
-          <div class="icon">
-            <i class="fa-solid fa-pencil"></i>
-          </div>
-          <a href="{{route('articulos')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
-      <div class="col">
-        <!-- small box -->
-        <div class="small-box bg-dark">
-          <div class="inner">
-            <h3>Enlaces</h3>
-          </div>
-          <div class="icon">
-            <i class="fas fa-file"></i>
-          </div>
-          <a href="{{route('enlaces.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
-      <div class="col">
-        <!-- small box -->
-        <div class="small-box bg-dark">
-          <div class="inner">
-            <h3>Nombres</h3>
-          </div>
-          <div class="icon">
-            <i class="fa-solid fa-pencil"></i>
-          </div>
-          <a href="{{route('nombres.index')}}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
+<div class="content-header bg-dark mb-4 shadow-sm" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/Aeberion/imagenes/Aeberion.jpeg'); background-size: cover; background-position: center; border-radius: 0 0 15px 15px; min-height: 90px; display: flex; align-items: center;">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-8 offset-sm-2 text-center">
+        <h1 class="m-0 text-white font-weight-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.8); letter-spacing: 2px;">
+            Worldbuilding App
+        </h1>
+        <p class="text-light mt-2 d-none d-md-block" style="opacity: 0.9;">
+            Gestiona la mitología, geografía y crónicas de un universo.
+        </p>
       </div>
     </div>
-    <!--<img src="/Aeberion/imagenes/Aeberion.jpeg" class="img-fluid" alt="Aeberion.jpeg">-->
   </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+      
+        {{-- Sección: El Mundo --}}
+        <h5 class="mb-3 mt-4 text-muted"><i class="fas fa-globe-americas mr-2"></i>Geografía y Vida</h5>
+        <div class="row">
+          <x-dashboard-card route="lugares.index" title="Lugares" icon="fa-mountain-sun" bg="bg-dark" />
+          <x-dashboard-card route="asentamientos.index" title="Asentamientos" icon="fa-house" bg="bg-dark" />
+          <x-dashboard-card route="especies.index" title="Especies" icon="fa-dna" bg="bg-dark" />
+          <x-dashboard-card route="construcciones.index" title="Construcciones" icon="fa-building" bg="bg-dark" />
+        </div>
+
+        {{-- Sección: Historia y Cultura --}}
+        <h5 class="mb-3 mt-4 text-muted"><i class="fas fa-scroll mr-2"></i>Historia y Sociedad</h5>
+        <div class="row">
+          <x-dashboard-card route="personajes.index" title="Personajes" icon="fa-people-group" bg="bg-purple" />
+          <x-dashboard-card route="organizaciones.index" title="Instituciones" icon="fa-building-columns" bg="bg-purple" />
+          <x-dashboard-card route="religiones.index" title="Religiones" icon="fa-place-of-worship" bg="bg-purple" />
+          <x-dashboard-card route="conflictos.index" title="Conflictos" icon="fa-shield-halved" bg="bg-purple" />
+          <x-dashboard-card route="timelines.index" title="Cronologías" icon="fas fa-columns" bg="bg-purple" />
+        </div>
+
+        {{-- Sección: Herramientas --}}
+        <h5 class="mb-3 mt-4 text-muted"><i class="fas fa-toolbox mr-2"></i>Herramientas de Escritura</h5>
+        <div class="row">
+          <x-dashboard-card route="articulos.index" title="Apuntes" icon="fa-pencil" bg="bg-olive" />
+          <x-dashboard-card route="nombres.index" title="Nombres" icon="fa-signature" bg="bg-olive" />
+          <x-dashboard-card route="enlaces.index" title="Enlaces" icon="fas fa-file" bg="bg-olive" />
+          <x-dashboard-card route="galeria.index" title="Galería" icon="fa-image" bg="bg-olive" />
+        </div>
+
+    </div>
 </section>
+
+<style>
+    /* Efecto moderno de elevación al pasar el ratón */
+    .small-box {
+        transition: transform .2s, box-shadow .2s;
+        border-radius: 12px; /* Esquinas más suaves */
+        overflow: hidden;
+    }
+    .small-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+</style>
 @endsection

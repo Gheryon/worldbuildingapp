@@ -1,6 +1,4 @@
 @extends('layouts.index')
-@extends('layouts.navbar')
-@extends('layouts.menu')
 
 @section('title')
 <title id="title">Relatos e historias</title>
@@ -10,110 +8,78 @@
 <li class="nav-item">
   <a href="{{route('relatos.create')}}" class="btn btn-dark">Nuevo</a>
 </li>
+<x-order-input name="orden" label="Orden A-Z" :orden="$orden" />
+
+<x-order-date-input :fecha="$fecha" />
+
 <li class="nav-item ml-2">
-  <select id="order" class="form-control ml-2" name="order">
-    <option selected disabled value="ASC">Orden</option>
-    <option value="asc">Ascendente</option>
-    <option value="desc">Descendente</option>
-  </select>
+  <a href="{{ route('relatos.index') }}" class="btn btn-outline-dark ml-2" title="Limpiar filtros">
+    <i class="fas fa-sync-alt"></i>
+  </a>
 </li>
 @endsection
 
 @section('navbar-search')
-<!--<li class="nav-item">
-  <form class="form-inline ml-2" action="{{route('relatos.search')}}" method="GET">
-    <div class="input-group">
-      <input type="search" name="search" class="form-control" placeholder="Nombre a buscar">
-      <div class="input-group-append">
-        <button type="submit" class="btn btn-default">
-          <i class="fa fa-search"></i>
-        </button>
-      </div>
+<li class="nav-item">
+  <form class="form-inline ml-2" action="{{route('relatos.index')}}" method="GET" value="{{ request('search') }}>
+    <div class=" input-group">
+    <input type="search" name="search" class="form-control" placeholder="Nombre a buscar">
+    <div class="input-group-append">
+      <button type="submit" class="btn btn-default">
+        <i class="fa fa-search"></i>
+      </button>
+    </div>
     </div>
   </form>
-</li>-->
+</li>
 @endsection
 
 @section('content')
-<div class="modal fade" id="eliminar-relato" tabindex="-1" role="dialog" aria-labelledby="confirmar_eliminacion" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="card card-danger">
-        <div class="card-header">
-          <h5 class="card-title" id="confirmar_eliminacion">Confirmar eliminación</h5>
-          <button data-dismiss="modal" aria-label="close" class="close">
-            <span aria-hidden="true">&times;</span>
+<table class="table table-bordered table-striped table-hover">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th style="width: 200px;">Última modificación</th>
+      <th class="text-center" style="width: 150px;">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    @forelse($articulos as $articulo)
+    <tr>
+      <td class="align-middle">{{ $articulo->nombre }}</td>
+      <td class="align-middle text-muted small">
+        {{ $articulo->updated_at->diffForHumans() }} 
+      </td>
+      <td class="text-center">
+        <div class="btn-group" role="group">
+          <a href="{{ route('relatos.show', $articulo->id) }}" class="btn btn-sm btn-info" title="Ver">
+            <i class="fas fa-eye"></i>
+          </a>
+          <a href="{{ route('relatos.edit', $articulo->id) }}" class="btn btn-sm btn-success" title="Editar">
+            <i class="fas fa-pencil-alt"></i>
+          </a>
+          <button data-id="{{ $articulo->id }}" data-nombre="{{ $articulo->nombre }}"
+            class="borrar btn btn-sm btn-danger" data-toggle="modal" data-target="#eliminar-relato" title="Borrar">
+            <i class="fas fa-trash"></i>
           </button>
         </div>
-        <div class="card-body">
-          <div class="row">
-            <p> ¿Borrar artículo: <span id="nombre-borrar"> </span>?</p>
-          </div>
-        </div>
-        <div class="card-footer">
-          <form id="form-confirmar-borrar" class="col-md-auto" action="{{route('relatos.destroy')}}" method="POST">
-            @csrf
-            @method('DELETE')
-            <input type="hidden" name="id_borrar" id="id_borrar">
-            <input type="hidden" name="tipo" id="tipo">
-            <input type="hidden" name="nombre_borrado" id="nombre_borrado">
-            <button type="button" id="cancelar-borrar-button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
-            <button type="submit" id="confirmar-borrar-button" class="btn btn-danger">Eliminar</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+      </td>
+    </tr>
+    @empty
+    <tr>
+      <td colspan="3" class="text-center py-4">
+        <p class="text-muted mb-3">No hay relatos almacenados</p>
+        <a href="{{ route('relatos.create') }}" class="btn btn-dark btn-sm">Añadir nuevo</a>
+      </td>
+    </tr>
+    @endforelse
+  </tbody>
+</table>
 
-<div class="row">
-  <div class="col-md-12">
-    @if (Arr::has($relatos, 'error.error'))
-    <div class="text-center">
-      {{Arr::get($relatos, 'error.error')}}
-    </div>
-    @else
-    @if($relatos->count()>0)
-    <table class="table table-bordered table-sm table-striped table-hover">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th style="text-align:right">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @foreach($relatos as $relato)
-        <tr>
-          <td>{{$relato->nombre}}</td>
-          <td style="text-align:right">
-            <div class="btn-group" role="group" aria-label="Basic example">
-              <a href="{{route('relatos.show',$relato->id_articulo)}}" role="button" title="Ver" class="btn btn-info detalles">
-                <i class="fas fa-id-card mr-1"></i>
-              </a>
-              <a href="{{route('relatos.edit',$relato->id_articulo)}}" role="button" title="Editar" class="btn btn-success"><i class="fas fa-pencil-alt"></i></a>
-              <button data-id="{{$relato->id_articulo}}" data-nombre="{{$relato->nombre}}" type="button" title="borrar" class="borrar btn btn-danger" data-toggle="modal" data-target="#eliminar-relato"><i class="fas fa-trash"></i></button>
-            </div>
-          </td>
-        </tr>
-        @endforeach
-      </tbody>
-      @else
-      <div class="col-12">
-        <h5 class="card-title">No hay elementos almacenados</h5>
-      </div>
-      </br>
-      <div class="col-12 mt-3">
-        <a href="{{route('relatos.create')}}" class="btn btn-dark">Añadir nuevo</a>
-      </div>
-      @endif
-    </table>
-
-    @endif
-  </div>
-  <!-- /.col -->
-
-</div>
-
+<x-modal-delete
+  id="eliminar-relato"
+  :route="route('relatos.destroy')"
+  message="Estás a punto de eliminar el siguiente relato de forma permanente:" />
 @endsection
 
 @section('specific-scripts')
@@ -121,57 +87,30 @@
 <script src="{{asset('dist/js/config.js')}}"></script>
 <script>
   $(function() {
-    $(document).on('change', '#order', function() {
-      orden = this.value;
-      let url = "{{ route('relatos', ['orden'=>'_orden']) }}";
-      url = url.replace('_orden', orden);
-      document.location.href = url;
-    });
+
+    function redirigirConFiltros() {
+      const orden = $('#order').val();
+      const tipo = $('#filtro_tipo').val();
+      const fecha = $('#filtro_fecha').val();
+      const search = $('input[name="search"]').val();
+
+      // Creamos el objeto de parámetros de búsqueda
+      const params = new URLSearchParams();
+
+      // Solo agregamos los parámetros si tienen un valor útil
+      if (orden) params.append('orden', orden);
+      if (tipo && tipo !== 'all') params.append('tipo', tipo);
+      if (fecha) params.append('fecha', fecha);
+      if (search) params.append('search', search); //Mantiene la búsqueda al filtrar
+
+      // Generamos la URL base desde Laravel
+      const baseUrl = "{{ route('articulos.index') }}";
+      const urlFinal = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+      //console.log(orden, tipo, urlFinal);
+      document.location.href = urlFinal;
+    }
+
+    $(document).on('change', '#order, #filtro_tipo, #filtro_fecha', redirigirConFiltros);
   });
-</script>
-<script>
-  @if(Session::has('message'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 600,
-    "preventDuplicates": true,
-  }
-  toastr.success("{{ session('message') }}");
-  @endif
-
-  @if(Session::has('error'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 900,
-    "preventDuplicates": true,
-  }
-  toastr.error("{{ session('error') }}");
-  @endif
-
-  @if(Session::has('info'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 600,
-    "preventDuplicates": true,
-  }
-  toastr.info("{{ session('info') }}");
-  @endif
-
-  @if(Session::has('warning'))
-  toastr.options = {
-    "closeButton": true,
-    "closeOnHover": true,
-    "progressBar": false,
-    "showDuration": 600,
-    "preventDuplicates": true,
-  }
-  toastr.warning("{{ session('warning') }}");
-  @endif
 </script>
 @endsection

@@ -24,6 +24,15 @@ class articulo extends Model
   ];
 
   /**
+   * Relación con los personajes relevantes.
+   */
+  public function personajes_relevantes()
+  {
+    return $this->belongsToMany(personaje::class, 'personajes_relevantes', 'relato_id', 'personaje_id')
+      ->withTimestamps();
+  }
+
+  /**
    * Scope para filtrar y ordenar articulos.
    */
   public function scopeFiltrar($query, $filtros)
@@ -37,9 +46,21 @@ class articulo extends Model
       ->when($filtros['search'] ?? null, function ($q, $search) {
         $q->where('articulos_genericos.nombre', 'LIKE', "%{$search}%");
       })
-      ->when($filtros['tipo'] ?? null, function ($q, $tipo) {
-        if ($tipo !== 'all') $q->where('articulos_genericos.tipo', $tipo);
-      })
+      ->when(isset($filtros['tipo']), function ($q) use ($filtros) {
+        if ($filtros['tipo'] === 'Relato') {
+            // Si se pide explícitamente Relato
+            $q->where('articulos_genericos.tipo', 'Relato');
+        } elseif ($filtros['tipo'] !== 'all') {
+            // Si se pide otro tipo específico (ej: 'Noticia')
+            $q->where('articulos_genericos.tipo', $filtros['tipo']);
+        } else {
+            // Si el tipo es 'all', mostramos todo MENOS relatos
+            $q->where('articulos_genericos.tipo', '!=', 'Relato');
+        }
+    }, function ($q) {
+        // Si no se pasa el parámetro 'tipo' en absoluto, protegemos el listado
+        $q->where('articulos_genericos.tipo', '!=', 'Relato');
+    })
       // Prioridad de ordenación
       ->when($filtros['fecha'] ?? null, function ($q, $fecha) {
         // Si el usuario eligió un orden por fecha, se aplica este
@@ -102,6 +123,15 @@ class articulo extends Model
 
       $this->save();
 
+      // Sincronización de personajes (solo si vienen en el request)
+      // sync() elimina los que no estén en el array y añade los nuevos.
+      if ($request->has('personajes')) {
+        $this->personajes_relevantes()->sync($request->input('personajes'));
+      } else {
+        // Si se desmarcan todos, se limpia la tabla pivot
+        $this->personajes_relevantes()->detach();
+      }
+
       return $this;
     });
   }
@@ -114,6 +144,11 @@ class articulo extends Model
   public function eliminar_articulo()
   {
     return DB::transaction(function () {
+      //Limpiar relación con personajes (tabla pivot) sólo si es un relato, los otros casos no tienen personajes relevantes
+      if ($this->tipo === 'Relato') {
+        $this->personajes_relevantes()->detach();
+      }
+
       //Borrar imágenes de Summernote relacionadas
       $imageService = new ImageService();
       $imageService->deleteImagesByOwner('articulos', $this->id);
@@ -121,51 +156,5 @@ class articulo extends Model
       //Borrar el articulo
       return $this->delete();
     });
-  }
-
-  /**
-   * Obtiene los articulos donde tipo = relato, ordenados por nombre.
-   *
-   * @return \Illuminate\Database\Eloquent\Collection
-   */
-  public static function get_relatos()
-  {
-    try {
-      $articulos = self::where('tipo', '=', 'relato')
-        ->select('id_articulo', 'nombre')
-        ->orderBy('nombre', 'asc')
-        ->get();
-      if ($articulos->isEmpty()) {
-        Log::warning('articulo->get_relatos: No se encontraron articulos con tipo = relato.');
-        $articulos = ['error' => ['error' => 'No hay relatos guardados.']];
-      }
-    } catch (\Exception $e) {
-      Log::error('articulo->get_relatos: Error al obtener articulos: ' . $e->getMessage());
-      $articulos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    }
-    return $articulos;
-  }
-
-  /**
-   * Obtiene un articulo por su ID.
-   *
-   * @param int $id
-   * @return \App\Models\articulo|null
-   */
-  public static function get_articulo($id)
-  {
-    try {
-      $articulo = self::findorfail($id);
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $excepcion) {
-      Log::error("Articulo no encontrada con ID: " . $id);
-      $articulo = ['error' => ['error' => "articulo no encontrada con ID: " . $id]];
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error("Error de base de datos al obtener articulo con ID: " . $id . " - " . $excepcion->getMessage());
-      $articulo = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      Log::error("Error general al obtener articulo con ID: " . $id . " - " . $excepcion->getMessage());
-      $articulo = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-    return $articulo;
   }
 }

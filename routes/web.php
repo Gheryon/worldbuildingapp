@@ -158,7 +158,7 @@ Route::delete('/timelines/destroy', [App\Http\Controllers\TimelineController::cl
 
 /*******relatos routes********/
 Route::controller(App\Http\Controllers\ArticuloController::class)->group(function () {
-  Route::get('/relatos/index/{orden?}', 'index_relatos')->name('relatos');
+  Route::get('/relatos/index', 'index_relatos')->name('relatos.index');
   Route::get('/relatos/create', 'create_relato')->name('relatos.create');
   Route::post('/relatos/relatos', 'store_relato')->name('relatos.store');
   Route::get('/relatos/{id}', 'show_relato')->name('relatos.show');

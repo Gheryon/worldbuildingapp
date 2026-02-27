@@ -143,7 +143,7 @@ class ArticuloController extends Controller
 
     try {
       // Llamada a la lógica del modelo
-      $articulo=articulo::findOrFail($id);
+      $articulo = articulo::findOrFail($id);
       $articulo->update_articulo($request);
 
       return redirect()->route('articulos.index')
@@ -180,7 +180,7 @@ class ArticuloController extends Controller
    */
   public function destroy(Request $request)
   {
-     // Validamos que el ID venga en la petición
+    // Validamos que el ID venga en la petición
     $request->validate([
       'id_borrar' => 'required|integer|exists:articulos_genericos,id'
     ]);
@@ -200,18 +200,36 @@ class ArticuloController extends Controller
       return redirect()->route('articulos.index')
         ->with('error', 'No se pudo eliminar el articulo. Consulte los logs para más detalles.');
     }
-  
   }
 
   /**
    * Display a listing of the resource.
    */
-  public function index_relatos($orden = 'asc')
+  public function index_relatos(Request $request)
   {
-    // Obtener todos los relatos almacenados
-    $articulos = articulo::get_relatos();
+    $datosValidados = $request->validate([
+      'orden' => 'sometimes|string|in:asc,desc', // 'sometimes' permite que no esté presente.
+      'fecha' => 'sometimes|string|in:asc,desc', // 'sometimes' permite que no esté presente.
+      'search' => 'sometimes|nullable|string|max:100',
+    ], [
+      'orden.in' => 'El orden debe ser ascendente (asc) o descendente (desc).',
+      'fecha.in' => 'El orden debe ser ascendente (asc) o descendente (desc).',
+    ]);
 
-    return view('relatos.index', ['relatos' => $articulos, 'orden' => $orden]);
+    // Si la validación falla o el parámetro no está presente, se usan los valores por defecto.
+    $orden = $datosValidados['orden'] ?? 'asc';
+    $fecha = $datosValidados['fecha'] ?? null; // Si no se especifica, no se ordena por fecha.
+    $tipo = $datosValidados['tipo'] ?? 'all';
+    $terminoBusqueda = $datosValidados['search'] ?? null;
+
+    $articulos = articulo::filtrar([
+      'orden'  => $orden,
+      'fecha'  => $fecha,
+      'tipo'   => 'Relato', // Solo mostramos relatos
+      'search' => $terminoBusqueda
+    ])->paginate(50);
+
+    return view('relatos.index', compact('articulos', 'orden', 'fecha', 'tipo', 'terminoBusqueda'));
   }
 
   /**
@@ -220,9 +238,9 @@ class ArticuloController extends Controller
   public function create_relato()
   {
     //Obtener todos los personajes almacenados
-    $personajes = personaje::get_personajes_id_nombre();
+    $personajes = personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
-    return view('relatos.create')->with('personajes', $personajes);
+    return view('relatos.create', compact('personajes'));
   }
 
   /**
@@ -231,42 +249,45 @@ class ArticuloController extends Controller
   public function store_relato(Request $request)
   {
     $request->validate([
-      'nombre' => 'required|max:256',
-      'contenido' => 'required'
+      'nombre'    => 'required|string|max:256',
+      'contenido' => 'required',
+      'personajes' => 'nullable|array',
+      'personajes.*' => 'exists:personajes,id',
     ]);
 
-    $articulo = new articulo();
-    $articulo->nombre = $request->nombre;
-    $articulo->tipo = 'relato';
-    $content = $request->contenido;
-
     try {
-      $articulo->save();
-      $id_articulo = DB::scalar("SELECT MAX(id_articulo) as id FROM articulosgenericos");
+      // Forzamos el tipo a Relato por seguridad
+      $request->merge(['tipo' => 'Relato']);
 
-      $articulo->contenido = app(ImagenController::class)->store_for_summernote($content, "articulos", $id_articulo);
+      // Llamada a la lógica del modelo
+      $articulo = articulo::store_articulo($request);
 
-      if ($request->filled('personajes')) {
-        $personajes = $request->input('personajes');
-        try {
-          foreach ($personajes as $personaje) {
-            DB::table('personajes_relevantes')->insert([
-              'relato' => $id_articulo,
-              'personaje' => $personaje,
-            ]);
-          }
-        } catch (\Illuminate\Database\QueryException $excepcion) {
-        } catch (Exception $excepcion) {
-        }
-      }
-      $articulo->save();
-      return redirect()->route('relatos')->with('message', 'Historia ' . $articulo->nombre . ' añadida correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ArticuloController->store_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('relatos')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      Log::error('ArticuloController->store_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('relatos')->with('error', $excepcion->getMessage());
+      return redirect()->route('relatos.index')
+        ->with('success', 'Relato ' . $articulo->nombre . ' añadido correctamente.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error(
+        "Error de base de datos al añadir relato.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'No se pudo crear el relato debido a un error en la base de datos.');
+    } catch (\Exception $e) {
+      Log::critical(
+        "Error inesperado al añadir relato.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'No se pudo crear el relato: ' . $e->getMessage());
     }
   }
 
@@ -275,20 +296,23 @@ class ArticuloController extends Controller
    */
   public function show_relato($id)
   {
-    $articulo = articulo::get_articulo($id);
-    if ($articulo['error'] ?? false) {
-      return redirect()->route('relatos')->with('error', $articulo['error']['error']);
-    }
-
     try {
-      $personajes_r = DB::select('SELECT personaje.id, personaje.Nombre as nombre FROM personajes_relevantes JOIN personaje ON personajes_relevantes.personaje=personaje.id WHERE relato = ?', [$id]);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $personajes_r = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $personajes_r = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+      // Buscamos el artículo asegurándonos de que sea un 'Relato' 
+      // y cargamos sus personajes relacionados en una sola query
+      $articulo = articulo::where('tipo', 'Relato')
+        ->with('personajes_relevantes')
+        ->findOrFail($id);
 
-    return view('relatos.show', ['relato' => $articulo, 'personajes' => $personajes_r]);
+      return view('articulos.show', compact('articulo'));
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+      Log::error("Relato no encontrado ID {$id}: " . $e->getMessage());
+      return redirect()->route('relatos.index')
+        ->with('error', 'El relato solicitado no existe.');
+    } catch (\Exception $e) {
+      Log::critical("Error al mostrar relato ID {$id}: " . $e->getMessage());
+      return redirect()->route('relatos.index')
+        ->with('error', 'Ocurrió un error inesperado al cargar el relato.');
+    }
   }
 
   /**
@@ -296,25 +320,19 @@ class ArticuloController extends Controller
    */
   public function edit_relato($id)
   {
-    $articulo = articulo::get_articulo($id);
-    if ($articulo['error'] ?? false) {
-      return redirect()->route('relatos')->with('error', $articulo['error']['error']);
-    }
-
-    // Obtener todos los personajes almacenados
-    $personajes = personaje::get_personajes_id_nombre();
-
     try {
-      $personajes_r = DB::table('personajes_relevantes')->select('personaje')->where('relato', '=', $id)->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ArticuloController->edit_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $personajes_r = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      Log::error('ArticuloController->edit_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $personajes_r = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+      // Cargamos el relato 
+      $relato = Articulo::with('personajes_relevantes')->findOrFail($id);
 
-    return view('relatos.edit', ['relato' => $articulo, 'personajes' => $personajes, 'personajes_r' => $personajes_r]);
+      //Obtener todos los personajes almacenados
+      $personajes = personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
+
+      return view('relatos.edit', compact('relato', 'personajes'));
+    } catch (\Exception $e) {
+      Log::error("Error al obtener relato: " . $e->getMessage());
+      return redirect()->route('relatos.index')
+        ->with('error', 'Relato no encontrado.');
+    }
   }
 
   /**
@@ -323,45 +341,27 @@ class ArticuloController extends Controller
   public function update_relato(Request $request, $id)
   {
     $request->validate([
-      'nombre' => 'required|string|max:256',
+      'nombre'    => 'required|string|max:256',
       'contenido' => 'required',
+      'personajes' => 'nullable|array',
+      'personajes.*' => 'exists:personajes,id',
     ]);
 
-    $relato = articulo::get_articulo($id);
-    if ($relato['error'] ?? false) {
-      return redirect()->route('relatos')->with('error', $relato['error']['error']);
-    }
-
-    $relato->nombre = $request->nombre;
-    $content = $request->contenido;
-    $relato->contenido = app(ImagenController::class)->update_for_summernote($content, "articulos", $id);
-
-    if ($request->filled('personajes')) {
-      // Eliminar los personajes relevantes existentes
-      DB::table('personajes_relevantes')->where('relato', '=', $id)->delete();
-      $personajes = $request->input('personajes');
-      try {
-        // Insertar los nuevos personajes relevantes
-        foreach ($personajes as $personajeId) {
-          DB::table('personajes_relevantes')->insert([
-            'relato' => $id,
-            'personaje' => $personajeId,
-          ]);
-        }
-      } catch (\Illuminate\Database\QueryException $excepcion) {
-      } catch (Exception $excepcion) {
-      }
-    }
-
     try {
-      $relato->save();
-      return redirect()->route('relatos')->with('message', $relato->nombre . ' editado correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ArticuloController->update_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('relatos')->with('error', 'Se produjo un problema en la base de datos, no se pudo actualizar.');
-    } catch (Exception $excepcion) {
-      Log::error('ArticuloController->update_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('relatos')->with('error', $excepcion->getMessage());
+      $relato = articulo::findOrFail($id);
+
+      // Forzamos el tipo a Relato por seguridad
+      $request->merge(['tipo' => 'Relato']);
+
+      $relato->update_articulo($request);
+
+      return redirect()->route('relatos.index')
+        ->with('success', "Relato '{$relato->nombre}' actualizado con éxito.");
+    } catch (\Exception $e) {
+      Log::error("Error al actualizar relato ID {$id}: " . $e->getMessage());
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'Error al guardar los cambios: ' . $e->getMessage());
     }
   }
 
@@ -370,35 +370,25 @@ class ArticuloController extends Controller
    */
   public function destroy_relato(Request $request)
   {
+    // Validamos que el ID exista y pertenezca a un relato
+    $request->validate([
+      'id_borrar' => 'required|integer|exists:articulos_genericos,id'
+    ]);
+
     try {
-      $imagenes = DB::table('imagenes')
-        ->select('id', 'nombre')
-        ->where('table_owner', '=', 'articulos')
-        ->where('owner', '=', $request->id_borrar)->get();
+      $relato = articulo::findOrFail($request->id_borrar);
+      $nombre = $relato->nombre;
 
-      foreach ($imagenes as $imagen) {
-        if (file_exists(public_path("/storage/imagenes/" . $imagen->nombre))) {
-          unlink(public_path("/storage/imagenes/" . $imagen->nombre));
-          //Storage::delete(asset($imagen->nombre));
-        }
-        imagen::destroy($imagen->id);
-      }
-      try {
-        // Eliminar los personajes relevantes existentes
-        DB::table('personajes_relevantes')->where('relato', '=', $request->id_borrar)->delete();
-      } catch (\Illuminate\Database\QueryException $excepcion) {
-      } catch (Exception $excepcion) {
-      }
+      // Ejecutamos la lógica encapsulada en el modelo
+      $relato->eliminar_articulo();
 
-      Articulo::destroy($request->id_borrar);
+      return redirect()->route('relatos.index')
+        ->with('success', "El relato '{$nombre}' ha sido eliminado correctamente.");
+    } catch (\Exception $e) {
+      Log::error("Error al eliminar relato ID {$request->id_borrar}: " . $e->getMessage());
 
-      return redirect()->route('relatos')->with('message', $request->nombre_borrado . ' borrado correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ArticuloController->destroy_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('relatos')->with('error', 'Se produjo un problema en la base de datos, no se pudo borrar.' . $excepcion->getMessage());
-    } catch (Exception $excepcion) {
-      Log::error('ArticuloController->destroy_relato: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('relatos')->with('error', $excepcion->getMessage());
+      return redirect()->route('relatos.index')
+        ->with('error', 'No se pudo eliminar el relato debido a un error interno.');
     }
   }
 }

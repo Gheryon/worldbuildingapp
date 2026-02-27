@@ -229,3 +229,51 @@ section{
     border: 1px solid #56606a !important;
     color: #fff !important;
 }
+
+
+/*================Para el show del artículo====================*/
+/* Mejoras de legibilidad y estética */
+    .article-container {
+        padding-top: 2rem;
+        background-color: #f8f9fa;
+    }
+    .main-card {
+        border: none;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+    }
+    .article-title {
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: #1a1a1a;
+        margin-bottom: 1.5rem;
+    }
+    .mailbox-read-message {
+        color: #333;
+        padding: 2rem !important; /* Más aire en los bordes */
+    }
+    /* Estilo para los relatos (Serif) */
+    .mailbox-read-message {
+        font-family: 'Georgia', serif;
+    }
+    .sidebar-card {
+        border-radius: 12px !important;
+    }
+    .personaje-link {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        margin: 2px 10px;
+    }
+    .personaje-link:hover {
+        background-color: #f0f0f0 !important;
+        transform: translateX(5px);
+    }
+
+    .retrato-mini {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 8px;
+    }
