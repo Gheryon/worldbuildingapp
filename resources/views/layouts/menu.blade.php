@@ -75,7 +75,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="{{route('relatos')}}" class="nav-link">
+          <a href="{{route('relatos.index')}}" class="nav-link">
             <i class="nav-icon fa-solid fa-book-open"></i>
             <p>
               Relatos e historias
