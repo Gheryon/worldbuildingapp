@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Services\ImageService;
 
-class personaje extends Model
+class Personaje extends Model
 {
   use HasFactory;
 
