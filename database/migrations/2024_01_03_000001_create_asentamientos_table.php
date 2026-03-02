@@ -25,16 +25,12 @@ return new class extends Migration
         ->constrained('tipo_asentamiento')
         ->nullOnDelete();
 
-      // --- Cronología (Relación con tabla fechas) ---
-      $table->unsignedBigInteger('fundacion_id')->nullable();
-      $table->unsignedBigInteger('disolucion_id')->nullable();
-
       // --- Ubicación geográfica (Dualidad) ---
       $table->foreignId('lugar_id')
         ->nullable()
         ->constrained('lugares')
         ->nullOnDelete();
-      $table->text('ubicacion_detalles')->nullable(); // Para notas específicas de dónde está
+      $table->text('ubicacion_detalles')->nullable(); // Para notas y secretos 
 
       // --- Relación de soberanía ---
       $table->foreignId('organizacion_id') // Antiguo id_owner
@@ -42,11 +38,18 @@ return new class extends Migration
         ->constrained('organizaciones')
         ->nullOnDelete();
 
+      // --- Relación de gobernante ---
+      $table->foreignId('gobernante_id')
+        ->nullable()
+        ->constrained('personajes')
+        ->nullOnDelete();
+
       // --- Datos demográficos y políticos ---
       $table->integer('poblacion')->nullable();
       $table->text('demografia')->nullable();
       $table->text('gobierno')->nullable();
       $table->text('defensas')->nullable();
+      $table->text('ejercito')->nullable();
 
       // --- Infraestructura y contenido narrativo ---
       $table->mediumText('descripcion')->nullable();
@@ -63,6 +66,10 @@ return new class extends Migration
       // Auditoría y borrado lógico
       $table->timestamps();
       $table->softDeletes();
+
+      // --- Cronología (Relación con tabla fechas) ---
+      $table->unsignedBigInteger('fundacion_id')->nullable();
+      $table->unsignedBigInteger('disolucion_id')->nullable();
 
       // Foreign Keys manuales para la tabla fechas
       $table->foreign('fundacion_id')->references('id')->on('fechas')->onDelete('set null');
