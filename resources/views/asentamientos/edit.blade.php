@@ -1,6 +1,4 @@
 @extends('layouts.index')
-@extends('layouts.navbar')
-@extends('layouts.menu')
 
 @section('title')
 <title id="title">Editar {{$asentamiento->nombre}}</title>
@@ -8,203 +6,196 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-<a href="{{route('asentamientos.index')}}" class="btn btn-dark">Cancelar</a>
+  <a href="{{route('asentamientos.index')}}" class="btn btn-dark">Cancelar</a>
 </li>
 @endsection
 
 @section('content')
-<div class="row">
-  <div class="col text-center">
-    <h1>Editar {{$asentamiento->nombre}}</h1>
+<div class="container-fluid">
+  {{-- Encabezado estilizado --}}
+  <div class="row mb-4">
+    <div class="col-12 text-center">
+      <h1 class="display-4 text-primary-custom font-weight-bold">
+        <i class="nav-icon fa-solid fa-house mr-2"></i>Editar {{$asentamiento->nombre}}
+      </h1>
+    </div>
   </div>
-</div>
-<hr>
 
-<!-- Main content -->
-<section class="content">
-<form id="form-create-asentamiento" class="position-relative needs-validation" action="{{route('asentamiento.update', $asentamiento->id )}}" method="post" enctype="multipart/form-data">
+  <form id="form-edit-asentamiento" class="needs-validation" action="{{route('asentamiento.update', $asentamiento->id )}}" method="post" enctype="multipart/form-data">
     @csrf
     @method('PUT')
-    <div class="row justify-content-md-center">
-      <div class="col-md-auto form-actions">
-        <button type="submit" id="submit-crear-button" class="btn btn-success">Guardar</button>
+
+    {{-- Fila de Acciones Flotante o Superior --}}
+    <div class="row mb-3">
+      <div class="col-12 d-flex justify-content-end">
+        <button type="submit" id="submit-crear-button" class="btn btn-success btn-lg shadow-sm">
+          <i class="fas fa-save mr-2"></i> Guardar Cambios
+        </button>
       </div>
     </div>
-    <div class="row mt-3 mb-3 justify-content-md-center border">
-      <div class="col">
-        <div class="row mt-2">
-          <div class="col-md">
-            <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" name="nombre" class="form-control" id="nombre" value="{{$asentamiento->nombre}}" placeholder="Ej: Córdoba" required>
-            @error('nombre')
-            <small style="color: red">{{$message}}</small>
-            @enderror
+
+    <div class="card card-outline card-dark shadow-sm">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-info-circle mr-1"></i> Información técnica</h3>
+      </div>
+      <div class="card-body bg-light">
+        <div class="row">
+          {{-- Bloque Principal --}}
+          <div class="col-md-8">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <x-text-input name="nombre" label="Nombre del asentamiento" placeholder="Ej: Córdoba, Minas Tirith, etc." :value="$asentamiento->nombre" required />
+              </div>
+              <div class="col-md-6 mb-3">
+                <x-text-input name="gentilicio" label="Gentilicio" placeholder="Ej: Cordobés, etc." :value="$asentamiento->gentilicio" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="select_tipo" class="form-label font-weight-bold">Tipo</label>
+                <select class="form-control select2bs4" name="select_tipo" id="select_tipo" required>
+                  <option selected disabled value="">Elegir...</option>
+                  @foreach($tipos_asentamientos as $tipo)
+                  <option value="{{$tipo->id}}" {{ old('select_tipo', $asentamiento->tipo_asentamiento_id) == $tipo->id ? 'selected' : '' }}>{{$tipo->nombre}}</option>
+                  @endforeach
+                </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="estatus" class="form-label font-weight-bold">Estatus actual</label>
+                <select class="form-control select2bs4" name="estatus" id="estatus" required>
+                  <option selected value="">Elegir...</option>
+                  @foreach(['Abandonado', 'En ruinas', 'Habitado', 'Secreto', 'Olvidado'] as $est)
+                  <option value="{{ $est }}" {{ old('estatus', $asentamiento->estatus) == $est ? 'selected' : '' }}>{{ $est }}</option>
+                  @endforeach
+                </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="poblacion" class="form-label font-weight-bold">Población estimada</label>
+                <div class="input-group">
+                  <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-users"></i></span></div>
+                  <input type="number" name="poblacion" class="form-control" id="poblacion" placeholder="Ej: 5000" value="{{ old('poblacion', $asentamiento->poblacion) }}">
+                  @error('poblacion')
+                  <small style="color: red">{{$message}}</small>
+                  @enderror
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="col-md">
-            <label for="gentilicio" class="form-label">Gentilicio</label>
-            <input type="text" name="gentilicio" class="form-control" id="gentilicio" value="{{$asentamiento->gentilicio}}" placeholder="Ej: Cordobés">
-            @error('gentilicio')
-            <small style="color: red">{{$message}}</small>
-            @enderror
-          </div>
-          <div class="col-md-3">
-            <label for="select_tipo" class="form-label">Tipo</label>
-            <select class="form-control" name="select_tipo" id="select_tipo" required>
-              <option selected disabled value="">Elegir</option>
-                @foreach($tipo_asentamiento as $tipo)
-                <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
+
+          {{-- Bloque de Control --}}
+          <div class="col-md-4 border-left">
+            <div class="mb-3">
+              <label for="select_owner" class="form-label font-weight-bold">Controlado por:</label>
+              <select class="form-control select2bs4" name="select_owner" id="select_owner">
+                <option value="">Independiente / Ninguno</option>
+                @foreach($paises as $id => $nombre)
+                <option value="{{$id}}" {{ old('select_owner', $asentamiento->organizacion_id) == $id ? 'selected' : '' }}>{{$nombre}}</option>
                 @endforeach
-            </select>
-          </div>
-          <div class="col-md">
-            <label for="select_owner" class="form-label">Controlado por:</label>
-            <select class="form-select form-control" name="select_owner" id="select_owner">
-              <option selected disabled value="">Elegir</option>
-                @foreach($paises as $pais)
-                <option value="{{$pais->id_organizacion}}">{{$pais->nombre}}</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="select_gobernante" class="form-label font-weight-bold">Gobernante local</label>
+              <select class="form-control select2bs4" name="select_gobernante" id="select_gobernante">
+                <option value="">Sin gobernante especificado</option>
+                @foreach($personajes as $id => $nombre)
+                <option value="{{$id}}" {{ old('select_gobernante', $asentamiento->gobernante_id) == $id ? 'selected' : '' }}>{{$nombre}}</option>
                 @endforeach
-            </select>
+              </select>
+            </div>
           </div>
         </div>
-        <div class="row mt-2">
-          <div class="col-2">
-            <label for="poblacion" class="form-label">Población</label>
-            <input type="number" name="poblacion" class="form-control" id="poblacion" placeholder="Ej: 5000" value="{{$asentamiento->poblacion}}">
-            @error('poblacion')
-            <small style="color: red">{{$message}}</small>
-            @enderror
+
+        <hr class="my-4">
+
+        {{-- Fila de Fechas --}}
+        <div class="row">
+          <div class="col-md-6">
+            <x-date-input-group name="fundacion" label="Fecha de fundación" :id="$asentamiento->fundacion_id" :dia="$asentamiento->fecha_fundacion->dia ?? ''" :mes="$asentamiento->fecha_fundacion->mes ?? ''" :anno="$asentamiento->fecha_fundacion->anno ?? ''" />
           </div>
-          <div class="col">
-            <label for="afundacion" class="form-label">Fundación</label>
-            <div class="input-group">
-              <input id="id_fundacion" type="hidden" name="id_fundacion" value="0">
-              <input type="text" id="dfundacion" name="dfundacion" class="form-control" placeholder="Día">
-              @error('dfundacion')
-              <small style="color: red">{{$message}}</small>
-              @enderror
-              <select class="form-control" id="mfundacion" name="mfundacion">
-                <option selected disabled value="">Mes</option>
-                <option value="0">Semana de año nuevo</option>
-                <option value="1">Enero</option>
-                <option value="2">Febrero</option>
-                <option value="3">Marzo</option>
-                <option value="4">Abril</option>
-                <option value="5">Mayo</option>
-                <option value="6">Junio</option>
-                <option value="7">Julio</option>
-                <option value="8">Agosto</option>
-                <option value="9">Septiembre</option>
-                <option value="10">Octubre</option>
-                <option value="11">Noviembre</option>
-                <option value="12">Diciembre</option>
-              </select>
-              <input type="text" id="afundacion" name="afundacion" class="form-control" placeholder="Año">
-              @error('afundacion')
-              <small style="color: red">{{$message}}</small>
-              @enderror
-            </div>
-          </div>
-          <div class="col">
-            <label for="adisolucion" class="form-label">Disolución</label>
-            <div class="input-group">
-              <input id="id_disolucion" type="hidden" name="id_disolucion" value="0">
-              <input type="text" id="ddisolucion" name="ddisolucion" class="form-control" placeholder="Día">
-              @error('ddisolucion')
-              <small style="color: red">{{$message}}</small>
-              @enderror
-              <select class="form-control" id="mdisolucion" name="mdisolucion">
-                <option selected disabled value="">Mes</option>
-                <option value="0">Semana de año nuevo</option>
-                <option value="1">Enero</option>
-                <option value="2">Febrero</option>
-                <option value="3">Marzo</option>
-                <option value="4">Abril</option>
-                <option value="5">Mayo</option>
-                <option value="6">Junio</option>
-                <option value="7">Julio</option>
-                <option value="8">Agosto</option>
-                <option value="9">Septiembre</option>
-                <option value="10">Octubre</option>
-                <option value="11">Noviembre</option>
-                <option value="12">Diciembre</option>
-              </select>
-              <input type="text" id="adisolucion" name="adisolucion" class="form-control" placeholder="Año">
-              @error('adisolucion')
-              <small style="color: red">{{$message}}</small>
-              @enderror
-            </div>
+          <div class="col-md-6">
+            <x-date-input-group name="disolucion" label="Fecha de disolución" :id="$asentamiento->disolucion_id" :dia="$asentamiento->fecha_disolucion->dia ?? ''" :mes="$asentamiento->fecha_disolucion->mes ?? ''" :anno="$asentamiento->fecha_disolucion->anno ?? ''" />
           </div>
         </div>
       </div>
     </div>
 
-    <label for="descripcion" class="form-label">Descripción</label>
-    <textarea name="descripcion" class="form-control summernote" id="descripcion" rows="2" aria-label="With textarea">{!!$asentamiento->descripcion!!}</textarea>
-    
-    <label for="demografia" class="form-label">Demografía</label>
-    <textarea name="demografia" class="form-control summernote" id="demografia" rows="2" aria-label="With textarea">{!!$asentamiento->demografia!!}</textarea>
-
-    <label for="gobierno" class="form-label">Gobierno</label>
-    <textarea name="gobierno" class="form-control summernote" id="gobierno" rows="2" aria-label="With textarea">{!!$asentamiento->gobierno!!}</textarea>
-    
-    <label for="infraestructura" class="form-label">Infraestructura</label>
-    <textarea name="infraestructura" class="form-control summernote" id="infraestructura" rows="2" aria-label="With textarea">{!!$asentamiento->infraestructura!!}</textarea>
-    
-    <label for="historia" class="form-label">Historia</label>
-    <textarea name="historia" class="form-control summernote" id="historia" rows="2" aria-label="With textarea">{!!$asentamiento->historia!!}</textarea>
-    
-    <label for="defensas" class="form-label">Defensas</label>
-    <textarea name="defensas" class="form-control summernote" id="defensas" rows="2" aria-label="With textarea">{!!$asentamiento->defensas!!}</textarea>
-
-    <label for="cultura" class="form-label">Cultura y arquitectura</label>
-    <textarea name="cultura" class="form-control summernote" id="cultura" rows="2" aria-label="With textarea">{!!$asentamiento->cultura!!}</textarea>
-    
-    <label for="economia" class="form-label">Economía, industria y comercio</label>
-    <textarea name="economia" class="form-control summernote" id="economia" rows="2" aria-label="With textarea">{!!$asentamiento->economia!!}</textarea>
-    
-    <label for="recursos" class="form-label">Recursos naturales</label>
-    <textarea name="recursos" class="form-control summernote" id="recursos" rows="2" aria-label="With textarea">{!!$asentamiento->recursos!!}</textarea>
-    
-    <label for="geografia" class="form-label">Geografía</label>
-    <textarea name="geografia" class="form-control summernote" id="geografia" rows="2" aria-label="With textarea">{!!$asentamiento->geografia!!}</textarea>
-    
-    <label for="clima" class="form-label">Clima</label>
-    <textarea name="clima" class="form-control summernote" id="clima" rows="2" aria-label="With textarea">{!!$asentamiento->clima!!}</textarea>
-
-    <label for="otros" class="form-label">Otros</label>
-    <textarea name="otros" class="form-control summernote" id="otros" rows="2" aria-label="With textarea">{!!$asentamiento->otros!!}</textarea>
+    {{-- Panel de pestañas para Textareas --}}
+    <div class="card card-dark card-outline card-tabs mt-4 shadow-sm">
+      <div class="card-header p-0 pt-1 border-bottom-0">
+        <ul class="nav nav-tabs" id="asentamientoTab" role="tablist">
+          <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#tab-descripcion"><i class="fas fa-align-left mr-1"></i> Descripción</a></li>
+          <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-social"><i class="fas fa-users mr-1"></i> Sociedad</a></li>
+          <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-politica"><i class="fas fa-gavel mr-1"></i> Política</a></li>
+          <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-economia"><i class="fas fa-coins mr-1"></i> Economía</a></li>
+          <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-historia"><i class="fas fa-book-old mr-1"></i> Historia</a></li>
+        </ul>
+      </div>
+      <div class="card-body bg-white">
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="tab-descripcion">
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <x-textarea-input name="descripcion" label="Descripción general" :value="$asentamiento->descripcion" />
+              </div>
+              <div class="col-md-6">
+                <x-textarea-input name="geografia" label="Geografía" :value="$asentamiento->geografia" />
+              </div>
+              <div class="col-md-6">
+                <x-textarea-input name="clima" label="Clima" :value="$asentamiento->clima" />
+              </div>
+              <div class="col-md-12">
+                <x-textarea-input name="ubicacion_detalles" label="Detalles especiales o secretos" :value="$asentamiento->ubicacion_detalles" />
+              </div>
+            </div>
+          </div>
+          {{-- ... Repetir estructura para las demás pestañas ... --}}
+          <div class="tab-pane fade" id="tab-social">
+            <x-textarea-input name="demografia" label="Composición demográfica" :value="$asentamiento->demografia" />
+            <x-textarea-input name="cultura" label="Tradiciones, costumbres y cultura" :value="$asentamiento->cultura" />
+            <x-textarea-input name="arquitectura" label="EArquitectura y monumentos" :value="$asentamiento->arquitectura" />
+            <x-textarea-input name="infraestructura" label="Servicios e infraestructura" :value="$asentamiento->infraestructura" />
+          </div>
+          <div class="tab-pane fade" id="tab-politica">
+            <x-textarea-input name="gobierno" label="Sistema de gobierno" :value="$asentamiento->gobierno" />
+            <x-textarea-input name="defensas" label="Murallas y fortificaciones" :value="$asentamiento->defensas" />
+            <x-textarea-input name="ejercito" label="Guarnición y fuerzas militares" :value="$asentamiento->ejercito" />
+          </div>
+          <div class="tab-pane fade" id="tab-economia">
+            <x-text-input name="recurso_principal" label="Recurso principal" placeholder="Ej: Hierro, carbón, etc." :value="$asentamiento->recurso_principal" />
+            <x-text-input name="nivel_riqueza" label="Nivel de riqueza" placeholder="Ej: Bajo, medio, alto, etc." :value="$asentamiento->nivel_riqueza" />
+            <x-textarea-input name="economia" label="Economía, industria y comercio" :value="$asentamiento->economia" />
+            <x-textarea-input name="recursos" label="Recursos naturales" :value="$asentamiento->recursos" />
+          </div>
+          <div class="tab-pane fade" id="tab-historia">
+            <x-textarea-input name="historia" label="Historia del asentamiento" class="summernote" rows="12" :value="$asentamiento->historia" />
+            <x-textarea-input name="otros" label="Notas adicionales" :value="$asentamiento->otros" />
+          </div>
+        </div>
+      </div>
+    </div>
   </form>
-
-</section>
-<!-- /.content -->
+</div>
 @endsection
 
 @section('specific-scripts')
+<script src="{{asset('dist/js/common.js')}}"></script>
 <script>
   $(function() {
-    // Summernote
-    $('.summernote').summernote({
-      height: 150
-    })
-    $('#select_tipo').val('{{$asentamiento->id_tipo_asentamiento}}');
-    if('{{$asentamiento->id_owner}}'!=0){
-      $('#select_owner').val('{{$asentamiento->id_owner}}');
-    }
-    
-    if('{{$asentamiento->fundacion}}'!=0){
-      $('#id_fundacion').val('{{$asentamiento->fundacion}}');
-      $('#dfundacion').val('{{$fundacion->dia}}');
-      $('#mfundacion').val('{{$fundacion->mes}}');
-      $('#afundacion').val('{{$fundacion->anno}}');
-    }
+    // Prevención de pérdida de datos
+    let formChanged = false;
+    $('#form-edit-asentamiento').on('change', 'input, select, textarea', function() {
+      formChanged = true;
+    });
 
-    if('{{$asentamiento->disolucion}}'!=0){
-      $('#id_disolucion').val('{{$asentamiento->disolucion}}');
-      $('#ddisolucion').val('{{$disolucion->dia}}');
-      $('#mdisolucion').val('{{$disolucion->mes}}');
-      $('#adisolucion').val('{{$disolucion->anno}}');
-    }
+    $(window).on('beforeunload', function() {
+      if (formChanged) {
+        return "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?";
+      }
+    });
+
+    $('#form-edit-asentamiento').on('submit', function() {
+      $(window).off('beforeunload'); // Desactivar alerta al enviar el formulario
+    });
   });
-
 </script>
 @endsection

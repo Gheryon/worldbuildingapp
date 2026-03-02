@@ -32,6 +32,7 @@ Route::controller(App\Http\Controllers\AsentamientoController::class)->group(fun
   Route::get('/asentamientos/index/{orden?}/{tipo?}', 'index')->name('asentamientos.index');
   Route::get('/asentamientos/create', 'create')->name('asentamiento.create');
   Route::post('/asentamientos/store', 'store')->name('asentamiento.store');
+  Route::get('/asentamientos/{id}', 'show')->name('asentamiento.show');
   Route::get('/asentamientos/{id}/edit', 'edit')->name('asentamiento.edit');
   Route::put('/asentamientos/{id}', 'update')->name('asentamiento.update');
   Route::delete('/asentamiento/destroy', 'destroy')->name('asentamiento.destroy');
@@ -169,7 +170,6 @@ Route::controller(App\Http\Controllers\ArticuloController::class)->group(functio
 
 /*******vistas routes********/
 Route::controller(App\Http\Controllers\VistaController::class)->group(function () {
-  Route::get('/asentamientos/{id}', 'show_asentamiento')->name('asentamiento.show');
   Route::get('/lugares/{id}', 'show_lugar')->name('lugar.show');
   Route::get('/conflictos/{id}', 'show_conflicto')->name('conflicto.show');
   Route::get('/construcciones/{id}', 'show_construccion')->name('construccion.show');

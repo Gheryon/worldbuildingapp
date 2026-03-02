@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Asentamiento;
 use App\Models\Fecha;
 use App\Models\imagen;
-use App\Models\organizacion;
+use App\Models\Organizacion;
+use App\Models\Personaje;
 use App\Models\tipo_asentamiento;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,35 +16,40 @@ use Illuminate\Support\Facades\Log;
 class AsentamientoController extends Controller
 {
   /**
-   * Display a listing of the resource.
+   * Muestra una lista paginada de asentamientos almacenados, permitiendo filtrar por tipo y ordenar.
+   *
+   * Los parámetros de la URL se validan estrictamente para asegurar la integridad de la consulta.
+   *
+   * @param Request $request Objeto de solicitud inyectado para acceder a los parámetros.
+   * @return View La vista con la lista de asentamientos y los filtros disponibles.
    */
-  public function index($orden = 'asc', $tipo = '0')
+  public function index(Request $request)
   {
-    try {
-      if ($tipo != 0) {
-        $asentamientos = DB::table('asentamientos')
-          ->select('id', 'nombre')
-          ->where('id_tipo_asentamiento', '=', $tipo)
-          ->where('id', '!=', 0)
-          ->orderBy('nombre', $orden)->get();
-      } else {
-        $asentamientos = DB::table('asentamientos')
-          ->select('id', 'nombre')
-          ->where('id', '!=', 0)
-          ->orderBy('nombre', $orden)->get();
-      }
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('AsentamientoController->index: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $asentamientos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      Log::error('AsentamientoController->index: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $asentamientos = ['error' => ['error' => $excepcion->getMessage()]];
-    }
+    $datosValidados = $request->validate([
+      'orden' => 'sometimes|string|in:asc,desc', // 'sometimes' permite que no esté presente.
+      'tipo'  => 'sometimes|integer|nullable',
+      'search' => 'sometimes|nullable|string|max:100',
+    ], [
+      'orden.in' => 'El orden debe ser ascendente (asc) o descendente (desc).',
+      'tipo.exists' => 'El tipo seleccionado no es válido.',
+    ]);
 
-    // Obtener todos los tipos de asentamiento almacenados
-    $tipos = tipo_asentamiento::get_tipos_asentamientos();
+    // Si la validación falla o el parámetro no está presente, se usan los valores por defecto.
+    $orden = $datosValidados['orden'] ?? 'asc';
+    $tipo_id = $datosValidados['tipo'] ?? 0; // 0 es el valor para "todos los tipos de organización".
+    $terminoBusqueda = $datosValidados['search'] ?? null;
 
-    return view('asentamientos.index', ['asentamientos' => $asentamientos, 'tipos' => $tipos, 'orden' => $orden, 'tipo_o' => $tipo]);
+    //Obtener asentamientos almacenados
+    $asentamientos = Asentamiento::filtrar([
+      'orden'  => $orden,
+      'tipo'   => $tipo_id,
+      'search' => $terminoBusqueda
+    ])->paginate(18);
+
+    // Obtener todos los tipos de asentamientos almacenados
+    $tipos_asentamientos = tipo_asentamiento::get_tipos_asentamientos();
+
+    return view('asentamientos.index', compact('asentamientos', 'tipos_asentamientos', 'orden', 'tipo_id', 'terminoBusqueda'));
   }
 
   /**
@@ -51,13 +57,16 @@ class AsentamientoController extends Controller
    */
   public function create()
   {
-    // Obtener todos los paises almacenados
-    $paises = organizacion::get_organizaciones();
+    // Obtener todos los paises almacenados, sólo id y nombre
+    $paises = Organizacion::orderBy('nombre', 'asc')->pluck('nombre', 'id');
+
+    // Obtener todos los personajes almacenados, sólo id y nombre
+    $personajes = Personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
     // Obtener todos los tipos de asentamiento almacenados
-    $tipos_asentamiento = tipo_asentamiento::get_tipos_asentamientos();
+    $tipos_asentamientos = tipo_asentamiento::orderBy('nombre', 'asc')->get();
 
-    return view('asentamientos.create', ['paises' => $paises, 'tipo_asentamiento' => $tipos_asentamiento]);
+    return view('asentamientos.create', compact('paises', 'personajes', 'tipos_asentamientos'));
   }
 
   /**
@@ -67,89 +76,78 @@ class AsentamientoController extends Controller
   {
     $request->validate([
       'nombre' => 'required|max:256',
-      'select_tipo' => 'required',
-      'poblacion' => 'nullable|numeric',
+      'poblacion' => 'nullable|numeric|min:0',
       'gentilicio' => 'nullable|max:256',
-      'afundacion' => 'nullable|integer|min:1|max:30',
-      'dfundacion' => 'nullable|integer',
-      'adisolucion' => 'nullable|integer|min:1|max:30',
-      'ddisolucion' => 'nullable|integer',
+      //selects
+      'select_tipo' => 'required|exists:tipo_asentamiento,id',
+      'estatus' => 'nullable|string|in:Abandonado,En ruinas,Habitado,Secreto,Olvidado',
+      'select_owner' => 'nullable|exists:organizaciones,id',
+      'select_gobernante' => 'nullable|exists:personajes,id',
+      //fechas
+      'dia_fundacion' => 'nullable|integer|min:1|max:30',
+      'mes_fundacion' => 'nullable|integer',
+      'anno_fundacion' => 'nullable|integer',
+      'dia_disolucion' => 'nullable|integer|min:1|max:30',
+      'mes_disolucion' => 'nullable|integer',
+      'anno_disolucion' => 'nullable|integer',
     ]);
 
-    $asentamiento = new Asentamiento();
-
-    $asentamiento->nombre = $request->nombre;
-    $asentamiento->save();
-
-    $id_asentamiento = DB::scalar("SELECT MAX(id) as id FROM asentamientos");
-    if ($request->filled('gentilicio')) {
-      $asentamiento->gentilicio = $request->gentilicio;
-    }
-    if ($request->filled('poblacion')) {
-      $asentamiento->poblacion = $request->poblacion;
-    }
-    if ($request->filled('descripcion')) {
-      $asentamiento->descripcion = app(ImagenController::class)->store_for_summernote($request->descripcion, "asentamientos", $id_asentamiento);
-    }
-    if ($request->filled('demografia')) {
-      $asentamiento->demografia = app(ImagenController::class)->store_for_summernote($request->demografia, "asentamientos", $id_asentamiento);
-    }
-    if ($request->filled('gobierno')) {
-      $asentamiento->gobierno = app(ImagenController::class)->store_for_summernote($request->gobierno, "asentamientos", $id_asentamiento);
-    }
-    if ($request->filled('infraestructura')) {
-      $asentamiento->infraestructura = app(ImagenController::class)->store_for_summernote($request->infraestructura, "asentamientos", $id_asentamiento);
-    }
-    if ($request->filled('historia')) {
-      $asentamiento->historia = app(ImagenController::class)->store_for_summernote($request->historia, "asentamientos", $id_asentamiento);
-    }
-    if ($request->filled('defensas')) {
-      $asentamiento->defensas = app(ImagenController::class)->store_for_summernote($request->defensas, "asentamientos", $id_asentamiento);
-    }
-    if ($request->filled('cultura')) {
-      $asentamiento->cultura = app(ImagenController::class)->store_for_summernote($request->cultura, "asentamientos", $id_asentamiento);
-    }
-    if ($request->filled('economia')) {
-      $asentamiento->economia = app(ImagenController::class)->store_for_summernote($request->economia, "asentamientos", $id_asentamiento);
-    }
-    if ($request->filled('recursos')) {
-      $asentamiento->recursos = app(ImagenController::class)->store_for_summernote($request->recursos, "asentamientos", $id_asentamiento);
-    }
-    if ($request->filled('geografia')) {
-      $asentamiento->geografia = app(ImagenController::class)->store_for_summernote($request->geografia, "asentamientos", $id_asentamiento);
-    }
-    if ($request->filled('clima')) {
-      $asentamiento->clima = app(ImagenController::class)->store_for_summernote($request->clima, "asentamientos", $id_asentamiento);
-    }
-    if ($request->filled('otros')) {
-      $asentamiento->otros = app(ImagenController::class)->store_for_summernote($request->otros, "asentamientos", $id_asentamiento);
-    }
-
-    $asentamiento->id_owner = $request->input('select_owner', 0);
-    $asentamiento->id_tipo_asentamiento = $request->select_tipo;
-
     try {
-      //------------fechas----------//
-      $asentamiento->fundacion = app(ConfigurationController::class)->store_fecha($request->input('dfundacion', 0), $request->input('mfundacion', 0), $request->input('afundacion', 0), "asentamientos");
-      $asentamiento->disolucion = app(ConfigurationController::class)->store_fecha($request->input('ddisolucion', 0), $request->input('mdisolucion', 0), $request->input('adisolucion', 0), "asentamientos");
+      // Llamada a la lógica del modelo
+      $asentamiento = Asentamiento::store_asentamiento($request);
 
-      $asentamiento->save();
-      return redirect()->route('asentamientos.index')->with('message', 'Asentamiento ' . $asentamiento->nombre . ' añadido correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('AsentamientoController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('asentamientos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      Log::error('AsentamientoController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('asentamientos.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('asentamientos.index')
+        ->with('success', 'Asentamiento ' . $asentamiento->nombre . ' añadido correctamente.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error(
+        "Error de base de datos al añadir asentamiento.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'No se pudo crear el asentamiento debido a un error en la base de datos.');
+    } catch (\Exception $e) {
+      Log::critical(
+        "Error inesperado al añadir asentamiento.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'No se pudo crear el asentamiento: ' . $e->getMessage());
     }
   }
 
   /**
    * Display the specified resource.
    */
-  public function show(Asentamiento $asentamiento)
+  public function show($id)
   {
-    //
+    try {
+      // Cargamos el asentamiento con sus fechas, tipo, religiones y ruler
+      $asentamiento = Asentamiento::with([
+        'tipo',
+        //'lider',
+        'controlado_por',
+      ])->findOrFail($id);
+
+      // Formateamos las fechas para la vista
+      $fundacion = Fecha::get_fecha_string($asentamiento->fundacion_id);
+      $disolucion = Fecha::get_fecha_string($asentamiento->disolucion_id);
+
+      return view('asentamientos.show', compact('asentamiento', 'fundacion', 'disolucion'));
+    } catch (\Exception $e) {
+      Log::error("Error al mostrar asentamiento: " . $e->getMessage());
+      return redirect()->route('asentamientos.index')
+        ->with('error', 'Organización no encontrada.');
+    }
   }
 
   /**
@@ -157,140 +155,55 @@ class AsentamientoController extends Controller
    */
   public function edit($id)
   {
-    // Obtener la organizacion a editar
-    $asentamiento = Asentamiento::get_asentamiento($id);
-    if (isset($asentamiento['error'])) {
-      Log::error('AsentamientoController->index: Se produjo un problema en la base de datos.: ' . $asentamiento['error']['error']);
-      return redirect()->route('organizaciones.index')->with('error', $asentamiento['error']['error']);
-    }
+    // Obtener el asentamiento a editar
+    $asentamiento = Asentamiento::with(['fecha_fundacion', 'fecha_disolucion'])->findOrFail($id);
 
-    // Obtener todos los paises almacenados
-    $paises = organizacion::get_organizaciones();
+    // Obtener todos los paises almacenados, sólo id y nombre
+    $paises = Organizacion::orderBy('nombre', 'asc')->pluck('nombre', 'id');
+
+    // Obtener todos los personajes almacenados, sólo id y nombre
+    $personajes = Personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
     // Obtener todos los tipos de asentamiento almacenados
-    $tipo_asentamiento = tipo_asentamiento::get_tipos_asentamientos();
+    $tipos_asentamientos = tipo_asentamiento::orderBy('nombre', 'asc')->get();
 
-    //obtención de las fechas de fundacion y disolucion
-    $fecha_disolucion = 0;
-    $fecha_fundacion = 0;
-    if ($asentamiento->fundacion != 0) {
-      $fecha_fundacion = Fecha::find($asentamiento->fundacion);
-    } else {
-      $fecha_fundacion = Fecha::find(0);
-    }
-
-    if ($asentamiento->disolucion != 0) {
-      $fecha_disolucion = Fecha::find($asentamiento->disolucion);
-    } else {
-      $fecha_disolucion = Fecha::find(0);
-    }
-
-    return view('asentamientos.edit', ['asentamiento' => $asentamiento, 'fundacion' => $fecha_fundacion, 'disolucion' => $fecha_disolucion, 'paises' => $paises, 'tipo_asentamiento' => $tipo_asentamiento]);
+    return view('asentamientos.edit', compact('asentamiento', 'personajes', 'paises', 'tipos_asentamientos'));
   }
 
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request)
+  public function update(Request $request, $id)
   {
     $request->validate([
       'nombre' => 'required|max:256',
-      'select_tipo' => 'required',
-      'poblacion' => 'nullable|numeric',
+      'poblacion' => 'nullable|numeric|min:0',
       'gentilicio' => 'nullable|max:256',
-      'dfundacion' => 'nullable|integer|min:1|max:30',
-      'afundacion' => 'nullable|integer',
-      'adisolucion' => 'nullable|integer|min:1|max:30',
-      'ddisolucion' => 'nullable|integer',
+      //selects
+      'select_tipo' => 'required|exists:tipo_asentamiento,id',
+      'estatus' => 'nullable|string|in:Abandonado,En ruinas,Habitado,Secreto,Olvidado',
+      'select_owner' => 'nullable|exists:organizaciones,id',
+      'select_gobernante' => 'nullable|exists:personajes,id',
+      //fechas
+      'dia_fundacion' => 'nullable|integer|min:1|max:30',
+      'mes_fundacion' => 'nullable|integer',
+      'anno_fundacion' => 'nullable|integer',
+      'dia_disolucion' => 'nullable|integer|min:1|max:30',
+      'mes_disolucion' => 'nullable|integer',
+      'anno_disolucion' => 'nullable|integer',
     ]);
 
     try {
-      $asentamiento = Asentamiento::find($request->id);
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('AsentamientoController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('asentamientos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      Log::error('AsentamientoController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('asentamientos.index')->with('error', $excepcion->getMessage());
-    }
+      $asentamiento = Asentamiento::findOrFail($id); //obtiene el asentamiento en bbdd
+      $asentamiento->update_asentamiento($request); //se actualiza con el request
 
-    $asentamiento->nombre = $request->nombre;
-    if ($request->filled('gentilicio')) {
-      $asentamiento->gentilicio = $request->gentilicio;
-    }
-    if ($request->filled('poblacion')) {
-      $asentamiento->poblacion = $request->poblacion;
-    }
-    if ($request->filled('descripcion')) {
-      $asentamiento->descripcion = app(ImagenController::class)->update_for_summernote($request->descripcion, "asentamientos", $request->id);
-    }
-    if ($request->filled('demografia')) {
-      $asentamiento->demografia = app(ImagenController::class)->update_for_summernote($request->demografia, "asentamientos", $request->id);
-    }
-    if ($request->filled('gobierno')) {
-      $asentamiento->gobierno = app(ImagenController::class)->update_for_summernote($request->gobierno, "asentamientos", $request->id);
-    }
-    if ($request->filled('infraestructura')) {
-      $asentamiento->infraestructura = app(ImagenController::class)->update_for_summernote($request->infraestructura, "asentamientos", $request->id);
-    }
-    if ($request->filled('historia')) {
-      $asentamiento->historia = app(ImagenController::class)->update_for_summernote($request->historia, "asentamientos", $request->id);
-    }
-    if ($request->filled('defensas')) {
-      $asentamiento->defensas = app(ImagenController::class)->update_for_summernote($request->defensas, "asentamientos", $request->id);
-    }
-    if ($request->filled('cultura')) {
-      $asentamiento->cultura = app(ImagenController::class)->update_for_summernote($request->cultura, "asentamientos", $request->id);
-    }
-    if ($request->filled('economia')) {
-      $asentamiento->economia = app(ImagenController::class)->update_for_summernote($request->economia, "asentamientos", $request->id);
-    }
-    if ($request->filled('recursos')) {
-      $asentamiento->recursos = app(ImagenController::class)->update_for_summernote($request->recursos, "asentamientos", $request->id);
-    }
-    if ($request->filled('geografia')) {
-      $asentamiento->geografia = app(ImagenController::class)->update_for_summernote($request->geografia, "asentamientos", $request->id);
-    }
-    if ($request->filled('clima')) {
-      $asentamiento->clima = app(ImagenController::class)->update_for_summernote($request->clima, "asentamientos", $request->id);
-    }
-    if ($request->filled('otros')) {
-      $asentamiento->otros = app(ImagenController::class)->update_for_summernote($request->otros, "asentamientos", $request->id);
-    }
-
-    $asentamiento->id_owner = $request->input('select_owner', 0);
-    $asentamiento->id_tipo_asentamiento = $request->select_tipo;
-
-    try {
-      //------------fechas----------//
-      if ($request->input('afundacion', 0) != 0) {
-        if ($asentamiento->fundacion != 0) {
-          //el asentamiento ya tenía fecha de fundacion antes de editar
-          app(ConfigurationController::class)->update_fecha($request->input('dfundacion', 0), $request->input('mfundacion', 0), $request->input('afundacion', 0), $asentamiento->fundacion);
-        } else {
-          //el asentamiento no tenía fecha de fundacion antes de editar, hay que añadirla a la db.
-          $asentamiento->fundacion = app(ConfigurationController::class)->store_fecha($request->input('dfundacion', 0), $request->input('mfundacion', 0), $request->input('afundacion', 0), "asentamientos");
-        }
-      }
-
-      if ($request->input('adisolucion', 0) != 0) {
-        if ($asentamiento->disolucion != 0) {
-          //el asentamiento ya tenía fecha de disolucion antes de editar
-          app(ConfigurationController::class)->update_fecha($request->input('ddisolucion', 0), $request->input('mdisolucion', 0), $request->input('adisolucion', 0), $asentamiento->disolucion);
-        } else {
-          //el asentamiento no tenía fecha de disolucion antes de editar, hay que añadirla a la db.
-          $asentamiento->disolucion = app(ConfigurationController::class)->store_fecha($request->input('ddisolucion', 0), $request->input('mdisolucion', 0), $request->input('adisolucion', 0), "asentamientos");
-        }
-      }
-
-      $asentamiento->save();
-      return redirect()->route('asentamientos.index')->with('message', 'Asentamiento ' . $asentamiento->nombre . ' editado correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('AsentamientoController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('asentamientos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      Log::error('AsentamientoController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('asentamientos.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('asentamientos.index')
+        ->with('success', 'Asentamiento ' . $asentamiento->nombre . ' actualizado con éxito.');
+    } catch (\Exception $e) {
+      Log::error("Error actualizando asentamiento ID {$id}: " . $e->getMessage());
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'Error al actualizar: ' . $e->getMessage());
     }
   }
 
