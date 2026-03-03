@@ -28,7 +28,7 @@ return new class extends Migration
       $table->mediumText('geografia')->nullable();
       $table->text('ecosistema')->nullable();
       $table->text('clima')->nullable();
-      $table->string('fenomeno_unico')->nullable(); // Ej: Aurora permanente
+      $table->text('fenomeno_unico')->nullable(); // Ej: Aurora permanente
       $table->string('estacionalidad')->nullable(); // Cambios según la época
 
       // Desafíos y mecánicas de juego/narrativa
