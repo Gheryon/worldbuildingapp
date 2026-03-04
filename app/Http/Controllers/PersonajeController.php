@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Especie;
 use App\Models\Fecha;
 use App\Models\imagen;
-use App\Models\personaje;
+use App\Models\Personaje;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +37,7 @@ class PersonajeController extends Controller
     $especie_id = $datosValidados['especie'] ?? 0; // 0 es el valor para "todas las especies".
     $terminoBusqueda = $datosValidados['search'] ?? null;
 
-    $personajes = personaje::filtrar([
+    $personajes = Personaje::filtrar([
       'orden'  => $orden,
       'especie'   => $especie_id,
       'search' => $terminoBusqueda
@@ -81,7 +81,7 @@ class PersonajeController extends Controller
 
     try {
       // Llamada a la lógica del modelo
-      $personaje = personaje::store_personaje($request);
+      $personaje = Personaje::store_personaje($request);
 
       return redirect()->route('personajes.index')
         ->with('success', 'Personaje ' . $personaje->nombre . ' añadido correctamente.');
@@ -118,7 +118,7 @@ class PersonajeController extends Controller
   public function show($id)
   {
     // Cargamos el personaje con sus relaciones para evitar el problema N+1
-    $personaje = personaje::with(['especie'])
+    $personaje = Personaje::with(['especie'])
       ->findOrFail($id);
 
     //obtener fechas en formato string
@@ -152,7 +152,7 @@ class PersonajeController extends Controller
   {
     try {
       //obtener personaje
-      $personaje = personaje::with(['fecha_nacimiento', 'fecha_fallecimiento'])->findOrFail($id);
+      $personaje = Personaje::with(['fecha_nacimiento', 'fecha_fallecimiento'])->findOrFail($id);
 
       //obtener todas las especies
       $especies = Especie::orderBy('nombre', 'asc')->pluck('nombre', 'id');
@@ -184,7 +184,7 @@ class PersonajeController extends Controller
     ]);
 
     try {
-      $personaje = personaje::findOrFail($id); //obtiene el personaje en bbdd
+      $personaje = Personaje::findOrFail($id); //obtiene el personaje en bbdd
       $personaje->update_personaje($request); //lo actualiza con el request
 
       return redirect()->route('personajes.index')
@@ -208,7 +208,7 @@ class PersonajeController extends Controller
     ]);
 
     try {
-      $personaje = personaje::findOrFail($request->id_borrar);
+      $personaje = Personaje::findOrFail($request->id_borrar);
       $nombre = $personaje->nombre; // Guardamos el nombre para el mensaje
 
       // Llamamos a la lógica centralizada en el modelo
