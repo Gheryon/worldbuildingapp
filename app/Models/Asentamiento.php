@@ -266,4 +266,28 @@ class Asentamiento extends Model
     });
   }
 
+  /**
+   * Elimina el asentamiento y todos sus recursos asociados (archivos y registros).
+   *
+   */
+  public function delete_asentamiento()
+  {
+    return DB::transaction(function () {
+      //Borrar fechas asociadas
+      if ($this->fundacion_id) {
+        Fecha::destroy($this->fundacion_id);
+      }
+      if ($this->disolucion_id) {
+        Fecha::destroy($this->disolucion_id);
+      }
+
+      //Borrar imágenes de Summernote usando el servicio
+      $imageService = new ImageService();
+      $imageService->deleteImagesByOwner('asentamientos', $this->id);
+
+      //Eliminar el asentamiento
+      return $this->delete();
+    });
+  }
+
 }

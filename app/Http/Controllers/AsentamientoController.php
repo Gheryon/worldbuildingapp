@@ -212,6 +212,19 @@ class AsentamientoController extends Controller
    */
   public function destroy(Request $request)
   {
+    try {
+      $asentamiento = Asentamiento::findOrFail($request->id_borrar);
+
+      $asentamiento->delete_asentamiento();
+
+      return redirect()->route('asentamientos.index')
+        ->with('success', $request->nombre_borrado . ' borrado correctamente.');
+    } catch (\Exception $e) {
+      Log::error('Error al borrar asentamiento: ' . $e->getMessage());
+      return redirect()->route('asentamientos.index')
+        ->with('error', 'No se pudo borrar el asentamiento.');
+    }
+
     if ($request->id_borrar != 0) {
       try {
         $fundacion = DB::scalar("SELECT fundacion FROM asentamientos where id = ?", [$request->id_borrar]);
@@ -250,36 +263,5 @@ class AsentamientoController extends Controller
     } else {
       return redirect()->route('asentamientos.index')->with('error', 'Error no se pudo borrar.');
     }
-  }
-
-  /**
-   * Display a listing of the resource searched.
-   */
-
-  public function search(Request $request)
-  {
-    $search = $request->input('search');
-    try {
-      $asentamientos = DB::table('asentamientos')
-        ->select('id', 'nombre')
-        ->where('nombre', 'LIKE', "%{$search}%")
-        ->orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      $asentamientos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      $asentamientos = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-
-    try {
-      $tipos = tipo_asentamiento::orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('AsentamientoController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $tipos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      Log::error('AsentamientoController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $tipos = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-
-    return view('asentamientos.index', ['asentamientos' => $asentamientos, 'tipos' => $tipos, 'orden' => 'asc', 'tipo_o' => 0]);
   }
 }

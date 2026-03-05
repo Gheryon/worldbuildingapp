@@ -28,7 +28,7 @@
 
 @section('navbar-search')
 <li class="nav-item">
-  <form class="form-inline ml-2" action="{{route('asentamientos.search')}}" method="GET">
+  <form class="form-inline ml-2" action="{{route('asentamientos.index')}}" method="GET">
     <div class="input-group">
       <input type="search" name="search" class="form-control" placeholder="Buscar">
       <div class="input-group-append">
@@ -92,8 +92,28 @@
 <script src="{{asset('dist/js/mensajes.js')}}"></script>
 <script>
   $(function() {
+    function redirigirConFiltros() {
+      const orden = $('#order').val();
+      const tipo = $('#filter_tipo').val();
+      const search = $('input[name="search"]').val();
 
+      // Creamos el objeto de parámetros de búsqueda
+      const params = new URLSearchParams();
 
+      // Solo agregamos los parámetros si tienen un valor útil
+      if (orden) params.append('orden', orden);
+      if (tipo && tipo !== '0') params.append('tipo', tipo);
+      if (search) params.append('search', search); //Mantiene la búsqueda al filtrar
+
+      // Generamos la URL base desde Laravel
+      const baseUrl = "{{ route('asentamientos.index') }}";
+      const urlFinal = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+      //console.log(orden, tipo, urlFinal);
+      document.location.href = urlFinal;
+    }
+
+    $(document).on('change', '#order', redirigirConFiltros);
+    $(document).on('change', '#filter_tipo', redirigirConFiltros);
   });
 </script>
 @endsection
