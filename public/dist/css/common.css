@@ -69,6 +69,31 @@ a:hover {
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
+/*================Para los cards de lugares====================*/
+/* Nuevos estilos para las Cards */
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.12) !important;
+}
+
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+.opacity-85 {
+    opacity: 0.85;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+/* Ajuste para inputs de la navbar */
+.nav-item .custom-select {
+    border-radius: 20px;
+    padding-left: 15px;
+    height: 38px;
+}
 /*================Pagination====================*/
 /* Cambia el color del texto y fondo de los items de paginación */
 .pagination .page-link {

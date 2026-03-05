@@ -5,26 +5,47 @@ namespace App\Http\Controllers;
 use App\Models\Lugar;
 use App\Models\imagen;
 use App\Models\tipo_lugar;
-use App\Http\Controllers\ImagenController;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class LugaresController extends Controller
 {
   /**
-   * Display a listing of the resource.
+   * Muestra una lista paginada de lugares almacenados, permitiendo filtrar por tipo y ordenar.
+   *
+   * Los parámetros de la URL se validan estrictamente para asegurar la integridad de la consulta.
+   *
+   * @param Request $request Objeto de solicitud inyectado para acceder a los parámetros.
+   * @return View La vista con la lista de lugares y los filtros disponibles.
    */
-  public function index($orden='asc', $tipo='0')
+  public function index(Request $request)
   {
-    //obtener todos los lugares almacenados
-    $lugares=Lugar::get_lugares($tipo, $orden);
+    $datosValidados = $request->validate([
+      'orden' => 'sometimes|string|in:asc,desc', // 'sometimes' permite que no esté presente.
+      'tipo'  => 'sometimes|integer|nullable',
+      'search' => 'sometimes|nullable|string|max:100',
+    ], [
+      'orden.in' => 'El orden debe ser ascendente (asc) o descendente (desc).',
+      'tipo.exists' => 'El tipo seleccionado no es válido.',
+    ]);
+
+    // Si la validación falla o el parámetro no está presente, se usan los valores por defecto.
+    $orden = $request->get('orden', 'asc');
+    $tipo_id = $request->get('tipo', 0);// 0 es el valor para "todos los tipos".
+    $terminoBusqueda = $request->get('search');
+
+    //Obtener lugares almacenados
+    $lugares = Lugar::filtrar([
+      'orden'  => $orden,
+      'tipo'   => $tipo_id,
+      'search' => $terminoBusqueda
+    ])->paginate(16);
 
     // Obtener todos los tipos de lugares almacenados
     $tipos = tipo_lugar::get_tipos_lugares();
 
-    return view('lugares.index', ['lugares' => $lugares, 'tipos'=>$tipos, 'orden'=>$orden, 'tipo_o'=>$tipo]);
+    return view('lugares.index', compact('lugares', 'tipos', 'orden', 'tipo_id', 'terminoBusqueda'));
   }
 
   /**
@@ -33,7 +54,7 @@ class LugaresController extends Controller
   public function create()
   {
     // Obtener todos los tipos de lugares almacenados
-    $tipos = tipo_lugar::get_tipos_lugares();
+    $tipos = tipo_lugar::orderby('nombre', 'asc')->get();
 
     return view('lugares.create', ['tipos'=>$tipos]);
   }
@@ -44,74 +65,53 @@ class LugaresController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'nombre'=>'required|max:256',
-      'select_tipo'=>'required',
+      'nombre' => 'required|max:256',
+      'select_tipo' => 'required|exists:tipo_lugar,id',
+      'nivel_peligro' => 'nullable|string|max:256',
+      'dificultad_acceso' => 'nullable|string|max:50',
     ]);
 
     try {
-      $lugar=new lugar();
-      $lugar->save();
-  
-      $id_lugar=DB::scalar("SELECT MAX(id) as id FROM lugares");
-    }catch(\Illuminate\Database\QueryException $excepcion){
-      Log::error('LugaresController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('lugares.index')->with('error', 'Se produjo un problema en la base de datos.');
-    }catch(Exception $excepcion){
-      Log::error('LugaresController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('lugares.index')->with('error', $excepcion->getMessage());
-    }
+      // Llamada a la lógica del modelo
+      $lugar = Lugar::store_lugar($request);
 
-    if($request->filled('nombre')){
-      $lugar->Nombre=$request->nombre;
-    }
-    if($request->filled('otros_nombres')){
-      $lugar->otros_nombres=$request->otros_nombres;
-    }
-    if($request->filled('descripcion_breve')){
-      $lugar->descripcion_breve=app(ImagenController::class)->update_for_summernote($request->descripcion_breve, "lugares", $id_lugar);
-    }
-    if($request->filled('geografia')){
-      $lugar->geografia=app(ImagenController::class)->update_for_summernote($request->geografia, "lugares", $id_lugar);
-    }
-    if($request->filled('ecosistema')){
-      $lugar->ecosistema=app(ImagenController::class)->update_for_summernote($request->ecosistema, "lugares", $id_lugar);
-    }
-    if($request->filled('clima')){
-      $lugar->clima=app(ImagenController::class)->update_for_summernote($request->clima, "lugares", $id_lugar);
-    }
-    if($request->filled('flora_fauna')){
-      $lugar->flora_fauna=app(ImagenController::class)->update_for_summernote($request->flora_fauna, "lugares", $id_lugar);
-    }
-    if($request->filled('recursos')){
-      $lugar->recursos=app(ImagenController::class)->update_for_summernote($request->recursos, "lugares", $id_lugar);
-    }
-    if($request->filled('historia')){
-      $lugar->Historia=app(ImagenController::class)->update_for_summernote($request->historia, "lugares", $id_lugar);
-    }
-    if($request->filled('otros')){
-      $lugar->otros=app(ImagenController::class)->update_for_summernote($request->otros, "lugares", $id_lugar);
-    }
-
-    $lugar->id_tipo_lugar=$request->select_tipo;
-    
-    try{
-      $lugar->save();
-      return redirect()->route('lugares.index')->with('message','Lugar añadido correctamente.');
-    }catch(\Illuminate\Database\QueryException $excepcion){
-      Log::error('LugaresController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('lugares.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
-    }catch(Exception $excepcion){
-      Log::error('LugaresController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('lugares.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('lugares.index')
+        ->with('success', 'Lugar ' . $lugar->nombre . ' añadido correctamente.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error(
+        "Error de base de datos al añadir lugar.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'No se pudo crear el lugar debido a un error en la base de datos.');
+    } catch (\Exception $e) {
+      Log::critical(
+        "Error inesperado al añadir lugar.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'No se pudo crear el lugar: ' . $e->getMessage());
     }
   }
 
   /**
    * Display the specified resource.
    */
-  public function show(lugar $lugar)
+  public function show($id)
   {
-    //se hace desde vistacontroller
+    $lugar=Lugar::with('tipo')->findOrFail($id);
+
+    return view('lugares.show', compact('lugar'));
   }
 
   /**
@@ -119,75 +119,36 @@ class LugaresController extends Controller
    */
   public function edit($id)
   {
+    $lugar=Lugar::findOrFail($id);
     // Obtener todos los tipos de lugares almacenados
-    $tipos = tipo_lugar::get_tipos_lugares();
+    $tipos = tipo_lugar::orderby('nombre', 'asc')->get();
 
-
-    $lugar = Lugar::get_lugar($id);
-    if($lugar['error']??false){
-      return redirect()->route('lugares')->with('error', $lugar['error']['error']);
-    }
-
-    return view('lugares.edit', ['lugar'=>$lugar, 'tipos'=>$tipos]);
+    return view('lugares.edit', compact('tipos', 'lugar'));
   }
 
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request)
+  public function update(Request $request, $id)
   {
     $request->validate([
-      'nombre'=>'required|max:256',
-      'select_tipo'=>'required',
+      'nombre' => 'required|max:256',
+      'select_tipo' => 'required|exists:tipo_lugar,id',
+      'nivel_peligro' => 'nullable|string|max:256',
+      'dificultad_acceso' => 'nullable|string|max:50',
     ]);
 
-     $lugar = Lugar::get_lugar($$request->id);
-    if($lugar['error']??false){
-      return redirect()->route('lugares')->with('error', $lugar['error']['error']);
-    }
-    
-    if($request->filled('nombre')){
-      $lugar->Nombre=$request->nombre;
-    }
-    if($request->filled('otros_nombres')){
-      $lugar->otros_nombres=$request->otros_nombres;
-    }
-    if($request->filled('descripcion_breve')){
-      $lugar->descripcion_breve=app(ImagenController::class)->update_for_summernote($request->descripcion_breve, "lugares", $request->id);
-    }
-    if($request->filled('geografia')){
-      $lugar->geografia=app(ImagenController::class)->update_for_summernote($request->geografia, "lugares", $request->id);
-    }
-    if($request->filled('ecosistema')){
-      $lugar->ecosistema=app(ImagenController::class)->update_for_summernote($request->ecosistema, "lugares", $request->id);
-    }
-    if($request->filled('clima')){
-      $lugar->clima=app(ImagenController::class)->update_for_summernote($request->clima, "lugares", $request->id);
-    }
-    if($request->filled('flora_fauna')){
-      $lugar->flora_fauna=app(ImagenController::class)->update_for_summernote($request->flora_fauna, "lugares", $request->id);
-    }
-    if($request->filled('recursos')){
-      $lugar->recursos=app(ImagenController::class)->update_for_summernote($request->recursos, "lugares", $request->id);
-    }
-    if($request->filled('historia')){
-      $lugar->Historia=app(ImagenController::class)->update_for_summernote($request->historia, "lugares", $request->id);
-    }
-    if($request->filled('otros')){
-      $lugar->otros=app(ImagenController::class)->update_for_summernote($request->otros, "lugares", $request->id);
-    }
+    try {
+      $lugar = Lugar::findOrFail($id); //obtiene el lugar en bbdd
+      $lugar->update_lugar($request); //se actualiza con el request
 
-    $lugar->id_tipo_lugar=$request->select_tipo;
-    
-    try{
-      $lugar->save();
-      return redirect()->route('lugares.index')->with('message', $lugar->nombre.' editado correctamente.');
-    }catch(\Illuminate\Database\QueryException $excepcion){
-      Log::error('LugaresController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('lugares.index')->with('error','Se produjo un problema en la base de datos, no se pudo añadir.');
-    }catch(Exception $excepcion){
-      Log::error('LugaresController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('lugares.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('lugares.index')
+        ->with('success', 'Lugar ' . $lugar->nombre . ' actualizado con éxito.');
+    } catch (\Exception $e) {
+      Log::error("Error actualizando lugar ID {$id}: " . $e->getMessage());
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'Error al actualizar: ' . $e->getMessage());
     }
   }
 
@@ -196,56 +157,17 @@ class LugaresController extends Controller
    */
   public function destroy(Request $request)
   {
-    try{
-      //borrado de las imagenes que pueda haber de summernote
-      $imagenes = DB::table('imagenes')
-        ->select('id', 'nombre')
-        ->where('table_owner', '=', 'lugares')
-        ->where('owner', '=', $request->id_borrar)->get();
-      
-      foreach ($imagenes as $imagen) {
-        if (file_exists(public_path("/storage/imagenes/" . $imagen->nombre))) {
-          unlink(public_path("/storage/imagenes/" . $imagen->nombre));
-          //Storage::delete(asset($imagen->nombre));
-        }
-        imagen::destroy($imagen->id);
-      }
+    try {
+      $lugar = Lugar::findOrFail($request->id_borrar);
 
-      lugar::destroy($request->id_borrar);
-      return redirect()->route('lugares.index')->with('message','lugar borrado correctamente.');
-    }catch(\Illuminate\Database\QueryException $excepcion){
-      Log::error('LugaresController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('lugares.index')->with('error','Se produjo un problema en la base de datos, no se pudo borrar.');
-    }catch(Exception $excepcion){
-      Log::error('LugaresController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('lugares.index')->with('error',$excepcion->getMessage());
+      $lugar->delete_lugar();
+
+      return redirect()->route('lugares.index')
+        ->with('success', $request->nombre_borrado . ' borrado correctamente.');
+    } catch (\Exception $e) {
+      Log::error('Error al borrar lugar: ' . $e->getMessage());
+      return redirect()->route('lugares.index')
+        ->with('error', 'No se pudo borrar el lugar.');
     }
-  }
-
-  /**
-   * Display a listing of the resource searched.
-   */
-  public function search(Request $request)
-  {
-    $search = $request->input('search');
-    try{
-      $lugares=DB::table('lugares')
-        ->leftjoin('tipo_lugar', 'lugares.id_tipo_lugar', '=', 'tipo_lugar.id')
-        ->select('lugares.id', 'lugares.nombre', 'descripcion_breve', 'tipo_lugar.nombre AS tipo')
-        ->where('lugares.nombre', 'LIKE', "%{$search}%")
-        ->orderBy('lugares.nombre', 'asc')->get();
-      
-    }catch(\Illuminate\Database\QueryException $excepcion){
-      Log::error('LugaresController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $lugares=['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    }catch(Exception $excepcion){
-      Log::error('LugaresController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $lugares=['error' => ['error' => $excepcion->getMessage()]];
-    }
-
-    // Obtener todos los tipos de lugares almacenados
-    $tipos = tipo_lugar::get_tipos_lugares();
-    
-    return view('lugares.index', ['lugares' => $lugares, 'tipos'=>$tipos, 'orden'=>'asc', 'tipo_o'=>0]);
   }
 }

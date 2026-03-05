@@ -108,7 +108,7 @@ Route::controller(App\Http\Controllers\LugaresController::class)->group(function
   Route::get('/lugares/{id}/edit', 'edit')->name('lugar.edit');
   Route::put('/lugares/{id}', 'update')->name('lugar.update');
   Route::delete('/lugar/destroy', 'destroy')->name('lugar.destroy');
-  Route::get('/lugares', 'search')->name('lugares.search');
+  Route::get('/lugares/{id}', 'show')->name('lugar.show');
 });
 
 /*******nombres routes********/
@@ -170,7 +170,6 @@ Route::controller(App\Http\Controllers\ArticuloController::class)->group(functio
 
 /*******vistas routes********/
 Route::controller(App\Http\Controllers\VistaController::class)->group(function () {
-  Route::get('/lugares/{id}', 'show_lugar')->name('lugar.show');
   Route::get('/conflictos/{id}', 'show_conflicto')->name('conflicto.show');
   Route::get('/construcciones/{id}', 'show_construccion')->name('construccion.show');
 });
