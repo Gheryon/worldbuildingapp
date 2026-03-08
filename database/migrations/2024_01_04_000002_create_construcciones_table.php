@@ -31,9 +31,34 @@ return new class extends Migration
       $table->unsignedBigInteger('fecha_construccion_id')->nullable();
       $table->unsignedBigInteger('fecha_destruccion_id')->nullable();
 
+       // Materiales de construcción
+      $table->text('materiales_principales')->nullable();
+      $table->text('materiales_exoticos')->nullable()->comment('Adamantio, hueso de dragón, etc.');
+      $table->string('tecnica_construccion', 256)->nullable();
+      $table->boolean('tecnologia_perdida')->default(false);
+
+      // Acceso y disponibilidad
+      $table->boolean('acceso_publico')->default(true);
+      $table->text('rutas_acceso')->nullable();
+      $table->string('dificultad_acceso', 64)->nullable()->comment('Fácil, moderado, peligroso');
+      $table->boolean('acceso_temporal')->default(false)->comment('Solo accesible en ciertas épocas');
+
+      // Propiedades mágicas
+      $table->boolean('tiene_magia_inherente')->default(false);
+      $table->text('propiedades_magicas')->nullable();
+      $table->string('fuente_poder_magico', 256)->nullable()->comment('Líneas ley, nodos mágicos, etc.');
+      $table->string('tipo_magia', 128)->nullable()->comment('Arcana, divina, elemental, etc.');
+
+      // Ubicación geográfica
+      $table->decimal('altitud', 8, 2)->nullable();
+
+      // Estado y significado
+      $table->string('nivel_deterioro', 64)->nullable();
+      $table->string('simbolismo', 256)->nullable();
+      
       // --- Información descriptiva ---
       $table->string('estatus', 64)->default('En uso'); // En uso, Abandonado, Ruinas.
-      $table->string('importancia_social', 128)->nullable()->comment('Ej: Hito local, Maravilla del mundo');
+      $table->text('importancia_social')->nullable()->comment('Ej: Hito local, Maravilla del mundo');
       $table->text('descripcion_breve')->nullable();
       $table->text('aspecto')->nullable();
       $table->mediumText('historia')->nullable();

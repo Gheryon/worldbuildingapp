@@ -61,7 +61,7 @@ $(document).ready(function () {
         // Toolbar simplificado para versiones Lite
         ['style', ['bold', 'italic', 'underline', 'clear']],
         ['para', ['ul', 'ol', 'paragraph']],
-        ['insert', ['link']],
+        ['insert', ['link', 'picture', 'video']],
         ['view', ['codeview']]
       ] : [
         // Toolbar completo para versiones grandes
