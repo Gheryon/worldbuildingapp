@@ -75,6 +75,34 @@ class Fecha extends Model
   }
 
   /**
+   * Sincroniza una fecha: la actualiza si existe, la crea si no, o la elimina si el año viene vacío.
+   * * @param int|null $id ID actual de la fecha en el modelo padre.
+   * @param array $data ['dia' => x, 'mes' => x, 'anno' => x]
+   * @return int|null El ID de la fecha (nuevo o existente) o null si se eliminó.
+   */
+  public static function sync(?int $id, array $data): ?int
+  {
+    $dia  = $data['dia'] ?? 0;
+    $mes  = $data['mes'] ?? 0;
+    $anno = $data['anno'] ?? null;
+
+    // Si no hay año, interpretamos que la fecha no debe existir
+    if (empty($anno)) {
+      // Opcional: borrar el registro de la tabla fechas físicamente
+      // if ($id && $id > 1) self::destroy($id); 
+      return null;
+    }
+
+    // Si ya existe un ID válido, actualizamos
+    if ($id && $id > 1) {
+      self::update_fecha($dia, $mes, $anno, $id);
+      return $id;
+    }
+
+    // Si no hay ID, creamos uno nuevo
+    return self::store_fecha($dia, $mes, $anno);
+  }
+  /**
    * Actualiza una fecha específica en la base de datos según su ID.
    *
    * @param int $id El ID de la fecha que se desea actualizar.
