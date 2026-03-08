@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <form id="form-create-asentamiento" class="needs-validation" action="{{route('asentamiento.store')}}" method="post" enctype="multipart/form-data">
+  <form id="form-create-asentamiento" data-prevent-loss="true" class="needs-validation" action="{{route('asentamiento.store')}}" method="post" enctype="multipart/form-data">
     @csrf
 
     {{-- Botón de Acción Superior --}}
@@ -166,180 +166,10 @@
   </form>
 </div>
 
-<div class="row">
-  <div class="col text-center">
-    <h1>Nuevo asentamiento</h1>
-  </div>
-</div>
-<hr>
-
-<!-- Main content -->
-<section class="content">
-  <form id="form-create-asentamiento" class="position-relative needs-validation" action="{{route('asentamiento.store')}}" method="post" enctype="multipart/form-data">
-    @csrf
-    <div class="row justify-content-md-center">
-      <div class="col-md-auto form-actions">
-        <button type="submit" id="submit-crear-button" class="btn btn-success">Guardar</button>
-      </div>
-    </div>
-    <div class="row mt-3 mb-3 justify-content-md-center border">
-      <div class="col">
-        <div class="row mt-2">
-          <div class="col-md">
-            <x-text-input name="nombre" label="Nombre" placeholder="Ej: Córdoba, Minas Tirith, etc." :value="old('nombre')" />
-          </div>
-          <div class="col-md">
-            <x-text-input name="gentilicio" label="Gentilicio" placeholder="Ej: Cordobés, etc." :value="old('gentilicio')" />
-          </div>
-          <div class="col-2">
-            <label for="poblacion" class="form-label mt-2">Población estimada</label>
-            <input type="number" name="poblacion" class="form-control" id="poblacion" placeholder="Ej: 5000" value="{{ old('poblacion') }}">
-            @error('poblacion')
-            <small style="color: red">{{$message}}</small>
-            @enderror
-          </div>
-          <div class="col-md">
-            <x-text-input name="recurso_principal" label="Recurso principal" placeholder="Ej: Hierro, carbón, etc." :value="old('recurso_principal')" />
-          </div>
-          <div class="col-md">
-            <x-text-input name="nivel_riqueza" label="Nivel de riqueza" placeholder="Ej: Bajo, medio, alto, etc." :value="old('nivel_riqueza')" />
-          </div>
-        </div>
-        <div class="row mt-2">
-          <div class="col-md">
-            <label for="select_tipo" class="form-label mt-2">Tipo</label>
-            <select class="form-select form-control" name="select_tipo" id="select_tipo" required>
-              <option selected disabled value="">Elegir</option>
-              @foreach($tipos_asentamientos as $tipo)
-              <option value="{{$tipo->id}}" {{ old('select_tipo') == $tipo->id ? 'selected' : '' }}>{{$tipo->nombre}}</option>
-              @endforeach
-            </select>
-            @error('select_tipo')
-            <small style="color: red">{{$message}}</small>
-            @enderror
-          </div>
-          <div class="col-md">
-            <label for="estatus" class="form-label mt-2">Estatus</label>
-            <select class="form-select form-control" name="estatus" id="estatus" required>
-              <option selected disabled value="">Elegir</option>
-              @foreach(['Abandonado', 'En ruinas', 'En uso', 'Olvidado'] as $estatus)
-              <option value="{{ $estatus }}"
-                {{ old('estatus') == $estatus ? 'selected' : '' }}>
-                {{ $estatus }}
-              </option>
-              @endforeach
-            </select>
-          </div>
-          <div class="col-md">
-            <label for="select_owner" class="form-label mt-2">Controlado por:</label>
-            <select class="form-select form-control" name="select_owner" id="select_owner">
-              <option selected disabled value="">Elegir</option>
-              @foreach($paises as $id => $nombre)
-              <option value="{{$id}}" {{ old('select_owner') == $id ? 'selected' : '' }}>{{$nombre}}</option>
-              @endforeach
-            </select>
-          </div>
-          <div class="col">
-            <x-date-input-group name="fundacion" label="Fecha de fundación" />
-          </div>
-          <div class="col">
-            <x-date-input-group name="disolucion" label="Fecha de disolución" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {{-- Panel de pestañas --}}
-    <div class="card card-dark card-outline card-tabs mt-4">
-      <div class="card-header p-0 pt-1 border-bottom-0">
-        <ul class="nav nav-tabs" id="personajeTab" role="tablist">
-          <li class="nav-item">
-            <a class="nav-link active" id="fisico-tab" data-toggle="pill" href="#tab-descripcion" role="tab">Descripción</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="social-tab" data-toggle="pill" href="#tab-social" role="tab">Cultura y sociedad</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="politica-tab" data-toggle="pill" href="#tab-politica" role="tab">Gobierno y militar</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="economia-tab" data-toggle="pill" href="#tab-economia" role="tab">Economía y recursos</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="historia-tab" data-toggle="pill" href="#tab-historia" role="tab">Historia y otros</a>
-          </li>
-        </ul>
-      </div>
-      <div class="card-body">
-        <div class="tab-content" id="personajeTabContent">
-
-          {{-- PESTAÑA 1: Descripción, geografia y clima --}}
-          <div class="tab-pane fade show active" id="tab-descripcion" role="tabpanel">
-            <x-textarea-input name="descripcion" label="Descripción general del asentamiento" />
-            <x-textarea-input name="geografia" label="Geografía" />
-            <x-textarea-input name="clima" label="Clima" />
-            <x-textarea-input name="ubicacion_detalles" label="Detalles especiales o secretos" />
-          </div>
-
-          {{-- PESTAÑA 2: cultura, demografia, arquitectura --}}
-          <div class="tab-pane fade" id="tab-social" role="tabpanel">
-            <x-textarea-input name="demografia" label="Demografía" />
-            <x-textarea-input name="cultura" label="Aspectos culturales" />
-            <x-textarea-input name="arquitectura" label="Arquitectura" />
-            <x-textarea-input name="inftraestructura" label="Infraestructura" />
-          </div>
-
-          {{-- PESTAÑA 3: Gobierno y militar --}}
-          <div class="tab-pane fade" id="tab-politica" role="tabpanel">
-            <x-textarea-input name="gobierno" label="Gobierno" />
-            <x-textarea-input name="defensas" label="Defensas" />
-            <x-textarea-input name="ejercito" label="Fuerzas militares" />
-          </div>
-
-          {{-- PESTAÑA 4: Economía y recursos --}}
-          <div class="tab-pane fade" id="tab-economia" role="tabpanel">
-            <x-textarea-input name="economia" label="Economía, industria y comercio" />
-            <x-textarea-input name="recursos" label="Recursos naturales" />
-          </div>
-
-          {{-- PESTAÑA 5: Historia y otros --}}
-          <div class="tab-pane fade" id="tab-historia" role="tabpanel">
-            <x-textarea-input name="historia" label="Historia" class="summernote" rows="10" />
-            <x-textarea-input name="otros" label="Otros detalles adicionales" />
-          </div>
-        </div>
-      </div>
-    </div>{{-- Fin panel de pestañas --}}
-  </form>
-
 </section>
 <!-- /.content -->
 @endsection
 
 @section('specific-scripts')
 <script src="{{asset('dist/js/common.js')}}"></script>
-<script>
-  $(function() {
-    // Summernote
-    $('.summernote').summernote({
-      height: 150
-    })
-
-    // Prevención de pérdida de datos
-    let formChanged = false;
-    $('#form-create-asentamiento').on('change', 'input, select, textarea', function() {
-      formChanged = true;
-    });
-
-    $(window).on('beforeunload', function() {
-      if (formChanged) {
-        return "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?";
-      }
-    });
-
-    $('#form-create-asentamiento').on('submit', function() {
-      $(window).off('beforeunload'); // Desactivar alerta al enviar el formulario
-    });
-  });
-</script>
 @endsection
