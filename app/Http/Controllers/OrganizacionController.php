@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Organizacion;
 use App\Models\tipo_organizacion;
 use App\Models\Fecha;
-use App\Models\personaje;
+use App\Models\Personaje;
 use App\Models\Religion;
 use Exception;
 use Illuminate\Http\Request;
@@ -61,7 +61,7 @@ class OrganizacionController extends Controller
     $tipo_organizacion = tipo_organizacion::get_tipos_organizaciones();
 
     // Obtener id y nombre de todos los personajes almacenados
-    $personajes = personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
+    $personajes = Personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
     //obtener id y nombre de todas las religiones
     $religiones = Religion::orderBy('nombre', 'asc')->pluck('nombre', 'id');
@@ -174,7 +174,7 @@ class OrganizacionController extends Controller
       $tipo_organizacion = tipo_organizacion::get_tipos_organizaciones();
 
       // Obtener todos los personajes almacenados
-      $personajes = personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
+      $personajes = Personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
       //obtener id y nombre de todas las religiones
       $religiones = Religion::orderBy('nombre', 'asc')->pluck('nombre', 'id');
