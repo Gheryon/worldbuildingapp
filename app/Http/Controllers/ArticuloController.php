@@ -3,12 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\articulo;
-use App\Models\imagen;
-use App\Models\personaje;
-use App\Http\Controllers\ImagenController;
+use App\Models\Personaje;
 use Illuminate\Http\Request;
 use Exception;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ArticuloController extends Controller
@@ -238,7 +235,7 @@ class ArticuloController extends Controller
   public function create_relato()
   {
     //Obtener todos los personajes almacenados
-    $personajes = personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
+    $personajes = Personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
     return view('relatos.create', compact('personajes'));
   }
@@ -325,7 +322,7 @@ class ArticuloController extends Controller
       $relato = Articulo::with('personajes_relevantes')->findOrFail($id);
 
       //Obtener todos los personajes almacenados
-      $personajes = personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
+      $personajes = Personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
       return view('relatos.edit', compact('relato', 'personajes'));
     } catch (\Exception $e) {
