@@ -15,17 +15,15 @@ class ImageService
   {
     if (empty($content)) return $content;
 
-    //asegurar que existe el directorio
-    //$storagePath = public_path("storage/imagenes/");
-    //if (!File::exists($storagePath)) {
-    //  File::makeDirectory($storagePath, 0755, true);
-    //}
-
     $dom = new \DomDocument();
-    //Mantener UTF-8 y evitar errores de HTML5
+     //Mantener UTF-8 y evitar errores de HTML5
     $htmlForDom = '<?xml encoding="utf-8" ?>' . $content;
     @$dom->loadHtml($htmlForDom, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
+    // Usar LIBXML_NOERROR para manejar errores de forma controlada si es necesario
+    /*libxml_use_internal_errors(true);
+    $dom->loadHtml('<?xml encoding="utf-8" ?>' . $content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();*/
     $images = $dom->getElementsByTagName('img');
 
     foreach ($images as $item => $image) {

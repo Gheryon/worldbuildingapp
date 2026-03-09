@@ -6,11 +6,10 @@ use App\Models\Asentamiento;
 use App\Models\Construccion;
 use App\Models\Fecha;
 use App\Models\imagen;
-use App\Models\tipo_construccion;
-use App\Http\Controllers\ImagenController;
+use App\Models\TipoConstruccion;
+use App\Http\Requests\ConstruccionRequest;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ConstruccionController extends Controller
@@ -18,15 +17,33 @@ class ConstruccionController extends Controller
   /**
    * Display a listing of the resource.
    */
-  public function index($orden = 'asc', $tipo = '0')
+  public function index(Request $request)
   {
-    // Obtener las construcciones
-    $construcciones = Construccion::get_construcciones($tipo, $orden);
+    $datosValidados = $request->validate([
+      'orden' => 'sometimes|string|in:asc,desc', // 'sometimes' permite que no esté presente.
+      'tipo'  => 'sometimes|integer|nullable',
+      'search' => 'sometimes|nullable|string|max:100',
+    ], [
+      'orden.in' => 'El orden debe ser ascendente (asc) o descendente (desc).',
+      'tipo.exists' => 'El tipo seleccionado no es válido.',
+    ]);
 
-    // Obtener todos los tipos de construcciones almacenados
-    $tipos = tipo_construccion::get_tipos_construcciones();
+    // Si la validación falla o el parámetro no está presente, se usan los valores por defecto.
+    $orden = $request->get('orden', 'asc');
+    $tipo_id = $request->get('tipo', 0); // 0 es el valor para "todos los tipos".
+    $terminoBusqueda = $request->get('search');
 
-    return view('construcciones.index', ['construcciones' => $construcciones, 'tipos' => $tipos, 'orden' => $orden, 'tipo_o' => $tipo]);
+    //Obtener construcciones almacenadas
+    $construcciones = Construccion::filtrar([
+      'orden'  => $orden,
+      'tipo'   => $tipo_id,
+      'search' => $terminoBusqueda
+    ])->paginate(16);
+
+    // Obtener todos los tipos de construcciones almacenadas
+    $tipos = TipoConstruccion::orderby('nombre', 'asc')->get();
+
+    return view('construcciones.index', compact('construcciones', 'tipos', 'orden', 'tipo_id', 'terminoBusqueda'));
   }
 
   /**
@@ -35,183 +52,119 @@ class ConstruccionController extends Controller
   public function create()
   {
     // Obtener todos los tipos de construcciones almacenados
-    $tipos = tipo_construccion::get_tipos_construcciones();
+    $tipos = TipoConstruccion::orderby('nombre', 'asc')->get();
 
     // Obtener todos los asentamientos almacenados
-    $ubicaciones = Asentamiento::get_asentamientos();
+    $asentamientos = Asentamiento::orderby('nombre', 'asc')->pluck('nombre', 'id');
 
-    return view('construcciones.create', ['tipos' => $tipos, 'ubicaciones' => $ubicaciones]);
+    return view('construcciones.create', compact('tipos', 'asentamientos'));
   }
 
   /**
    * Store a newly created resource in storage.
    */
-  public function store(Request $request)
+  public function store(ConstruccionRequest $request)
   {
-    $request->validate([
-      'nombre' => 'required|max:256',
-      'select_tipo' => 'required',
-      'dconstruccion' => 'nullable|integer|min:1|max:30',
-      'aconstruccion' => 'nullable|integer',
-      'ddestruccion' => 'nullable|integer|min:1|max:30',
-      'adestruccion' => 'nullable|integer',
-    ]);
-
+    $datosValidados=$request->validated();
     try {
-      $construccion = new Construccion();
-      $construccion->save();
+      // Llamada a la lógica del modelo
+      $construccion = Construccion::store_construccion($datosValidados);
 
-      $id_construccion = DB::scalar("SELECT MAX(id) as id FROM construccions");
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ConstruccionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('construcciones.index')->with('error', 'Se produjo un problema en la base de datos.' . $excepcion->getMessage());
-    } catch (Exception $excepcion) {
-      Log::error('ConstruccionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('construcciones.index')->with('error', $excepcion->getMessage());
-    }
-
-    if ($request->filled('nombre')) {
-      $construccion->nombre = $request->nombre;
-    }
-    if ($request->filled('descripcion')) {
-      $construccion->descripcion = app(ImagenController::class)->update_for_summernote($request->descripcion, "construcciones", $id_construccion);
-    }
-    if ($request->filled('historia')) {
-      $construccion->historia = app(ImagenController::class)->update_for_summernote($request->historia, "construcciones", $id_construccion);
-    }
-    if ($request->filled('proposito')) {
-      $construccion->proposito = app(ImagenController::class)->update_for_summernote($request->proposito, "construcciones", $id_construccion);
-    }
-    if ($request->filled('aspecto')) {
-      $construccion->aspecto = app(ImagenController::class)->update_for_summernote($request->aspecto, "construcciones", $id_construccion);
-    }
-    if ($request->filled('otros')) {
-      $construccion->otros = app(ImagenController::class)->update_for_summernote($request->otros, "construcciones", $id_construccion);
-    }
-
-    $construccion->tipo = $request->select_tipo;
-    $construccion->ubicacion = $request->select_ubicacion;
-
-    try {
-      $construccion->construccion = app(ConfigurationController::class)->store_fecha($request->input('dconstruccion', 0), $request->input('mconstruccion', 0), $request->input('aconstruccion', 0), "construcciones");
-      $construccion->destruccion = app(ConfigurationController::class)->store_fecha($request->input('ddestruccion', 0), $request->input('mdestruccion', 0), $request->input('adestruccion', 0), "construcciones");
-
-      $construccion->save();
-      return redirect()->route('construcciones.index')->with('message', 'Construcción ' . $construccion->nombre . ' añadida correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ConstruccionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('construcciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.' . $excepcion->getMessage());
-    } catch (Exception $excepcion) {
-      Log::error('ConstruccionController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('construcciones.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('construcciones.index')
+        ->with('success', 'Construcción ' . $construccion->nombre . ' añadida correctamente.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error(
+        "Error de base de datos al añadir construccion.",
+        [
+          'entrada_input' => $request->validated(),
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'No se pudo crear la construccion debido a un error en la base de datos.');
+    } catch (\Exception $e) {
+      Log::critical(
+        "Error inesperado al añadir construccion.",
+        [
+          'entrada_input' => $request->validated(),
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'No se pudo crear la construccion: ' . $e->getMessage());
     }
   }
 
+  /**
+   * Display the specified resource.
+   */
+  public function show($id)
+  {
+    try {
+      $construccion = Construccion::with([
+        'tipo',
+        'asentamiento',
+      ])->findorfail($id);
+
+      // Obtención de las fechas formateadas para la vista
+      $fecha_construccion = Fecha::get_fecha_string($construccion->fecha_construccion_id);
+      $fecha_destruccion = Fecha::get_fecha_string($construccion->fecha_destruccion_id);
+
+      return view('construcciones.show', compact('construccion', 'fecha_construccion', 'fecha_destruccion'));
+    } catch (\Exception $e) {
+      Log::error('Error al mostrar construccion: ' . $e->getMessage());
+      return redirect()->route('construcciones.index')
+        ->with('error', 'No se pudo mostrar la construccion.');
+    }
+  }
   /**
    * Show the form for editing the specified resource.
    */
   public function edit($id)
   {
-    // Obtener todos los tipos de construcciones almacenados
-    $tipos = tipo_construccion::get_tipos_construcciones();
+    try {
+      // Obtener todos los tipos de construcciones almacenados
+      $tipos = TipoConstruccion::orderby('nombre', 'asc')->get();
 
-    // Obtener todos los asentamientos almacenados
-    $ubicaciones = Asentamiento::get_asentamientos();
+      // Obtener todos los asentamientos almacenados
+      $asentamientos = Asentamiento::orderby('nombre', 'asc')->pluck('nombre', 'id');
 
-    // Obtener la construccion
-    $construccion = Construccion::get_construccion($id);
-    if ($construccion['error'] ?? false) {
-      return redirect()->route('construcciones')->with('error', $construccion['error']['error']);
+      // Obtener la construccion
+      $construccion = Construccion::with([
+        'tipo',
+        'asentamiento',
+        'fechaConstruccion',
+        'fechaDestruccion',
+      ])->findorfail($id);
+
+      return view('construcciones.edit', compact('construccion', 'tipos', 'asentamientos'));
+    } catch (\Exception $e) {
+      Log::error("Error al buscar construccion para editar: " . $e->getMessage());
+      return redirect()->route('construcciones.index')
+        ->with('error', 'Construcción no encontrada.');
     }
-
-    if ($construccion->construccion != 0) {
-      $construccion_ini = Fecha::find($construccion->construccion);
-    } else {
-      $construccion_ini = Fecha::find(0);
-    }
-
-    if ($construccion->destruccion != 0) {
-      $construccion_fin = Fecha::find($construccion->destruccion);
-    } else {
-      $construccion_fin = Fecha::find(0);
-    }
-
-    return view('construcciones.edit', ['construccion' => $construccion, 'construccion_ini' => $construccion_ini, 'construccion_fin' => $construccion_fin, 'tipos' => $tipos, 'ubicaciones' => $ubicaciones]);
   }
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request)
+  public function update(ConstruccionRequest $request, $id)
   {
-    $request->validate([
-      'nombre' => 'required|max:256',
-      'select_tipo' => 'required',
-      'dconstruccion' => 'nullable|integer|min:1|max:30',
-      'aconstruccion' => 'nullable|integer',
-      'ddestruccion' => 'nullable|integer|min:1|max:30',
-      'adestruccion' => 'nullable|integer',
-    ]);
-
-    // Obtener la construccion
-    $construccion = Construccion::get_construccion($request->id);
-    if ($construccion['error'] ?? false) {
-      return redirect()->route('construcciones')->with('error', $construccion['error']['error']);
-    }
-
-    $construccion->nombre = $request->nombre;
-    $construccion->ubicacion = $request->select_ubicacion;
-    $construccion->tipo = $request->select_tipo;
-
-    //inputs de summernote
-    if ($request->filled('descripcion')) {
-      $construccion->descripcion = app(ImagenController::class)->update_for_summernote($request->descripcion, "construcciones", $request->id);
-    }
-    if ($request->filled('historia')) {
-      $construccion->historia = app(ImagenController::class)->update_for_summernote($request->historia, "construcciones", $request->id);;
-    }
-    if ($request->filled('proposito')) {
-      $construccion->proposito = app(ImagenController::class)->update_for_summernote($request->proposito, "construcciones", $request->id);;
-    }
-    if ($request->filled('aspecto')) {
-      $construccion->aspecto = app(ImagenController::class)->update_for_summernote($request->aspecto, "construcciones", $request->id);;
-    }
-    if ($request->filled('otros')) {
-      $construccion->otros = app(ImagenController::class)->update_for_summernote($request->otros, "construcciones", $request->id);;
-    }
-
-    //------------fechas----------//
-    $construccion->construccion = $request->input('id_construccion', 0);
-    $construccion->destruccion = $request->input('id_destruccion', 0);
-
+    $datosValidados=$request->validated();
     try {
-      if ($request->input('aconstruccion', 0) != 0) {
-        if ($construccion->construccion != 0) {
-          //la construccion ya tenía fecha de construccion antes de editar
-          app(ConfigurationController::class)->update_fecha($request->input('dconstruccion', 0), $request->input('mconstruccion', 0), $request->input('aconstruccion', 0), $construccion->construccion);
-        } else {
-          //la construccion no tenía fecha de construccion antes de editar, hay que añadirla a la db.
-          $construccion->construccion = app(ConfigurationController::class)->store_fecha($request->input('dconstruccion', 0), $request->input('mconstruccion', 0), $request->input('aconstruccion', 0), "construcciones");
-        }
-      }
+      $construccion = Construccion::findOrFail($id); //obtiene la construccion en bbdd
+      $construccion->update_construccion($datosValidados);
 
-      if ($request->input('adestruccion', 0) != 0) {
-        if ($construccion->destruccion != 0) {
-          //el construccion ya tenía fecha de destruccion antes de editar
-          app(ConfigurationController::class)->update_fecha($request->input('ddestruccion', 0), $request->input('mdestruccion', 0), $request->input('adestruccion', 0), $construccion->destruccion);
-        } else {
-          //el construccion no tenía fecha de destruccion antes de editar, hay que añadirla a la db.
-          $construccion->destruccion = app(ConfigurationController::class)->store_fecha($request->input('ddestruccion', 0), $request->input('mdestruccion', 0), $request->input('adestruccion', 0), "construcciones");
-        }
-      }
-
-      $construccion->save();
-      return redirect()->route('construcciones.index')->with('message', $construccion->nombre . ' editado correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ConstruccionController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('construcciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo editar.' . $excepcion->getMessage());
-    } catch (Exception $excepcion) {
-      Log::error('ConstruccionController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('construcciones.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('construcciones.index')
+        ->with('success', 'Construccion ' . $construccion->nombre . ' actualizada con éxito.');
+    } catch (\Exception $e) {
+      Log::error("Error actualizando construccion ID {$id}: " . $e->getMessage());
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'Error al actualizar: ' . $e->getMessage());
     }
   }
 
@@ -221,65 +174,16 @@ class ConstruccionController extends Controller
   public function destroy(Request $request)
   {
     try {
-      $construccion = DB::scalar("SELECT construccion FROM construccions where id = ?", [$request->id_borrar]);
-      $destruccion = DB::scalar("SELECT destruccion FROM construccions where id = ?", [$request->id_borrar]);
+      $construccion = Construccion::findOrFail($request->id_borrar);
 
-      //borrado de las imagenes que pueda haber de summernote
-      $imagenes = DB::table('imagenes')
-        ->select('id', 'nombre')
-        ->where('table_owner', '=', 'construcciones')
-        ->where('owner', '=', $request->id_borrar)->get();
+      $construccion->delete();
 
-      foreach ($imagenes as $imagen) {
-        if (file_exists(public_path("/storage/imagenes/" . $imagen->nombre))) {
-          unlink(public_path("/storage/imagenes/" . $imagen->nombre));
-          //Storage::delete(asset($imagen->nombre));
-        }
-        imagen::destroy($imagen->id);
-      }
-      Construccion::destroy($request->id_borrar);
-
-      //si construccion/destruccion != 0, la construccion tiene fecha establecida, hay que borrar
-      if ($construccion != 0) {
-        Fecha::destroy($construccion);
-      }
-      if ($destruccion != 0) {
-        Fecha::destroy($destruccion);
-      }
-
-      return redirect()->route('construcciones.index')->with('message', $request->nombre_borrado . ' borrado correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ConstruccionController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('construcciones.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo borrar.');
-    } catch (Exception $excepcion) {
-      Log::error('ConstruccionController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('construcciones.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('construcciones.index')
+        ->with('success', $request->nombre_borrado . ' borrado correctamente.');
+    } catch (\Exception $e) {
+      Log::error('Error al borrar construccion: ' . $e->getMessage());
+      return redirect()->route('construcciones.index')
+        ->with('error', 'No se pudo borrar la construccion.');
     }
-  }
-
-  /**
-   * Display a listing of the resource searched.
-   */
-  public function search(Request $request)
-  {
-    $search = $request->input('search');
-    try {
-      $construcciones = DB::table('construccions')
-        ->join('tipo_construccion', 'construccions.tipo', '=', 'tipo_construccion.id')
-        ->select('construccions.id', 'construccions.nombre', 'construccions.descripcion', 'tipo_construccion.nombre AS tipo')
-        ->where('construccions.nombre', 'LIKE', "%{$search}%")
-        ->orderBy('construccions.nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ConstruccionController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $construcciones = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      Log::error('ConstruccionController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $construcciones = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-
-    // Obtener todos los tipos de construcciones almacenados
-    $tipos = tipo_construccion::get_tipos_construcciones();
-
-    return view('construcciones.index', ['construcciones' => $construcciones, 'tipos' => $tipos, 'orden' => 'asc', 'tipo_o' => 0]);
   }
 }

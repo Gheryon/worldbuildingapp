@@ -224,44 +224,5 @@ class AsentamientoController extends Controller
       return redirect()->route('asentamientos.index')
         ->with('error', 'No se pudo borrar el asentamiento.');
     }
-
-    if ($request->id_borrar != 0) {
-      try {
-        $fundacion = DB::scalar("SELECT fundacion FROM asentamientos where id = ?", [$request->id_borrar]);
-        $disolucion = DB::scalar("SELECT disolucion FROM asentamientos where id = ?", [$request->id_borrar]);
-
-        //si fundacion/disolucion != 0, la organizacion tiene fecha establecida, hay que borrar
-        if ($fundacion != 0) {
-          Fecha::destroy($fundacion);
-        }
-        if ($disolucion != 0) {
-          Fecha::destroy($disolucion);
-        }
-
-        //borrado de las imagenes que pueda haber de summernote
-        $imagenes = DB::table('imagenes')
-          ->select('id', 'nombre')
-          ->where('table_owner', '=', 'asentamientos')
-          ->where('owner', '=', $request->id_borrar)->get();
-
-        foreach ($imagenes as $imagen) {
-          if (file_exists(public_path("/storage/imagenes/" . $imagen->nombre))) {
-            unlink(public_path("/storage/imagenes/" . $imagen->nombre));
-            //Storage::delete(asset($imagen->nombre));
-          }
-          imagen::destroy($imagen->id);
-        }
-        Asentamiento::destroy($request->id_borrar);
-        return redirect()->route('asentamientos.index')->with('message', $request->nombre_borrado . ' borrado correctamente.');
-      } catch (\Illuminate\Database\QueryException $excepcion) {
-        Log::error('AsentamientoController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-        return redirect()->route('asentamientos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo borrar.');
-      } catch (Exception $excepcion) {
-        Log::error('AsentamientoController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-        return redirect()->route('asentamientos.index')->with('error', $excepcion->getMessage());
-      }
-    } else {
-      return redirect()->route('asentamientos.index')->with('error', 'Error no se pudo borrar.');
-    }
   }
 }
