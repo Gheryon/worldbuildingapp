@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Services\ImageService;
 
@@ -92,7 +91,7 @@ class Organizacion extends Model
    */
   public function lider(): BelongsTo
   {
-    return $this->belongsTo(personaje::class, 'lider_id');
+    return $this->belongsTo(Personaje::class, 'lider_id');
   }
 
   /**
