@@ -2,7 +2,7 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
   <!-- Brand Logo -->
   <a href="{{url('/')}}" class="brand-link">
-    <h2 class="brand-text text-center font-weight-light">Inicio</h2>
+    <h2 class="brand-text text-center text-white font-weight-light">Inicio</h2>
   </a>
 
   <!-- Sidebar -->

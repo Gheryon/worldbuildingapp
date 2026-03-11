@@ -77,7 +77,7 @@
               @if($construccion->tipo)
               <li class="list-group-item">
                 <small class="d-block text-muted text-uppercase font-weight-bold">Tipo de construcción</small>
-                <span>{{ $construccion->tipo->nombre }}</span>
+                <span><i class="fas fa-tags mr-1"></i> {{ $construccion->tipo->nombre }}</span>
               </li>
               @endif
 
