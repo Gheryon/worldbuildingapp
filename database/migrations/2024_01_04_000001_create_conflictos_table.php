@@ -45,6 +45,15 @@ return new class extends Migration
       $table->mediumText('consecuencias')->nullable();
       $table->text('otros')->nullable();
 
+      $table->text('fenomenos_naturales')->nullable();
+      $table->boolean('es_conflicto_magico')->default(false);
+      $table->text('seres_sobrenaturales_participantes')->nullable();
+      $table->text('armas_magicas_empleadas')->nullable();
+      $table->text('hechizos_decisivos')->nullable();
+      $table->text('unidades_especiales')->nullable();
+      $table->text('criaturas_combate')->nullable();
+      $table->text('maquinaria_warlike')->nullable();
+      
       $table->timestamps();
       $table->softDeletes();
 
