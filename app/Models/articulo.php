@@ -4,10 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Services\ImageService;
-use Exception;
 
 class articulo extends Model
 {
@@ -28,7 +26,7 @@ class articulo extends Model
    */
   public function personajes_relevantes()
   {
-    return $this->belongsToMany(personaje::class, 'personajes_relevantes', 'relato_id', 'personaje_id')
+    return $this->belongsToMany(Personaje::class, 'personajes_relevantes', 'relato_id', 'personaje_id')
       ->withTimestamps();
   }
 

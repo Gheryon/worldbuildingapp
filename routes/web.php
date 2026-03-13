@@ -62,7 +62,7 @@ Route::controller(App\Http\Controllers\ConflictoController::class)->group(functi
   Route::get('/conflictos/{id}/edit', 'edit')->name('conflicto.edit');
   Route::put('/conflictos/{id}', 'update')->name('conflicto.update');
   Route::delete('/conflicto/destroy', 'destroy')->name('conflicto.destroy');
-  Route::get('/conflictos', 'search')->name('conflictos.search');
+  Route::get('/conflictos/{id}', 'show')->name('conflicto.show');
 });
 
 /*******construcciones routes********/
@@ -166,9 +166,4 @@ Route::controller(App\Http\Controllers\ArticuloController::class)->group(functio
   Route::get('/relatos/{id}/edit', 'edit_relato')->name('relatos.edit');
   Route::put('/relatos/{id}', 'update_relato')->name('relatos.update');
   Route::delete('/relatos/destroy', 'destroy_relato')->name('relatos.destroy');
-});
-
-/*******vistas routes********/
-Route::controller(App\Http\Controllers\VistaController::class)->group(function () {
-  Route::get('/conflictos/{id}', 'show_conflicto')->name('conflicto.show');
 });
