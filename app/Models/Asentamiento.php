@@ -97,6 +97,15 @@ class Asentamiento extends Model
   }
 
   /**
+   * Relación con los conflictos que han ocurrido en este asentamiento.
+   * Se usa morphMany porque un conflicto puede ocurrir en un lugar natural o en un asentamiento.
+   */
+  public function conflictos(): \Illuminate\Database\Eloquent\Relations\MorphMany
+{
+    return $this->morphMany(Conflicto::class, 'ubicacion_principal');
+}
+
+  /**
    * Scope para filtrar y ordenar asentamientos.
    */
   public function scopeFiltrar($query, $filtros)

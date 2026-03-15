@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asentamiento;
 use App\Models\Conflicto;
 use App\Models\Fecha;
 use App\Models\imagen;
-use App\Models\organizacion;
-use App\Models\personaje;
-use App\Models\tipo_conflicto;
+use App\Models\Lugar;
+use App\Models\Organizacion;
+use App\Models\Personaje;
+use App\Models\TipoConflicto;
+use App\Http\Requests\ConflictoRequest;
 use App\Http\Controllers\ImagenController;
 use Exception;
 use Illuminate\Http\Request;
@@ -19,15 +22,33 @@ class ConflictoController extends Controller
   /**
    * Display a listing of the resource.
    */
-  public function index($orden = 'asc', $tipo = '0')
+  public function index(Request $request)
   {
-    // Obtener todos los conflictos almacenados
-    $conflictos = Conflicto::get_conflictos($tipo, $orden);
+    $datosValidados = $request->validate([
+      'orden' => 'sometimes|string|in:asc,desc', // 'sometimes' permite que no esté presente.
+      'tipo'  => 'sometimes|integer|nullable',
+      'search' => 'sometimes|nullable|string|max:100',
+    ], [
+      'orden.in' => 'El orden debe ser ascendente (asc) o descendente (desc).',
+      'tipo.exists' => 'El tipo seleccionado no es válido.',
+    ]);
+
+    // Si la validación falla o el parámetro no está presente, se usan los valores por defecto.
+    $orden = $request->get('orden', 'asc');
+    $tipo = $request->get('tipo', 0); // 0 es el valor para "todos los tipos".
+    $terminoBusqueda = $request->get('search');
+
+    //Obtener conflictos almacenados
+    $conflictos = Conflicto::filtrar([
+      'orden'  => $orden,
+      'tipo'   => $tipo,
+      'search' => $terminoBusqueda
+    ])->paginate(16);
 
     // Obtener todos los tipos de conflictos almacenados
-    $tipos = tipo_conflicto::get_tipos_conflictos();
+    $tipos = TipoConflicto::orderby('nombre', 'asc')->get();
 
-    return view('conflictos.index', ['conflictos' => $conflictos, 'tipos' => $tipos, 'orden' => $orden, 'tipo_o' => $tipo]);
+    return view('conflictos.index', compact('conflictos', 'tipos', 'orden', 'tipo', 'terminoBusqueda'));
   }
 
   /**
@@ -36,144 +57,88 @@ class ConflictoController extends Controller
   public function create()
   {
     // Obtener todos los tipos de conflictos almacenados
-    $tipos_conflicto = tipo_conflicto::get_tipos_conflictos();
+    $tipos_conflicto = TipoConflicto::orderby('nombre', 'asc')->get();
 
     // Obtener todos los paises almacenados
-    $paises = organizacion::get_organizaciones();
+    $paises = Organizacion::orderby('nombre', 'asc')->pluck('nombre', 'id');
 
-    // Obtener todos los conflictos almacenados, 0 para todos los tipos y asc para orden ascendente
-    $conflictos = Conflicto::get_conflictos(0, 'asc');
+    // Obtener todos los conflictos almacenados
+    $conflictos = Conflicto::orderby('nombre', 'asc')->pluck('nombre', 'id');
 
     // Obtener todos los personajes almacenados
-    $personajes = personaje::get_personajes();
+    $personajes = Personaje::orderby('nombre', 'asc')->pluck('nombre', 'id');
 
-    return view('conflictos.create', ['tipo_conflicto' => $tipos_conflicto, 'paises' => $paises, 'personajes' => $personajes, 'conflictos' => $conflictos]);
+    //Obtener todos los lugares almacenados
+    $lugares = Lugar::orderby('nombre', 'asc')->pluck('nombre', 'id') ?? [];
+
+    //Obtener todos los asentamientos almacenados
+    $asentamientos = Asentamiento::orderby('nombre', 'asc')->pluck('nombre', 'id') ?? [];
+
+    return view('conflictos.create', compact('tipos_conflicto', 'paises', 'personajes', 'conflictos', 'lugares', 'asentamientos'));
   }
 
   /**
    * Store a newly created resource in storage.
    */
-  public function store(Request $request)
+  public function store(ConflictoRequest $request)
   {
-    $request->validate([
-      'nombre' => 'required|max:256',
-      'select_tipo' => 'required',
-      'tipo_localizacion' => 'required',
-      'dfin' => 'nullable|integer|min:1|max:30',
-      'dinicio' => 'nullable|integer|min:1|max:30',
-    ]);
-
-    $conflicto = new Conflicto();
-
-    $conflicto->nombre = $request->nombre;
-    $conflicto->save();
-
-    $id_conflicto = DB::scalar("SELECT MAX(id) as id FROM conflicto");
-    if ($request->filled('descripcion')) {
-      $conflicto->descripcion = app(ImagenController::class)->store_for_summernote($request->descripcion, "conflictos", $id_conflicto);
-    }
-    if ($request->filled('preludio')) {
-      $conflicto->preludio = app(ImagenController::class)->store_for_summernote($request->preludio, "conflictos", $id_conflicto);
-    }
-    if ($request->filled('desarrollo')) {
-      $conflicto->desarrollo = app(ImagenController::class)->store_for_summernote($request->desarrollo, "conflictos", $id_conflicto);
-    }
-    if ($request->filled('resultado')) {
-      $conflicto->resultado = app(ImagenController::class)->store_for_summernote($request->resultado, "conflictos", $id_conflicto);
-    }
-    if ($request->filled('consecuencias')) {
-      $conflicto->consecuencias = app(ImagenController::class)->store_for_summernote($request->consecuencias, "conflictos", $id_conflicto);
-    }
-    if ($request->filled('otros')) {
-      $conflicto->otros = app(ImagenController::class)->store_for_summernote($request->otros, "conflictos", $id_conflicto);
-    }
-
-    if ($request->filled('atacantesp')) {
-      $atacantes = $request->input('atacantesp');
-      try {
-        foreach ($atacantes as $atacante) {
-          DB::table('conflicto_personajes')->insert([
-            'id_conflicto' => $id_conflicto,
-            'id_personaje' => $atacante,
-            'rol' => 'atacante'
-          ]);
-        }
-      } catch (\Illuminate\Database\QueryException $excepcion) {
-      } catch (Exception $excepcion) {
-      }
-    }
-
-    if ($request->filled('defensoresp')) {
-      $defensores = $request->input('defensoresp');
-      try {
-        foreach ($defensores as $defensor) {
-          DB::table('conflicto_personajes')->insert([
-            'id_conflicto' => $id_conflicto,
-            'id_personaje' => $defensor,
-            'rol' => 'defensor'
-          ]);
-        }
-      } catch (\Illuminate\Database\QueryException $excepcion) {
-      } catch (Exception $excepcion) {
-      }
-    }
-
-    if ($request->filled('atacantes')) {
-      $atacantes = $request->input('atacantes');
-      try {
-        foreach ($atacantes as $atacante) {
-          DB::table('conflicto_beligerantes')->insert([
-            'id_conflicto' => $id_conflicto,
-            'id_organizacion' => $atacante,
-            'lado' => 'atacante'
-          ]);
-        }
-      } catch (\Illuminate\Database\QueryException $excepcion) {
-      } catch (Exception $excepcion) {
-      }
-    }
-
-    if ($request->filled('defensores')) {
-      $defensores = $request->input('defensores');
-      try {
-        foreach ($defensores as $defensor) {
-          DB::table('conflicto_beligerantes')->insert([
-            'id_conflicto' => $id_conflicto,
-            'id_organizacion' => $defensor,
-            'lado' => 'defensor'
-          ]);
-        }
-      } catch (\Illuminate\Database\QueryException $excepcion) {
-      } catch (Exception $excepcion) {
-      }
-    }
-
-    $conflicto->tipo_localizacion = $request->input('tipo_localizacion');
-    $conflicto->id_tipo_conflicto = $request->select_tipo;
-    $conflicto->id_conflicto_padre = $request->select_padre;
-
+    $datosValidados = $request->validated();
     try {
-      //------------fechas----------//
-      $conflicto->fecha_inicio = app(ConfigurationController::class)->store_fecha($request->input('dinicio', 0), $request->input('minicio', 0), $request->input('ainicio', 0), "conflictos");
-      $conflicto->fecha_fin = app(ConfigurationController::class)->store_fecha($request->input('dfin', 0), $request->input('mfin', 0), $request->input('afin', 0), "conflictos");
+      // Llamada a la lógica del modelo
+      $conflicto = Conflicto::store_conflicto($datosValidados);
 
-      $conflicto->save();
-      return redirect()->route('conflictos.index')->with('message', 'Conflicto ' . $conflicto->nombre . ' añadido correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ConflictoController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('conflictos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo añadir.');
-    } catch (Exception $excepcion) {
-      Log::error('ConflictoController->store: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('conflictos.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('conflictos.index')
+        ->with('success', 'Conflicto ' . $conflicto->nombre . ' añadido correctamente.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error(
+        "Error de base de datos al añadir conflicto.",
+        [
+          'entrada_input' => $request->validated(),
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'No se pudo crear el conflicto debido a un error en la base de datos.');
+    } catch (\Exception $e) {
+      Log::critical(
+        "Error inesperado al añadir conflicto.",
+        [
+          'entrada_input' => $request->validated(),
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'No se pudo crear el conflicto: ' . $e->getMessage());
     }
   }
 
   /**
    * Display the specified resource.
    */
-  public function show(Conflicto $conflicto)
+  public function show($id)
   {
-    //
+    try {
+      $conflicto = Conflicto::with([
+        'tipoConflicto',
+        'personajes',
+        'organizaciones',
+        'conflictoPadre',
+      ])->findorfail($id);
+
+      // Obtención de las fechas formateadas para la vista
+      $fecha_inicio = Fecha::get_fecha_string($conflicto->fecha_inicio_id);
+      $fecha_fin = Fecha::get_fecha_string($conflicto->fecha_fin_id);
+
+      return view('conflictos.show', compact('conflicto', 'fecha_inicio', 'fecha_fin'));
+    } catch (\Exception $e) {
+      Log::error('Error al mostrar conflicto: ' . $e->getMessage());
+      return redirect()->route('conflictos.index')
+        ->with('error', 'No se pudo mostrar el conflicto.');
+    }
   }
 
   /**
@@ -181,189 +146,66 @@ class ConflictoController extends Controller
    */
   public function edit($id)
   {
-    // Obtener el conflicto a editar
-    $conflicto = Conflicto::get_conflicto($id);
-    if ($conflicto['error'] ?? false) {
-      return redirect()->route('conflictos.index')->with('error', $conflicto['error']['error']);
+    try {
+      // Obtener todos los tipos de conflictos almacenados
+      $tipos_conflicto = TipoConflicto::orderby('nombre', 'asc')->get();
+
+      // Obtener todos los paises almacenados
+      $paises = Organizacion::orderby('nombre', 'asc')->pluck('nombre', 'id');
+
+      // Obtener todos los conflictos almacenados
+      $conflictos = Conflicto::orderby('nombre', 'asc')->pluck('nombre', 'id');
+
+      // Obtener todos los personajes almacenados
+      $personajes = Personaje::orderby('nombre', 'asc')->pluck('nombre', 'id');
+
+      //Obtener todos los lugares almacenados
+      $lugares = Lugar::orderby('nombre', 'asc')->pluck('nombre', 'id') ?? [];
+
+      //Obtener todos los asentamientos almacenados
+      $asentamientos = Asentamiento::orderby('nombre', 'asc')->pluck('nombre', 'id') ?? [];
+
+      // Obtener la construccion
+      $conflicto = Conflicto::with([
+        'tipoConflicto',
+        'personajes',
+        'organizaciones',
+        'fechaInicio',
+        'fechaFin',
+      ])->findorfail($id);
+
+      // Extraemos los IDs actuales por bando para pre-seleccionarlos en la vista
+      $personajesAtacantesIds = $conflicto->personajes()->wherePivot('lado', 'atacante')->pluck('personajes.id')->toArray();
+      $personajesDefensoresIds = $conflicto->personajes()->wherePivot('lado', 'defensor')->pluck('personajes.id')->toArray();
+
+      $paisesAtacantesIds = $conflicto->organizaciones()->wherePivot('lado', 'atacante')->pluck('organizaciones.id')->toArray();
+      $paisesDefensoresIds = $conflicto->organizaciones()->wherePivot('lado', 'defensor')->pluck('organizaciones.id')->toArray();
+
+      return view('conflictos.edit', compact('conflicto', 'tipos_conflicto', 'asentamientos', 'lugares', 'personajes', 'conflictos', 'paises', 'personajesAtacantesIds', 'personajesDefensoresIds', 'paisesAtacantesIds', 'paisesDefensoresIds'));
+    } catch (\Exception $e) {
+      Log::error("Error al buscar conflicto para editar: " . $e->getMessage());
+      return redirect()->route('conflictos.index')
+        ->with('error', 'Conflicto no encontrado.');
     }
-
-    $fecha_inicio = 0;
-    $fecha_fin = 0;
-
-    // Obtener todos los tipos de conflictos almacenados
-    $tipos_conflicto = tipo_conflicto::get_tipos_conflictos();
-
-    // Obtener todos los paises almacenados
-    $paises = organizacion::get_organizaciones();
-
-    // Obtener todos los personajes almacenados
-    $personajes = personaje::get_personajes_id_nombre();
-
-    // Obtener todos los conflictos almacenados, 0 para todos los tipos y asc para orden ascendente
-    $conflictos = Conflicto::get_conflictos(0, 'asc');
-
-    //Obtener los atacantes y defensores del conflicto
-    $atacantes=Conflicto::get_paises_bando($id,'atacante');
-    $defensores=Conflicto::get_paises_bando($id,'defensor');
-
-    //Obtener los atacantes y defensores del conflicto
-    $atacantesp=Conflicto::get_personajes_bando($id,'atacante');
-    $defensoresp=Conflicto::get_personajes_bando($id,'defensor');
-
-    if ($conflicto->fecha_inicio != 0) {
-      $fecha_inicio = Fecha::find($conflicto->fecha_inicio);
-    } else {
-      $fecha_inicio = Fecha::find(0);
-    }
-
-    if ($conflicto->fecha_fin != 0) {
-      $fecha_fin = Fecha::find($conflicto->fecha_fin);
-    } else {
-      $fecha_fin = Fecha::find(0);
-    }
-
-    return view('conflictos.edit', ['conflicto' => $conflicto, 'inicio' => $fecha_inicio, 'fin' => $fecha_fin, 'tipo_conflicto' => $tipos_conflicto, 'personajes' => $personajes, 'conflictos' => $conflictos, 'paises' => $paises, 'atacantes' => $atacantes, 'defensores' => $defensores, 'atacantesp' => $atacantesp, 'defensoresp' => $defensoresp]);
   }
 
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, Conflicto $conflicto)
+  public function update(ConflictoRequest $request, $id)
   {
-    $request->validate([
-      'nombre' => 'required|max:256',
-      'select_tipo' => 'required',
-      'tipo_localizacion' => 'required',
-      'dfin' => 'nullable|integer|min:1|max:30',
-      'dinicio' => 'nullable|integer|min:1|max:30',
-    ]);
-
-    // Obtener el conflicto a editar
-    $conflicto = Conflicto::get_conflicto($request->id);
-    if ($conflicto['error'] ?? false) {
-      return redirect()->route('conflictos.index')->with('error', $conflicto['error']['error']);
-    }
-
-    $conflicto->nombre = $request->nombre;
-    $conflicto->tipo_localizacion = $request->input('tipo_localizacion');
-    $conflicto->id_tipo_conflicto = $request->select_tipo;
-    $conflicto->id_conflicto_padre = $request->select_padre;
-
-    if ($request->filled('descripcion')) {
-      $conflicto->descripcion = app(ImagenController::class)->update_for_summernote($request->descripcion, "conflictos", $request->id);
-    }
-    if ($request->filled('preludio')) {
-      $conflicto->preludio = app(ImagenController::class)->update_for_summernote($request->preludio, "conflictos", $request->id);
-    }
-    if ($request->filled('desarrollo')) {
-      $conflicto->desarrollo = app(ImagenController::class)->update_for_summernote($request->desarrollo, "conflictos", $request->id);
-    }
-    if ($request->filled('resultado')) {
-      $conflicto->resultado = app(ImagenController::class)->update_for_summernote($request->resultado, "conflictos", $request->id);
-    }
-    if ($request->filled('consecuencias')) {
-      $conflicto->consecuencias = app(ImagenController::class)->update_for_summernote($request->consecuencias, "conflictos", $request->id);
-    }
-    if ($request->filled('otros')) {
-      $conflicto->otros = app(ImagenController::class)->update_for_summernote($request->otros, "conflictos", $request->id);
-    }
-
-    //para actualizar los atacantes y defensores, se borran todos los antiguos y se vuelven a añadir
-    if ($request->filled('atacantes')) {
-      DB::table('conflicto_beligerantes')->where('lado', '=', 'atacante')->where('id_conflicto', '=', $request->id)->delete();
-      $atacantes = $request->input('atacantes');
-      try {
-        foreach ($atacantes as $atacante) {
-          DB::table('conflicto_beligerantes')->insert([
-            'id_conflicto' => $request->id,
-            'id_organizacion' => $atacante,
-            'lado' => 'atacante'
-          ]);
-        }
-      } catch (\Illuminate\Database\QueryException $excepcion) {
-      } catch (Exception $excepcion) {
-      }
-    }
-
-    if ($request->filled('defensores')) {
-      DB::table('conflicto_beligerantes')->where('lado', '=', 'defensor')->where('id_conflicto', '=', $request->id)->delete();
-      $defensores = $request->input('defensores');
-      try {
-        foreach ($defensores as $defensor) {
-          DB::table('conflicto_beligerantes')->insert([
-            'id_conflicto' => $request->id,
-            'id_organizacion' => $defensor,
-            'lado' => 'defensor'
-          ]);
-        }
-      } catch (\Illuminate\Database\QueryException $excepcion) {
-      } catch (Exception $excepcion) {
-      }
-    }
-
-    //para actualizar los personajes atacantes y defensores, se borran todos los antiguos y se vuelven a añadir
-    if ($request->filled('atacantesp')) {
-      DB::table('conflicto_personajes')->where('rol', '=', 'atacante')->where('id_conflicto', '=', $request->id)->delete();
-      $atacantes = $request->input('atacantesp');
-      try {
-        foreach ($atacantes as $atacante) {
-          DB::table('conflicto_personajes')->insert([
-            'id_conflicto' => $request->id,
-            'id_personaje' => $atacante,
-            'rol' => 'atacante'
-          ]);
-        }
-      } catch (\Illuminate\Database\QueryException $excepcion) {
-      } catch (Exception $excepcion) {
-      }
-    }
-
-    if ($request->filled('defensoresp')) {
-      DB::table('conflicto_personajes')->where('rol', '=', 'defensor')->where('id_conflicto', '=', $request->id)->delete();
-      $defensores = $request->input('defensoresp');
-      try {
-        foreach ($defensores as $defensor) {
-          DB::table('conflicto_personajes')->insert([
-            'id_conflicto' => $request->id,
-            'id_personaje' => $defensor,
-            'rol' => 'defensor'
-          ]);
-        }
-      } catch (\Illuminate\Database\QueryException $excepcion) {
-      } catch (Exception $excepcion) {
-      }
-    }
-
+    $datosValidados = $request->validated();
     try {
-      //------------fechas----------//
-      if ($request->input('ainicio', 0) != 0) {
-        if ($conflicto->fecha_inicio != 0) {
-          //el conflicto ya tenía fecha de inicio antes de editar
-          app(ConfigurationController::class)->update_fecha($request->input('dinicio', 0), $request->input('minicio', 0), $request->input('ainicio', 0), $conflicto->fecha_inicio);
-        } else {
-          //el conflicto no tenía fecha de inicio antes de editar, hay que añadirla a la db.
-          $conflicto->fecha_inicio = app(ConfigurationController::class)->store_fecha($request->input('dinicio', 0), $request->input('minicio', 0), $request->input('ainicio', 0), "conflictos");
-        }
-      }
+      $conflicto = Conflicto::findOrFail($id); //obtiene el conflicto en bbdd
+      $conflicto->update_conflicto($datosValidados);
 
-      if ($request->input('afin', 0) != 0) {
-        if ($conflicto->fecha_fin != 0) {
-          //el conflicto ya tenía fecha de fin antes de editar
-          app(ConfigurationController::class)->update_fecha($request->input('dfin', 0), $request->input('mfin', 0), $request->input('afin', 0), $conflicto->fecha_fin);
-        } else {
-          //el conflicto no tenía fecha de fin antes de editar, hay que añadirla a la db.
-          $conflicto->fecha_fin = app(ConfigurationController::class)->store_fecha($request->input('dfin', 0), $request->input('mfin', 0), $request->input('afin', 0), "conflictos");
-        }
-      }
-
-      $conflicto->save();
-      return redirect()->route('conflictos.index')->with('message', 'conflicto ' . $conflicto->nombre . ' editado correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ConflictoController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('conflictos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo editar.');
-    } catch (Exception $excepcion) {
-      Log::error('ConflictoController->update: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('conflictos.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('conflictos.index')
+        ->with('success', 'Conflicto ' . $conflicto->nombre . ' actualizado con éxito.');
+    } catch (\Exception $e) {
+      Log::error("Error actualizando conflicto ID {$id}: " . $e->getMessage());
+      return redirect()->back()
+        ->withInput()
+        ->with('error', 'Error al actualizar: ' . $e->getMessage());
     }
   }
 
@@ -412,31 +254,5 @@ class ConflictoController extends Controller
       Log::error('ConflictoController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
       return redirect()->route('conflictos.index')->with('error', $excepcion->getMessage());
     }
-  }
-
-  /**
-   * Display a listing of the resource searched.
-   */
-  public function search(Request $request)
-  {
-    $search = $request->input('search');
-    try {
-      $conflictos = DB::table('conflicto')
-        ->leftjoin('tipo_conflicto', 'conflicto.id_tipo_conflicto', '=', 'tipo_conflicto.id')
-        ->select('conflicto.id', 'conflicto.nombre', 'descripcion', 'tipo_conflicto.nombre AS tipo')
-        ->where('conflicto.nombre', 'LIKE', "%{$search}%")
-        ->orderBy('nombre', 'asc')->get();
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ConflictoController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $conflictos = ['error' => ['error' => 'Se produjo un problema en la base de datos.']];
-    } catch (Exception $excepcion) {
-      Log::error('ConflictoController->search: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      $conflictos = ['error' => ['error' => $excepcion->getMessage()]];
-    }
-
-    // Obtener todos los tipos de conflictos almacenados
-    $tipos = tipo_conflicto::get_tipos_conflictos();
-
-    return view('conflictos.index', ['conflictos' => $conflictos, 'tipos' => $tipos, 'orden' => 'asc', 'tipo_o' => 0]);
   }
 }

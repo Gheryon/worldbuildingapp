@@ -51,6 +51,14 @@ class Lugar extends Model
     return $this->belongsTo(tipo_lugar::class, 'tipo_lugar_id');
   }
 
+  /** Relación con los conflictos que han ocurrido en este lugar.
+   * Se usa morphMany porque un conflicto puede ocurrir en un lugar natural o en un asentamiento.
+   */
+  public function conflictos(): \Illuminate\Database\Eloquent\Relations\MorphMany
+  {
+    return $this->morphMany(Conflicto::class, 'ubicacion_principal');
+  }
+
   /**
    * Definición del Atributo PeligroConfig
    * Esto crea una propiedad virtual llamada 'peligro_config'
