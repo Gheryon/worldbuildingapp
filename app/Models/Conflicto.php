@@ -152,21 +152,20 @@ class Conflicto extends Model
   public function scopeFiltrar($query, $filtros)
   {
     return $query->with('tipoConflicto')
-      ->select(
-        'conflictos.id',
-        'conflictos.nombre',
-        'conflictos.tipo_conflicto_id',
-        'conflictos.descripcion',
-        'conflictos.es_conflicto_magico',
-      )
-      ->where('conflictos.id', '!=', 0)
+      // Si 'tipo' tiene un valor (y no es 0 o vacío), se filtra.
+      // PHP interpreta 0 como false
+      ->when(!empty($filtros['tipo']), function ($q) use ($filtros) {
+        $q->where('tipo_conflicto_id', $filtros['tipo']);
+      })
+      ->when(isset($filtros['magia']) && $filtros['magia'] != 0, function ($q) use ($filtros) {
+        // Si magia es 1, se busca true (1). Si es 2, false (0).
+        $valorBusqueda = ($filtros['magia'] == 1);
+        $q->where('es_conflicto_magico', $valorBusqueda);
+      })
       ->when($filtros['search'] ?? null, function ($q, $search) {
-        $q->where('conflictos.nombre', 'LIKE', "%{$search}%");
+        $q->where('nombre', 'LIKE', "%{$search}%");
       })
-      ->when($filtros['tipo'] ?? null, function ($q, $tipo) {
-        if ($tipo > 0) $q->where('conflictos.tipo_conflicto_id', $tipo);
-      })
-      ->orderBy('conflictos.nombre', $filtros['orden'] ?? 'asc');
+      ->orderBy('nombre', $filtros['orden'] ?? 'asc');
   }
 
   /**
@@ -300,7 +299,7 @@ class Conflicto extends Model
       $this->organizaciones()->wherePivot('lado', 'atacante')->detach();
       if (!empty($datos['paises_atacantes'])) {
         foreach ($datos['paises_atacantes'] as $id) {
-          $this->organizaciones()->attach($id, ['lado' => 'atacante','es_vencedor' => ($bandoGanador === 'atacante')]);
+          $this->organizaciones()->attach($id, ['lado' => 'atacante', 'es_vencedor' => ($bandoGanador === 'atacante')]);
         }
       }
 
@@ -308,7 +307,7 @@ class Conflicto extends Model
       $this->personajes()->wherePivot('lado', 'defensor')->detach();
       if (!empty($datos['personajes_defensores'])) {
         foreach ($datos['personajes_defensores'] as $id) {
-          $this->personajes()->attach($id, ['lado' => 'defensor','es_vencedor' => ($bandoGanador === 'defensor')]);
+          $this->personajes()->attach($id, ['lado' => 'defensor', 'es_vencedor' => ($bandoGanador === 'defensor')]);
         }
       }
 
@@ -316,7 +315,7 @@ class Conflicto extends Model
       $this->organizaciones()->wherePivot('lado', 'defensor')->detach();
       if (!empty($datos['paises_defensores'])) {
         foreach ($datos['paises_defensores'] as $id) {
-          $this->organizaciones()->attach($id, ['lado' => 'defensor','es_vencedor' => ($bandoGanador === 'defensor')]);
+          $this->organizaciones()->attach($id, ['lado' => 'defensor', 'es_vencedor' => ($bandoGanador === 'defensor')]);
         }
       }
 
@@ -334,9 +333,12 @@ class Conflicto extends Model
   {
     static::deleting(function ($conflicto) {
       // Llamamos al servicio para limpiar el disco y la DB
-      $imageService = new \App\Services\ImageService();
-      $imageService->deleteImagesByOwner('conflictos', $conflicto->id);
+      //$imageService = new \App\Services\ImageService();
+      //$imageService->deleteImagesByOwner('conflictos', $conflicto->id);
+      //Versión alternativa con service container, para evitar inyección directa y facilitar testing/mocking
+      app(\App\Services\ImageService::class)->deleteImagesByOwner('conflictos', $conflicto->id);
 
+      //Borrado de fechas
       if ($conflicto->fecha_inicio_id) {
         \App\Models\Fecha::destroy($conflicto->fecha_inicio_id);
       }
@@ -344,6 +346,10 @@ class Conflicto extends Model
       if ($conflicto->fecha_fin_id) {
         \App\Models\Fecha::destroy($conflicto->fecha_fin_id);
       }
+
+      //Borrado de relaciones con personajes y organizaciones
+      $conflicto->personajes()->detach();
+      $conflicto->organizaciones()->detach();
     });
   }
 }

@@ -11,7 +11,6 @@ use App\Models\Organizacion;
 use App\Models\Personaje;
 use App\Models\TipoConflicto;
 use App\Http\Requests\ConflictoRequest;
-use App\Http\Controllers\ImagenController;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,28 +26,35 @@ class ConflictoController extends Controller
     $datosValidados = $request->validate([
       'orden' => 'sometimes|string|in:asc,desc', // 'sometimes' permite que no esté presente.
       'tipo'  => 'sometimes|integer|nullable',
+      'magia' => 'sometimes|integer|in:0,1,2', // 0 = Todos, 1 = Sí, 2 = No
       'search' => 'sometimes|nullable|string|max:100',
     ], [
       'orden.in' => 'El orden debe ser ascendente (asc) o descendente (desc).',
       'tipo.exists' => 'El tipo seleccionado no es válido.',
+      'magia.in' => 'La opción de magia debe ser "Todos", "Sí" o "No".'
     ]);
 
     // Si la validación falla o el parámetro no está presente, se usan los valores por defecto.
     $orden = $request->get('orden', 'asc');
     $tipo = $request->get('tipo', 0); // 0 es el valor para "todos los tipos".
+    $magia = $request->get('magia', 0); // 0 es el valor para "todos".
     $terminoBusqueda = $request->get('search');
 
     //Obtener conflictos almacenados
     $conflictos = Conflicto::filtrar([
       'orden'  => $orden,
       'tipo'   => $tipo,
+      'magia'  => $magia,
       'search' => $terminoBusqueda
-    ])->paginate(16);
+    ]) // IMPORTANTE: Incluir siempre las FK (tipo_conflicto_id) para que el 'with' funcione.
+      ->select('id', 'nombre', 'tipo_conflicto_id', 'descripcion', 'es_conflicto_magico')
+      ->paginate(16)
+      ->withQueryString();
 
     // Obtener todos los tipos de conflictos almacenados
     $tipos = TipoConflicto::orderby('nombre', 'asc')->get();
 
-    return view('conflictos.index', compact('conflictos', 'tipos', 'orden', 'tipo', 'terminoBusqueda'));
+    return view('conflictos.index', compact('conflictos', 'tipos', 'orden', 'tipo', 'magia', 'terminoBusqueda'));
   }
 
   /**
@@ -215,44 +221,18 @@ class ConflictoController extends Controller
   public function destroy(Request $request)
   {
     try {
-      $fecha_inicio = DB::scalar("SELECT fecha_inicio FROM conflicto where id = ?", [$request->id_borrar]);
-      $fecha_fin = DB::scalar("SELECT fecha_fin FROM conflicto where id = ?", [$request->id_borrar]);
+      $conflicto = Conflicto::findOrFail($request->id_borrar);
 
-      //si fecha inicio/fin != 0, la conflicto tiene fecha establecida, hay que borrar
-      if ($fecha_inicio != 0) {
-        Fecha::destroy($fecha_inicio);
-      }
-      if ($fecha_fin != 0) {
-        Fecha::destroy($fecha_fin);
-      }
+      DB::transaction(function () use ($conflicto) {
+        $conflicto->delete();
+      });
 
-      //borrado de las imagenes que pueda haber de summernote
-      $imagenes = DB::table('imagenes')
-        ->select('id', 'nombre')
-        ->where('table_owner', '=', 'conflictos')
-        ->where('owner', '=', $request->id_borrar)->get();
-
-      foreach ($imagenes as $imagen) {
-        if (file_exists(public_path("/storage/imagenes/" . $imagen->nombre))) {
-          unlink(public_path("/storage/imagenes/" . $imagen->nombre));
-          //Storage::delete(asset($imagen->nombre));
-        }
-        imagen::destroy($imagen->id);
-      }
-      //borrado de los registros que pueda haber de beligerantes (atacantes y defensores)
-      DB::table('conflicto_beligerantes')->where('id_conflicto', '=', $request->id_borrar)->delete();
-
-      //borrado de los registros que pueda haber de personajes (atacantes y defensores)
-      DB::table('conflicto_personajes')->where('id_conflicto', '=', $request->id_borrar)->delete();
-
-      Conflicto::destroy($request->id_borrar);
-      return redirect()->route('conflictos.index')->with('message', $request->nombre_borrado . ' borrado correctamente.');
-    } catch (\Illuminate\Database\QueryException $excepcion) {
-      Log::error('ConflictoController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('conflictos.index')->with('error', 'Se produjo un problema en la base de datos, no se pudo borrar.');
-    } catch (Exception $excepcion) {
-      Log::error('ConflictoController->destroy: Se produjo un problema en la base de datos.: ' . $excepcion->getMessage());
-      return redirect()->route('conflictos.index')->with('error', $excepcion->getMessage());
+      return redirect()->route('conflictos.index')
+        ->with('success', $request->nombre_borrado . ' borrado correctamente.');
+    } catch (\Exception $e) {
+      Log::error('Error al borrar conflicto: ' . $e->getMessage());
+      return redirect()->route('conflictos.index')
+        ->with('error', 'No se pudo borrar el conflicto.');
     }
   }
 }

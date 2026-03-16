@@ -10,11 +10,19 @@
 </li>
 <li class="nav-item ml-2">
   <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
-    <option selected disabled value="0">Filtrar tipo</option>
-    <option value="0">Todos</option>
-    @foreach($tipos as $tipo)
-    <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
+    <option disabled {{ is_null($tipo) || $tipo == 0 ? 'selected' : '' }}>Filtrar tipo</option>
+    <option value="0" {{ $tipo === '0' || $tipo === 0 ? 'selected' : '' }}>Todos</option>
+    @foreach($tipos as $item)
+    <option value="{{$item->id}}" {{ $item->id == $tipo ? 'selected' : '' }}>{{$item->nombre}}</option>
     @endforeach
+  </select>
+</li>
+<li class="nav-item ml-2">
+  <select id="filter_magia" class="form-control ml-2" name="filter_magia">
+    <option disabled {{ is_null($magia) || $magia == 0 ? 'selected' : '' }}>Filtrar magia</option>
+    <option value="0" {{ $magia == '0' ? 'selected' : '' }}>Todos</option>
+    <option value="1" {{ $magia == '1' ? 'selected' : '' }}>Sí</option>
+    <option value="2" {{ $magia == '2' ? 'selected' : '' }}>No</option>
   </select>
 </li>
 <x-order-input name="orden" label="Orden" :orden="$orden" />
@@ -30,7 +38,7 @@
 <li class="nav-item">
   <form class="form-inline ml-2" action="{{route('conflictos.index')}}" method="GET">
     <div class="input-group">
-      <input type="search" name="search" class="form-control shadow-sm" placeholder="Buscar">
+      <input type="search" name="search" class="form-control shadow-sm" placeholder="Buscar" value="{{ request('search') }}">
       <div class="input-group-append">
         <button type="submit" class="btn btn-default shadow-sm">
           <i class="fa fa-search"></i>
@@ -78,6 +86,33 @@
 @section('specific-scripts')
 <script src="{{asset('dist/js/config.js')}}"></script>
 <script>
- 
+ $(function() {
+
+    function redirigirConFiltros() {
+      const orden = $('#order').val();
+      const tipo = $('#filter_tipo').val();
+      const magia = $('#filter_magia').val();
+      const search = $('input[name="search"]').val();
+
+      // Creamos el objeto de parámetros de búsqueda
+      const params = new URLSearchParams();
+
+      // Solo agregamos los parámetros si tienen un valor útil
+      if (orden) params.append('orden', orden);
+      if (tipo && tipo !== '0') params.append('tipo', tipo);
+      if (magia && magia !== '0') params.append('magia', magia);
+      if (search) params.append('search', search); //Mantiene la búsqueda al filtrar
+
+      // Generamos la URL base desde Laravel
+      const baseUrl = "{{ route('conflictos.index') }}";
+      const urlFinal = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+      //console.log(orden, tipo, urlFinal);
+      document.location.href = urlFinal;
+    }
+
+    $(document).on('change', '#order', redirigirConFiltros);
+    $(document).on('change', '#filter_tipo', redirigirConFiltros);
+    $(document).on('change', '#filter_magia', redirigirConFiltros);
+  });
 </script>
 @endsection
