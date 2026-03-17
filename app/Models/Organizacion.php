@@ -83,7 +83,7 @@ class Organizacion extends Model
    */
   public function tipo(): BelongsTo
   {
-    return $this->belongsTo(tipo_organizacion::class, 'tipo_organizacion_id');
+    return $this->belongsTo(TipoOrganizacion::class, 'tipo_organizacion_id');
   }
 
   /**

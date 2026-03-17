@@ -3,15 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Organizacion;
-use App\Models\tipo_organizacion;
+use App\Models\TipoOrganizacion;
 use App\Models\Fecha;
 use App\Models\Personaje;
 use App\Models\Religion;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-
-use function Ramsey\Uuid\v1;
 
 class OrganizacionController extends Controller
 {
@@ -47,7 +45,7 @@ class OrganizacionController extends Controller
     ])->paginate(18);
 
     // Obtener todos los tipos de organizacion almacenados
-    $tipos_organizacion = tipo_organizacion::get_tipos_organizaciones();
+    $tipos_organizacion = TipoOrganizacion::orderby('nombre', 'asc')->get();
 
     return view('organizaciones.index', compact('organizaciones', 'tipos_organizacion', 'orden', 'tipo_id', 'terminoBusqueda'));
   }
@@ -58,7 +56,7 @@ class OrganizacionController extends Controller
   public function create()
   {
     // Obtener todos los tipos de organizacion almacenados
-    $tipo_organizacion = tipo_organizacion::get_tipos_organizaciones();
+    $tipo_organizacion = TipoOrganizacion::orderby('nombre', 'asc')->get();
 
     // Obtener id y nombre de todos los personajes almacenados
     $personajes = Personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
@@ -171,7 +169,7 @@ class OrganizacionController extends Controller
       $organizacion = Organizacion::with(['religiones', 'fecha_fundacion', 'fecha_disolucion'])->findOrFail($id);
 
       // Obtener todos los tipos de organizacion almacenados
-      $tipo_organizacion = tipo_organizacion::get_tipos_organizaciones();
+      $tipo_organizacion = TipoOrganizacion::orderby('nombre', 'asc')->get();
 
       // Obtener todos los personajes almacenados
       $personajes = Personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');

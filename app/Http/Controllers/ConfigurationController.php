@@ -8,7 +8,7 @@ use App\Models\tipo_asentamiento;
 use App\Models\TipoConflicto;
 use App\Models\TipoConstruccion;
 use App\Models\tipo_lugar;
-use App\Models\tipo_organizacion;
+use App\Models\TipoOrganizacion;
 use App\Models\lineas_temporales;
 use App\Models\Fecha;
 use Illuminate\Http\Request;
@@ -41,7 +41,7 @@ class ConfigurationController extends Controller
     $tipos_lugar = tipo_lugar::get_tipos_lugares();
 
     // Obtener todos los tipos de organizacion almacenados
-    $tipos_organizacion = tipo_organizacion::get_tipos_organizaciones();
+    $tipos_organizacion = TipoOrganizacion::orderby('nombre', 'asc')->get();
 
     //actualmente sin uso, pero se deja para futuras implementaciones
     try {
@@ -130,7 +130,7 @@ class ConfigurationController extends Controller
     ]);
 
     try {
-      $nuevo = new tipo_organizacion();
+      $nuevo = new TipoOrganizacion();
       $nuevo->nombre = $request->input('nuevo_tipo_organizacion');
       $nuevo->save();
       return redirect()->route('config.index')->with('message', $nuevo->nombre . ' añadido correctamente.');
@@ -225,7 +225,7 @@ class ConfigurationController extends Controller
         $tipo_editar = tipo_lugar::findorfail($request->id_editar);
       }
       if ($request->tipo_editar == 'organizacion') {
-        $tipo_editar = tipo_organizacion::findorfail($request->id_editar);
+        $tipo_editar = TipoOrganizacion::findorfail($request->id_editar);
       }
       if ($request->tipo_editar == 'linea_temporal') {
         $tipo_editar = lineas_temporales::findorfail($request->id_editar);
@@ -259,7 +259,7 @@ class ConfigurationController extends Controller
         tipo_lugar::destroy($request->id_borrar);
       }
       if ($request->tipo == 'organizacion') {
-        tipo_organizacion::destroy($request->id_borrar);
+        TipoOrganizacion::destroy($request->id_borrar);
       }
       if ($request->tipo == 'linea_temporal') {
         lineas_temporales::destroy($request->id_borrar);
