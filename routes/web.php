@@ -44,12 +44,7 @@ Route::controller(App\Http\Controllers\ConfigurationController::class)->group(fu
   Route::get('/config/index', 'index')->name('config.index');
   Route::post('/config/update/nombre_mundo', 'update_nombre_mundo')->name('config.update_nombre_mundo');
   Route::post('/config/update/fecha_mundo', 'update_fecha_mundo')->name('config.update_fecha_mundo');
-  Route::post('/config/store/tipo_asentamiento', 'store_tipo_asentamiento')->name('config.store_tipo_asentamiento');
-  Route::post('/config/store/tipo_conflicto', 'store_tipo_conflicto')->name('config.store_tipo_conflicto');
-  Route::post('/config/store/tipo_construccion', 'store_tipo_construccion')->name('config.store_tipo_construccion');
-  Route::post('/config/store/tipo_lugar', 'store_tipo_lugar')->name('config.store_tipo_lugar');
-  Route::post('/config/store/tipo_organizacion', 'store_tipo_organizacion')->name('config.store_tipo_organizacion');
-  Route::post('/config/store/linea_temporal', 'store_linea_temporal')->name('config.store_linea_temporal');
+  Route::post('/config/store/{type}', 'store')->name('config.store_generic');
   Route::put('/config/update', 'update')->name('config.update');
   Route::delete('/config/destroy', 'destroy')->name('config.destroy');
 });

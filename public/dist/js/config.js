@@ -24,9 +24,18 @@ $(document).ready(function () {
     const nombre = elemento.getAttribute('data-nombre');
     const id = elemento.getAttribute('data-id');
     const tipo = elemento.getAttribute('data-tipo');
+
+    // para que este input exista en el formulario del modal-delete, ausente por defecto, y así poder enviar el tipo al controlador
+    if($('#tipo').length === 0) {
+        $('#form-confirmar-borrar').append(`<input type="hidden" name="tipo" id="tipo" value="${tipo}">`);
+    } else {
+        $('#tipo').val(tipo);
+    }
+
     $('#id_borrar').val(id);
     $('#tipo').val(tipo);
-    $('#texto-borrar').html(nombre);
+    $('#nombre_borrado').val(nombre);
+    $('#nombre-borrar').html(nombre);
   });
 
 
@@ -61,6 +70,20 @@ $(document).ready(function () {
     $('#id_editar').val(id);
     $('#nombres_editar').val(nombre);
   });
+
+  //versión a probar
+  $(document).on('click', '.editar-nombres2', function() {
+    // Obtenemos los datos del botón que disparó el modal
+    const categoriaId = $(this).data('id');
+    const nombresActuales = $(this).data('nombres');
+
+    // Rellenamos el formulario del modal
+    $('#id_editar').val(categoriaId);
+    $('#nombres_editar').val(nombresActuales);
+    
+    // Opcional: Cambiar el título del modal dinámicamente
+    $('#nuevoEventoLabel').text('Editar ' + categoriaId);
+});
 
   //lleva el id a borrar al modal de confirmacion de las vistas index
   $(document).on('click', '.borrar', function (e) {

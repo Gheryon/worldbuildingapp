@@ -4,13 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Asentamiento;
 use App\Models\Fecha;
-use App\Models\imagen;
 use App\Models\Organizacion;
 use App\Models\Personaje;
-use App\Models\tipo_asentamiento;
+use App\Models\TipoAsentamiento;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AsentamientoController extends Controller
@@ -47,7 +45,7 @@ class AsentamientoController extends Controller
     ])->paginate(18);
 
     // Obtener todos los tipos de asentamientos almacenados
-    $tipos_asentamientos = tipo_asentamiento::get_tipos_asentamientos();
+    $tipos_asentamientos = TipoAsentamiento::get_tipos_asentamientos();
 
     return view('asentamientos.index', compact('asentamientos', 'tipos_asentamientos', 'orden', 'tipo_id', 'terminoBusqueda'));
   }
@@ -64,7 +62,7 @@ class AsentamientoController extends Controller
     $personajes = Personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
     // Obtener todos los tipos de asentamiento almacenados
-    $tipos_asentamientos = tipo_asentamiento::orderBy('nombre', 'asc')->get();
+    $tipos_asentamientos = TipoAsentamiento::orderBy('nombre', 'asc')->get();
 
     return view('asentamientos.create', compact('paises', 'personajes', 'tipos_asentamientos'));
   }
@@ -79,7 +77,7 @@ class AsentamientoController extends Controller
       'poblacion' => 'nullable|numeric|min:0',
       'gentilicio' => 'nullable|max:256',
       //selects
-      'select_tipo' => 'required|exists:tipo_asentamiento,id',
+      'select_tipo' => 'required|exists:TipoAsentamiento,id',
       'estatus' => 'nullable|string|in:Abandonado,En ruinas,Habitado,Secreto,Olvidado',
       'select_owner' => 'nullable|exists:organizaciones,id',
       'select_gobernante' => 'nullable|exists:personajes,id',
@@ -165,7 +163,7 @@ class AsentamientoController extends Controller
     $personajes = Personaje::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
     // Obtener todos los tipos de asentamiento almacenados
-    $tipos_asentamientos = tipo_asentamiento::orderBy('nombre', 'asc')->get();
+    $tipos_asentamientos = TipoAsentamiento::orderBy('nombre', 'asc')->get();
 
     return view('asentamientos.edit', compact('asentamiento', 'personajes', 'paises', 'tipos_asentamientos'));
   }
@@ -180,7 +178,7 @@ class AsentamientoController extends Controller
       'poblacion' => 'nullable|numeric|min:0',
       'gentilicio' => 'nullable|max:256',
       //selects
-      'select_tipo' => 'required|exists:tipo_asentamiento,id',
+      'select_tipo' => 'required|exists:TipoAsentamiento,id',
       'estatus' => 'nullable|string|in:Abandonado,En ruinas,Habitado,Secreto,Olvidado',
       'select_owner' => 'nullable|exists:organizaciones,id',
       'select_gobernante' => 'nullable|exists:personajes,id',

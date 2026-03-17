@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
-class tipo_asentamiento extends Model
+class TipoAsentamiento extends Model
 {
     use HasFactory;
 

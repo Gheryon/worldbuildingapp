@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lugar;
-use App\Models\imagen;
-use App\Models\tipo_lugar;
+use App\Models\TipoLugar;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -43,7 +42,7 @@ class LugaresController extends Controller
     ])->paginate(16);
 
     // Obtener todos los tipos de lugares almacenados
-    $tipos = tipo_lugar::get_tipos_lugares();
+    $tipos = TipoLugar::get_tipos_lugares();
 
     return view('lugares.index', compact('lugares', 'tipos', 'orden', 'tipo_id', 'terminoBusqueda'));
   }
@@ -54,7 +53,7 @@ class LugaresController extends Controller
   public function create()
   {
     // Obtener todos los tipos de lugares almacenados
-    $tipos = tipo_lugar::orderby('nombre', 'asc')->get();
+    $tipos = TipoLugar::orderby('nombre', 'asc')->get();
 
     return view('lugares.create', ['tipos'=>$tipos]);
   }
@@ -66,7 +65,7 @@ class LugaresController extends Controller
   {
     $request->validate([
       'nombre' => 'required|max:256',
-      'select_tipo' => 'required|exists:tipo_lugar,id',
+      'select_tipo' => 'required|exists:TipoLugar,id',
       'nivel_peligro' => 'nullable|string|max:256',
       'dificultad_acceso' => 'nullable|string|max:50',
     ]);
@@ -121,7 +120,7 @@ class LugaresController extends Controller
   {
     $lugar=Lugar::findOrFail($id);
     // Obtener todos los tipos de lugares almacenados
-    $tipos = tipo_lugar::orderby('nombre', 'asc')->get();
+    $tipos = TipoLugar::orderby('nombre', 'asc')->get();
 
     return view('lugares.edit', compact('tipos', 'lugar'));
   }
@@ -133,7 +132,7 @@ class LugaresController extends Controller
   {
     $request->validate([
       'nombre' => 'required|max:256',
-      'select_tipo' => 'required|exists:tipo_lugar,id',
+      'select_tipo' => 'required|exists:TipoLugar,id',
       'nivel_peligro' => 'nullable|string|max:256',
       'dificultad_acceso' => 'nullable|string|max:50',
     ]);

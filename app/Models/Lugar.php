@@ -48,7 +48,7 @@ class Lugar extends Model
    */
   public function tipo(): BelongsTo
   {
-    return $this->belongsTo(tipo_lugar::class, 'tipo_lugar_id');
+    return $this->belongsTo(TipoLugar::class, 'tipo_lugar_id');
   }
 
   /** Relación con los conflictos que han ocurrido en este lugar.
