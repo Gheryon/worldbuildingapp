@@ -7,8 +7,10 @@ use App\Models\Fecha;
 use App\Models\Organizacion;
 use App\Models\Personaje;
 use App\Models\TipoAsentamiento;
+use App\Http\Requests\AsentamientoRequest;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AsentamientoController extends Controller
@@ -70,29 +72,13 @@ class AsentamientoController extends Controller
   /**
    * Store a newly created resource in storage.
    */
-  public function store(Request $request)
+  public function store(AsentamientoRequest $request)
   {
-    $request->validate([
-      'nombre' => 'required|max:256',
-      'poblacion' => 'nullable|numeric|min:0',
-      'gentilicio' => 'nullable|max:256',
-      //selects
-      'select_tipo' => 'required|exists:tipo_asentamiento,id',
-      'estatus' => 'nullable|string|in:Abandonado,En ruinas,Habitado,Secreto,Olvidado',
-      'select_owner' => 'nullable|exists:organizaciones,id',
-      'select_gobernante' => 'nullable|exists:personajes,id',
-      //fechas
-      'dia_fundacion' => 'nullable|integer|min:1|max:30',
-      'mes_fundacion' => 'nullable|integer',
-      'anno_fundacion' => 'nullable|integer',
-      'dia_disolucion' => 'nullable|integer|min:1|max:30',
-      'mes_disolucion' => 'nullable|integer',
-      'anno_disolucion' => 'nullable|integer',
-    ]);
+    $datosValidados = $request->validated();
 
     try {
       // Llamada a la lógica del modelo
-      $asentamiento = Asentamiento::store_asentamiento($request);
+      $asentamiento = Asentamiento::store_asentamiento($datosValidados);
 
       return redirect()->route('asentamientos.index')
         ->with('success', 'Asentamiento ' . $asentamiento->nombre . ' añadido correctamente.');
@@ -132,7 +118,6 @@ class AsentamientoController extends Controller
       // Cargamos el asentamiento con sus fechas, tipo, religiones y ruler
       $asentamiento = Asentamiento::with([
         'tipo',
-        //'lider',
         'controlado_por',
       ])->findOrFail($id);
 
@@ -171,29 +156,13 @@ class AsentamientoController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, $id)
+  public function update(AsentamientoRequest $request, $id)
   {
-    $request->validate([
-      'nombre' => 'required|max:256',
-      'poblacion' => 'nullable|numeric|min:0',
-      'gentilicio' => 'nullable|max:256',
-      //selects
-      'select_tipo' => 'required|exists:tipo_asentamiento,id',
-      'estatus' => 'nullable|string|in:Abandonado,En ruinas,Habitado,Secreto,Olvidado',
-      'select_owner' => 'nullable|exists:organizaciones,id',
-      'select_gobernante' => 'nullable|exists:personajes,id',
-      //fechas
-      'dia_fundacion' => 'nullable|integer|min:1|max:30',
-      'mes_fundacion' => 'nullable|integer',
-      'anno_fundacion' => 'nullable|integer',
-      'dia_disolucion' => 'nullable|integer|min:1|max:30',
-      'mes_disolucion' => 'nullable|integer',
-      'anno_disolucion' => 'nullable|integer',
-    ]);
+    $datosValidados = $request->validated();
 
     try {
       $asentamiento = Asentamiento::findOrFail($id); //obtiene el asentamiento en bbdd
-      $asentamiento->update_asentamiento($request); //se actualiza con el request
+      $asentamiento->update_asentamiento($datosValidados); //se actualiza con los datos validados
 
       return redirect()->route('asentamientos.index')
         ->with('success', 'Asentamiento ' . $asentamiento->nombre . ' actualizado con éxito.');
@@ -213,7 +182,9 @@ class AsentamientoController extends Controller
     try {
       $asentamiento = Asentamiento::findOrFail($request->id_borrar);
 
-      $asentamiento->delete_asentamiento();
+      DB::transaction(function () use ($asentamiento) {
+        $asentamiento->delete();
+      });
 
       return redirect()->route('asentamientos.index')
         ->with('success', $request->nombre_borrado . ' borrado correctamente.');

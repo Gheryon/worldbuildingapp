@@ -6,15 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use App\Services\ImageService;
+use App\Traits\HandlesRichTextImages;
 
 class Asentamiento extends Model
 {
-  use HasFactory;
+  use HasFactory, HandlesRichTextImages;
 
   protected $table = 'asentamientos';
   protected $primaryKey = 'id';
-  public $timestamps=true;
+  public $timestamps = true;
 
   protected $fillable = [
     'nombre',
@@ -46,7 +46,6 @@ class Asentamiento extends Model
     'gobernante_id'
   ];
 
-
   protected $casts = [
     'fundacion_id' => 'integer',
     'disolucion_id' => 'integer',
@@ -54,6 +53,25 @@ class Asentamiento extends Model
     'organizacion_id' => 'integer',
     'gobernante_id' => 'integer',
     'tipo_asentamiento_id' => 'integer',
+  ];
+
+  // Mapeo: 'columna_en_db' => 'nombre_input_formulario'
+  public static $richTextFields = [
+    'descripcion' => 'descripcion',
+    'geografia' => 'geografia',
+    'ubicacion_detalles' => 'ubicacion_detalles',
+    'clima' => 'clima',
+    'demografia' => 'demografia',
+    'cultura' => 'cultura',
+    'arquitectura' => 'arquitectura',
+    'infraestructura' => 'infraestructura',
+    'gobierno' => 'gobierno',
+    'defensas' => 'defensas',
+    'ejercito' => 'ejercito',
+    'economia' => 'economia',
+    'recursos' => 'recursos',
+    'historia' => 'historia',
+    'otros' => 'otros'
   ];
 
   /**
@@ -80,7 +98,7 @@ class Asentamiento extends Model
     return $this->belongsTo(Fecha::class, 'disolucion_id');
   }
 
-   /**
+  /**
    * Relación con organización dueña.
    */
   public function controlado_por(): BelongsTo
@@ -101,9 +119,9 @@ class Asentamiento extends Model
    * Se usa morphMany porque un conflicto puede ocurrir en un lugar natural o en un asentamiento.
    */
   public function conflictos(): \Illuminate\Database\Eloquent\Relations\MorphMany
-{
+  {
     return $this->morphMany(Conflicto::class, 'ubicacion_principal');
-}
+  }
 
   /**
    * Scope para filtrar y ordenar asentamientos.
@@ -132,66 +150,29 @@ class Asentamiento extends Model
    * @param \Illuminate\Http\Request $request
    * @return \App\Models\Asentamiento
    */
-  public static function store_asentamiento($request)
+  public static function store_asentamiento(array $request)
   {
     return DB::transaction(function () use ($request) {
-      $asentamiento = self::create([
-        'nombre' => $request->nombre,
-        'gentilicio' => $request->gentilicio,
-        'poblacion' => $request->poblacion,
-        'estatus' => $request->estatus,
-        'recurso_principal' => $request->recurso_principal,
-        'nivel_riqueza' => $request->nivel_riqueza,
-        'organizacion_id' => $request->select_owner,
-        'gobernante_id' => $request->select_gobernante,
-        'tipo_asentamiento_id' => $request->select_tipo,
-      ]);
+      $asentamiento = self::create($request);
 
-      // Procesado de campos de Summernote
-      $imageService = new ImageService();
-      $camposRichText = [
-        'descripcion' => 'descripcion',
-        'geografia' => 'geografia',
-        'ubicacion_detalles' => 'ubicacion_detalles',
-        'clima' => 'clima',
-        'demografia' => 'demografia',
-        'cultura' => 'cultura',
-        'arquitectura' => 'arquitectura',
-        'infraestructura' => 'infraestructura',
-        'gobierno' => 'gobierno',
-        'defensas' => 'defensas',
-        'ejercito' => 'ejercito',
-        'economia' => 'economia',
-        'recursos' => 'recursos',
-        'historia' => 'historia',
-        'otros' => 'otros'
-      ];
-
-      foreach ($camposRichText as $columna => $input) {
-        if ($request->filled($input)) {
-          $asentamiento->$columna = $imageService->processSummernoteImages(
-            $request->$input,
-            "asentamientos",
-            $asentamiento->id
-          );
-        }
-      }
+      // Procesado de campos de RichText (Summernote)
+      $asentamiento->processRichTextImages($request, self::$richTextFields, 'asentamientos');
 
       //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
-      if ($request->filled('anno_fundacion')) {
-        $asentamiento->fundacion_id = Fecha::store_fecha(
-          $request->dia_fundacion,
-          $request->mes_fundacion,
-          $request->anno_fundacion
-        );
+      if (!empty($request['anno_fundacion'])) {
+        $asentamiento->fecha_inicio_id = Fecha::sync(null, [
+          'dia'  => $request['dia_fundacion'] ?? 0,
+          'mes'  => $request['mes_fundacion'] ?? 0,
+          'anno' => $request['anno_fundacion'] ?? null
+        ]);
       }
 
-      if ($request->filled('anno_disolucion')) {
-        $asentamiento->disolucion_id = Fecha::store_fecha(
-          $request->dia_disolucion,
-          $request->mes_disolucion,
-          $request->anno_disolucion
-        );
+      if (!empty($request['anno_disolucion'])) {
+        $asentamiento->fecha_fin_id = Fecha::sync(null, [
+          'dia'  => $request['dia_disolucion'] ?? 0,
+          'mes'  => $request['mes_disolucion'] ?? 0,
+          'anno' => $request['anno_disolucion'] ?? null
+        ]);
       }
 
       // Guardamos los cambios finales (rutas de imágenes y fechas)
@@ -204,99 +185,61 @@ class Asentamiento extends Model
   /**
    * Actualiza un asentamiento existente en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $request
    * @return \App\Models\Asentamiento
    */
-  public function update_asentamiento($request)
+  public function update_asentamiento(array $request)
   {
     return DB::transaction(function () use ($request) {
       //Campos básicos
-      $this->fill([
-        'nombre' => $request->nombre,
-        'gentilicio' => $request->gentilicio,
-        'poblacion' => $request->poblacion,
-        'estatus' => $request->estatus,
-        'recurso_principal' => $request->recurso_principal,
-        'nivel_riqueza' => $request->nivel_riqueza,
-        'organizacion_id' => $request->select_owner,
-        'gobernante_id' => $request->select_gobernante,
-        'tipo_asentamiento_id' => $request->select_tipo,
-      ]);
+      $this->fill($request);
 
-      // Procesado campos RichText (Summernote)
-      $imageService = new ImageService();
-      $campos = [
-        'descripcion' => 'descripcion',
-        'geografia' => 'geografia',
-        'ubicacion_detalles' => 'ubicacion_detalles',
-        'clima' => 'clima',
-        'demografia' => 'demografia',
-        'cultura' => 'cultura',
-        'arquitectura' => 'arquitectura',
-        'infraestructura' => 'infraestructura',
-        'gobierno' => 'gobierno',
-        'defensas' => 'defensas',
-        'ejercito' => 'ejercito',
-        'economia' => 'economia',
-        'recursos' => 'recursos',
-        'historia' => 'historia',
-        'otros' => 'otros'
-      ];
+      // Procesado de campos de RichText (Summernote)
+      $this->processRichTextImages($request, self::$richTextFields, 'asentamientos');
 
-      foreach ($campos as $campo) {
-        if ($request->filled($campo)) {
-          $this->$campo = $imageService->processSummernoteImages(
-            $request->$campo,
-            "organizaciones",
-            $this->id
-          );
-        }
+      //Actualizado de fechas, si existe *_id se actualiza, si no se crea. Si no hay año no se guarda fecha
+      if (!empty($request['anno_fundacion'])) {
+        $this->fecha_inicio_id = Fecha::sync($this->fundacion_id, [
+          'dia'  => $request['dia_fundacion'] ?? 0,
+          'mes'  => $request['mes_fundacion'] ?? 0,
+          'anno' => $request['anno_fundacion'] ?? null
+        ]);
       }
 
-      //Actualizado de fechas
-      //Procesar Fechas, si existe fundacion_id o disolucion_id se actualiza, si no se crea. Si no hay año no se guarda fecha
-      if ($this->fundacion_id) {
-        Fecha::update_fecha($request->dia_fundacion, $request->mes_fundacion, $request->anno_fundacion, $this->fundacion_id);
-      } else {
-        if ($request->filled('anno_fundacion')) {
-          $this->fundacion_id = Fecha::store_fecha($request->dia_fundacion, $request->mes_fundacion, $request->anno_fundacion);
-        }
+      if (!empty($request['anno_disolucion'])) {
+        $this->fecha_fin_id = Fecha::sync($this->disolucion_id, [
+          'dia'  => $request['dia_disolucion'] ?? 0,
+          'mes'  => $request['mes_disolucion'] ?? 0,
+          'anno' => $request['anno_disolucion'] ?? null
+        ]);
       }
-
-      if ($this->disolucion_id) {
-        Fecha::update_fecha($request->dia_disolucion, $request->mes_disolucion, $request->anno_disolucion, $this->disolucion_id);
-      } else {
-        if ($request->filled('anno_disolucion')) {
-          $this->disolucion_id = Fecha::store_fecha($request->dia_disolucion, $request->mes_disolucion, $request->anno_disolucion);
-        }
-      }
-
       return $this->save();
     });
   }
 
   /**
-   * Elimina el asentamiento y todos sus recursos asociados (archivos y registros).
+   * Elimina el asentamiento y sus recursos relacionados (imágenes y fechas).
    *
+   * @return bool|null
+   * @throws \Exception
    */
-  public function delete_asentamiento()
+  protected static function booted()
   {
-    return DB::transaction(function () {
-      //Borrar fechas asociadas
-      if ($this->fundacion_id) {
-        Fecha::destroy($this->fundacion_id);
-      }
-      if ($this->disolucion_id) {
-        Fecha::destroy($this->disolucion_id);
+    static::deleting(function ($asentamiento) {
+      // Llamamos al servicio para limpiar el disco y la DB
+      //$imageService = new \App\Services\ImageService();
+      //$imageService->deleteImagesByOwner('asentamientos', $asentamiento->id);
+      //Versión alternativa con service container, para evitar inyección directa y facilitar testing/mocking
+      app(\App\Services\ImageService::class)->deleteImagesByOwner('asentamientos', $asentamiento->id);
+
+      //Borrado de fechas
+      if ($asentamiento->fecha_inicio_id) {
+        \App\Models\Fecha::destroy($asentamiento->fecha_inicio_id);
       }
 
-      //Borrar imágenes de Summernote usando el servicio
-      $imageService = new ImageService();
-      $imageService->deleteImagesByOwner('asentamientos', $this->id);
-
-      //Eliminar el asentamiento
-      return $this->delete();
+      if ($asentamiento->fecha_fin_id) {
+        \App\Models\Fecha::destroy($asentamiento->fecha_fin_id);
+      }
     });
   }
-
 }
