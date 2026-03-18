@@ -61,7 +61,7 @@ class Asentamiento extends Model
    */
   public function tipo(): BelongsTo
   {
-    return $this->belongsTo(tipo_asentamiento::class, 'tipo_asentamiento_id');
+    return $this->belongsTo(TipoAsentamiento::class, 'tipo_asentamiento_id');
   }
 
   /**

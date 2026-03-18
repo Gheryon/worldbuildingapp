@@ -77,7 +77,7 @@ class AsentamientoController extends Controller
       'poblacion' => 'nullable|numeric|min:0',
       'gentilicio' => 'nullable|max:256',
       //selects
-      'select_tipo' => 'required|exists:TipoAsentamiento,id',
+      'select_tipo' => 'required|exists:tipo_asentamiento,id',
       'estatus' => 'nullable|string|in:Abandonado,En ruinas,Habitado,Secreto,Olvidado',
       'select_owner' => 'nullable|exists:organizaciones,id',
       'select_gobernante' => 'nullable|exists:personajes,id',
@@ -178,7 +178,7 @@ class AsentamientoController extends Controller
       'poblacion' => 'nullable|numeric|min:0',
       'gentilicio' => 'nullable|max:256',
       //selects
-      'select_tipo' => 'required|exists:TipoAsentamiento,id',
+      'select_tipo' => 'required|exists:tipo_asentamiento,id',
       'estatus' => 'nullable|string|in:Abandonado,En ruinas,Habitado,Secreto,Olvidado',
       'select_owner' => 'nullable|exists:organizaciones,id',
       'select_gobernante' => 'nullable|exists:personajes,id',
