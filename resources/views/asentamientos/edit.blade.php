@@ -127,7 +127,7 @@
           <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-social"><i class="fas fa-users mr-1"></i> Sociedad</a></li>
           <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-politica"><i class="fas fa-gavel mr-1"></i> Política</a></li>
           <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-economia"><i class="fas fa-coins mr-1"></i> Economía</a></li>
-          <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-historia"><i class="fas fa-book-old mr-1"></i> Historia</a></li>
+          <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-historia"><i class="fas fa-book mr-1"></i> Historia</a></li>
         </ul>
       </div>
       <div class="card-body bg-white">
@@ -152,7 +152,7 @@
           <div class="tab-pane fade" id="tab-social">
             <x-textarea-input name="demografia" label="Composición demográfica" :value="$asentamiento->demografia" />
             <x-textarea-input name="cultura" label="Tradiciones, costumbres y cultura" :value="$asentamiento->cultura" />
-            <x-textarea-input name="arquitectura" label="EArquitectura y monumentos" :value="$asentamiento->arquitectura" />
+            <x-textarea-input name="arquitectura" label="Arquitectura y monumentos" :value="$asentamiento->arquitectura" />
             <x-textarea-input name="infraestructura" label="Servicios e infraestructura" :value="$asentamiento->infraestructura" />
           </div>
           <div class="tab-pane fade" id="tab-politica">
