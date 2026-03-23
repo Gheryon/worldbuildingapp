@@ -43,6 +43,19 @@ class Especie extends Model
     'otros',
   ];
 
+  // Mapeo: 'columna_en_db' => 'nombre_input_formulario'
+  public static $richTextFields = [
+    'anatomia'          => 'anatomia',
+    'alimentacion'      => 'alimentacion',
+    'reproduccion'      => 'reproduccion',
+    'dimorfismo_sexual' => 'dimorfismo_sexual',
+    'distribucion'      => 'distribucion',
+    'habilidades'       => 'habilidades',
+    'domesticacion'     => 'domesticacion',
+    'explotacion'       => 'explotacion',
+    'otros'             => 'otros'
+  ];
+
   /**
    * Scope para filtrar y ordenar organizaciones.
    */
@@ -72,52 +85,17 @@ class Especie extends Model
   /**
    * Almacena una nueva especie en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $request
    * @return \App\Models\Especie
    */
-  public static function store_especie($request)
+  public static function store_especie(array $request)
   {
     return DB::transaction(function () use ($request) {
       // Crear registro
-      $especie = self::create([
-        'nombre' => $request->nombre,
-        'reino' => $request->reino,
-        'clase_taxonomica' => $request->clase_taxonomica,
-        'locomocion' => $request->locomocion,
-        'organizacion_social' => $request->organizacion_social,
-        'edad' => $request->edad,
-        'mortalidad' => $request->mortalidad,
-        'peso' => $request->peso,
-        'altura' => $request->altura,
-        'longitud' => $request->longitud,
-        'estatus' => $request->estatus,
-        'dieta' => $request->dieta,
-        'rareza' => $request->rareza,
-      ]);
+      $especie = self::create($request);
 
-      // Procesado de campos de Summernote
-      $imageService = new ImageService();
-      $camposRichText = [
-        'anatomia' => 'anatomia',
-        'alimentacion' => 'alimentacion',
-        'reproduccion' => 'reproduccion',
-        'dimorfismo_sexual' => 'dimorfismo_sexual',
-        'distribucion' => 'distribucion',
-        'habilidades' => 'habilidades',
-        'domesticacion' => 'domesticacion',
-        'explotacion' => 'explotacion',
-        'otros' => 'otros'
-      ];
-
-      foreach ($camposRichText as $columna => $input) {
-        if ($request->filled($input)) {
-          $especie->$columna = $imageService->processSummernoteImages(
-            $request->$input,
-            "especies",
-            $especie->id
-          );
-        }
-      }
+      // Procesado de campos de RichText (Summernote)
+      $especie->processRichTextImages($request, self::$richTextFields, 'especies');
 
       $especie->save();
 
@@ -128,51 +106,16 @@ class Especie extends Model
   /**
    * Actualiza una especie existente en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $request
    * @return \App\Models\Especie
    */
-  public function update_especie($request)
+  public function update_especie(array $request)
   {
     return DB::transaction(function () use ($request) {
-      $this->fill([
-        'nombre' => $request->nombre,
-        'reino' => $request->reino,
-        'clase_taxonomica' => $request->clase_taxonomica,
-        'locomocion' => $request->locomocion,
-        'organizacion_social' => $request->organizacion_social,
-        'edad' => $request->edad,
-        'mortalidad' => $request->mortalidad,
-        'peso' => $request->peso,
-        'altura' => $request->altura,
-        'longitud' => $request->longitud,
-        'estatus' => $request->estatus,
-        'dieta' => $request->dieta,
-        'rareza' => $request->rareza,
-      ]);
+      $this->fill($request);
 
-      // Procesado de campos de Summernote
-      $imageService = new ImageService();
-      $camposRichText = [
-        'anatomia' => 'anatomia',
-        'alimentacion' => 'alimentacion',
-        'reproduccion' => 'reproduccion',
-        'dimorfismo_sexual' => 'dimorfismo_sexual',
-        'distribucion' => 'distribucion',
-        'habilidades' => 'habilidades',
-        'domesticacion' => 'domesticacion',
-        'explotacion' => 'explotacion',
-        'otros' => 'otros'
-      ];
-
-      foreach ($camposRichText as $columna => $input) {
-        if ($request->filled($input)) {
-          $this->$columna = $imageService->processSummernoteImages(
-            $request->$input,
-            "especies",
-            $this->id
-          );
-        }
-      }
+      // Procesado de campos de RichText (Summernote)
+      $this->processRichTextImages($request, self::$richTextFields, 'especies');
 
       $this->save();
 
@@ -182,32 +125,17 @@ class Especie extends Model
 
   /**
    * Elimina la especie y sus recursos asociados (imágenes).
-   * * @return void
+   * @return bool|null
+   * @throws \Exception
    */
-  public function delete_especie()
+  protected static function booted()
   {
-    return DB::transaction(function () {
-      // Obtener y eliminar imágenes físicas del disco
-      $imagenes = DB::table('imagenes')
-        ->where('table_owner', 'especies')
-        ->where('owner', $this->id)
-        ->get();
-
-      foreach ($imagenes as $imagen) {
-        $path = public_path("/storage/imagenes/{$imagen->nombre}");
-        if (file_exists($path)) {
-          unlink($path);
-        }
-      }
-
-      //Limpiar registros de la tabla imagenes
-      DB::table('imagenes')
-        ->where('table_owner', 'especies')
-        ->where('owner', $this->id)
-        ->delete();
-
-      // Eliminar la especie
-      return $this->delete();
+    static::deleting(function ($especie) {
+      // Llamamos al servicio para limpiar el disco y la DB
+      //$imageService = new \App\Services\ImageService();
+      //$imageService->deleteImagesByOwner('especies', $especie->id);
+      //Versión alternativa con service container, para evitar inyección directa y facilitar testing/mocking
+      app(\App\Services\ImageService::class)->deleteImagesByOwner('especies', $especie->id);
     });
   }
 }

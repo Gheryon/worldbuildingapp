@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Especie;
-use App\Models\imagen;
 use Exception;
 use Illuminate\Http\Request;
+use App\Http\Requests\EspecieRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -28,7 +28,6 @@ class EspecieController extends Controller
     $terminoBusqueda = $datosValidados['search'] ?? null;
 
     // Obtener todas las especies almacenadas
-    //$especies = Especie::get_especies();
     $especies = Especie::filtrar([
       'orden'  => $orden,
       'search' => $terminoBusqueda
@@ -48,15 +47,12 @@ class EspecieController extends Controller
   /**
    * Store a newly created resource in storage.
    */
-  public function store(Request $request)
+  public function store(EspecieRequest $request)
   {
-    $request->validate([
-      'nombre' => 'required|max:255',
-      'estatus' => 'required',
-    ]);
+    $datosValidados = $request->validated();
 
     try {
-      $especie = Especie::store_especie($request);
+      $especie = Especie::store_especie($datosValidados);
 
       return redirect()->route('especies.index')
         ->with('success', 'Especie ' . $especie->nombre . ' añadida correctamente.');
@@ -111,16 +107,13 @@ class EspecieController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, $id)
+  public function update(EspecieRequest $request, $id)
   {
-    $request->validate([
-      'nombre' => 'required|max:255',
-      'estatus' => 'required',
-    ]);
+    $datosValidados = $request->validated();
 
     try {
       $especie = Especie::findOrFail($id);
-      $especie->update_especie($request);
+      $especie->update_especie($datosValidados);
 
       return redirect()->route('especies.index')
         ->with('success', 'Especie ' . $especie->nombre . ' actualizada correctamente.');
@@ -150,7 +143,10 @@ class EspecieController extends Controller
       $especie = Especie::findOrFail($id);
       $nombre = $especie->nombre;
 
-      $especie->delete_especie();
+      DB::transaction(function () use ($especie) {
+        $especie->delete();
+      });
+
 
       return redirect()->route('especies.index')
         ->with('success', "La especie '{$nombre}' y sus recursos han sido eliminados.");
