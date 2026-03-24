@@ -5,14 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\Collection;
-use App\Services\ImageService;
+use App\Traits\HandlesRichTextImages;
 use Exception;
 
 class Especie extends Model
 {
-  use HasFactory;
+  use HasFactory, HandlesRichTextImages;
 
   protected $table = 'especies';
   protected $primaryKey = 'id';

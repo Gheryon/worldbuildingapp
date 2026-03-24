@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Traits\HandlesRichTextImages;
 
 class Personaje extends Model
 {
-  use HasFactory;
+  use HasFactory, HandlesRichTextImages;
 
   protected $table = 'personajes';
   protected $primaryKey = 'id';
@@ -202,8 +203,6 @@ class Personaje extends Model
       if (isset($request['retrato']) && $request['retrato'] instanceof \Illuminate\Http\UploadedFile) {
         $path = $request['retrato']->store('retratos', 'public');
         $request['retrato'] = basename($path);
-      } else {
-        $request['retrato'] = "default.png";
       }
 
       // Asignación de campos básicos
