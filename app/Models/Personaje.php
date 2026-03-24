@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use App\Services\ImageService;
 
 class Personaje extends Model
 {
@@ -54,6 +52,23 @@ class Personaje extends Model
     'especie_id' => 'integer',
   ];
 
+  // Mapeo: 'columna_en_db' => 'nombre_input_formulario'
+  public static $richTextFields = [
+    'descripcion_fisica' => 'descripcion_fisica',
+    'descripcion_corta' => 'descripcion_corta',
+    'salud' => 'salud',
+    'personalidad' => 'personalidad',
+    'deseos' => 'deseos',
+    'miedos' => 'miedos',
+    'magia' => 'magia',
+    'educacion' => 'educacion',
+    'biografia' => 'biografia',
+    'religion' => 'religion',
+    'familia' => 'familia',
+    'politica' => 'politica',
+    'otros' => 'otros'
+  ];
+
   /**
    * Obtiene la especie a la que pertenece el personaje.
    */
@@ -96,21 +111,12 @@ class Personaje extends Model
    */
   public function scopeFiltrar($query, $filtros)
   {
-    return $query->leftJoin('especies', 'personajes.especie_id', '=', 'especies.id')
-      ->select(
-        'personajes.id',
-        'personajes.nombre',
-        'personajes.retrato',
-        'personajes.sexo',
-        'personajes.especie_id',
-        DB::raw('COALESCE(especies.nombre, "Especie desconocida") as especie')
-      )
-      ->where('personajes.id', '!=', 0)
+    return $query->with('especie:id,nombre')
       ->when($filtros['search'] ?? null, function ($q, $search) {
         $q->where('personajes.nombre', 'LIKE', "%{$search}%");
       })
-      ->when($filtros['especie'] ?? null, function ($q, $especie) {
-        if ($especie > 0) $q->where('personajes.especie_id', $especie);
+      ->when(!empty($filtros['especie']), function ($q) use ($filtros) {
+        $q->where('personajes.especie_id', $filtros['especie']);
       })
       ->orderBy('personajes.nombre', $filtros['orden'] ?? 'asc');
   }
@@ -137,75 +143,44 @@ class Personaje extends Model
   /**
    * Almacena un nuevo personaje en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $request
    * @return \App\Models\personaje
    */
-  public static function store_personaje($request)
+  public static function store_personaje(array $request)
   {
     return DB::transaction(function () use ($request) {
-      $personaje =self::create([
-        'nombre' => $request->nombre,
-        'apellidos' => $request->apellidos,
-        'nombre_familia' => $request->nombre_familia,
-        'apodo' => $request->apodo,
-        'profesion' => $request->profesion,
-        //'lugar_nacimiento' => $request->lugar_nacimiento,//aún sin implementar
-        'causa_fallecimiento' => $request->causa_fallecimiento,
-        'especie_id' => $request->select_especie,
-        'sexo' => $request->sexo
-      ]);
+      // Manejo del retrato
+      if (isset($request['retrato']) && $request['retrato'] instanceof \Illuminate\Http\UploadedFile) {
+        $path = $request['retrato']->store('retratos', 'public');
+        $request['retrato'] = basename($path);
+      } else {
+        $request['retrato'] = "default.png";
+      }
+
+      if (isset($request['select_especie'])) {
+        $request['especie_id'] = $request['select_especie'];
+      }
+
+      $personaje = self::create($request);
 
       // Procesado de campos de Summernote
-      $imageService = new ImageService();
-      $camposRichText = [
-        'descripcion_fisica' => 'descripcion_fisica',
-        'descripcion_corta' => 'descripcion_corta',
-        'salud' => 'salud',
-        'personalidad' => 'personalidad',
-        'deseos' => 'deseos',
-        'miedos' => 'miedos',
-        'magia' => 'magia',
-        'educacion' => 'educacion',
-        'biografia' => 'biografia',
-        'religion' => 'religion',
-        'familia' => 'familia',
-        'politica' => 'politica',
-        'otros' => 'otros'
-      ];
+      $personaje->processRichTextImages($request, self::$richTextFields, 'personajes');
 
-      foreach ($camposRichText as $columna => $input) {
-        if ($request->filled($input)) {
-          $personaje->$columna = $imageService->processSummernoteImages(
-            $request->$input,
-            "personajes",
-            $personaje->id
-          );
-        }
-      }
-
-      // Manejo del Retrato
-      if ($request->hasFile('retrato')) {
-        $path = $request->file('retrato')->store('retratos', 'public');
-        $personaje->retrato = basename($path);
-      } else {
-        $personaje->retrato = "default.png";
-      }
-      
       //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
-      if ($request->filled('anno_nacimiento')) {
-        $personaje->nacimiento_id = Fecha::store_fecha(
-          $request->dia_nacimiento,
-          $request->mes_nacimiento,
-          $request->anno_nacimiento
-        );
+      if (!empty($request['anno_nacimiento'])) {
+        $personaje->nacimiento_id = Fecha::sync(null, [
+          'dia'  => $request['dia_nacimiento'] ?? null,
+          'mes'  => $request['mes_nacimiento'] ?? null,
+          'anno' => $request['anno_nacimiento'] ?? null
+        ]);
       }
 
-      if ($request->filled('anno_fallecimiento')) {
-        $personaje->fallecimiento_id = Fecha::store_fecha(
-          $request->dia_fallecimiento,
-          $request->mes_fallecimiento,
-          $request->anno_fallecimiento
-        );
+      if (!empty($request['anno_fallecimiento'])) {
+        $personaje->fallecimiento_id = Fecha::sync(null, [
+          'dia'  => $request['dia_fallecimiento'] ?? null,
+          'mes'  => $request['mes_fallecimiento'] ?? null,
+          'anno' => $request['anno_fallecimiento'] ?? null
+        ]);
       }
 
       $personaje->save();
@@ -217,78 +192,42 @@ class Personaje extends Model
   /**
    * Actualiza un personaje existente en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $request
    * @return \App\Models\personaje
    */
-  public function update_personaje($request)
+  public function update_personaje(array $request)
   {
     return DB::transaction(function () use ($request) {
+      // Manejo del retrato
+      if (isset($request['retrato']) && $request['retrato'] instanceof \Illuminate\Http\UploadedFile) {
+        $path = $request['retrato']->store('retratos', 'public');
+        $request['retrato'] = basename($path);
+      } else {
+        $request['retrato'] = "default.png";
+      }
+
       // Asignación de campos básicos
-    $this->fill([
-      'nombre' => $request->nombre,
-      'apellidos' => $request->apellidos,
-      'nombre_familia' => $request->nombre_familia,
-      'apodo' => $request->apodo,
-      'profesion' => $request->profesion,
-      //'lugar_nacimiento' => $request->lugar_nacimiento,//aún sin implementar
-      'causa_fallecimiento' => $request->causa_fallecimiento,
-      'especie_id' => $request->select_especie,
-      'sexo' => $request->sexo
-    ]);
+      $this->fill($request);
 
       // Procesado de campos de Summernote
-      $imageService = new ImageService();
-      $camposRichText = [
-        'descripcion_fisica' => 'descripcion_fisica',
-        'descripcion_corta' => 'descripcion_corta',
-        'salud' => 'salud',
-        'personalidad' => 'personalidad',
-        'deseos' => 'deseos',
-        'miedos' => 'miedos',
-        'magia' => 'magia',
-        'educacion' => 'educacion',
-        'biografia' => 'biografia',
-        'religion' => 'religion',
-        'familia' => 'familia',
-        'politica' => 'politica',
-        'otros' => 'otros'
-      ];
-
-      foreach ($camposRichText as $columna => $input) {
-        if ($request->filled($input)) {
-          $this->$columna = $imageService->processSummernoteImages(
-            $request->$input,
-            "personajes",
-            $this->id
-          );
-        }
-      }
-
-      // Manejo de retrato con Storage
-      if ($request->hasFile('retrato')) {
-        if ($this->retrato && $this->retrato !== 'default.png') {
-          Storage::disk('public')->delete('retratos/' . $this->retrato);
-        }
-        $path = $request->file('retrato')->store('retratos', 'public');
-        $this->retrato = basename($path);
-      }
+      $this->processRichTextImages($request, self::$richTextFields, 'personajes');
 
       //Actualizado de fechas
       //Procesar Fechas, si existe nacimiento_id o fallecimiento_id se actualiza, si no se crea. Si no hay año no se guarda fecha
-      if ($this->nacimiento_id) {
-        Fecha::update_fecha($request->dia_nacimiento, $request->mes_nacimiento, $request->anno_nacimiento, $this->nacimiento_id);
-      } else {
-        if ($request->filled('anno_nacimiento')) {
-          $this->nacimiento_id = Fecha::store_fecha($request->dia_nacimiento, $request->mes_nacimiento, $request->anno_nacimiento);
-        }
+      if (!empty($request['anno_nacimiento'])) {
+        $this->nacimiento_id = Fecha::sync($this->nacimiento_id, [
+          'dia'  => $request['dia_nacimiento'] ?? null,
+          'mes'  => $request['mes_nacimiento'] ?? null,
+          'anno' => $request['anno_nacimiento'] ?? null
+        ]);
       }
 
-      if ($this->fallecimiento_id) {
-        Fecha::update_fecha($request->dia_fallecimiento, $request->mes_fallecimiento, $request->anno_fallecimiento, $this->fallecimiento_id);
-      } else {
-        if ($request->filled('anno_fallecimiento')) {
-          $this->fallecimiento_id = Fecha::store_fecha($request->dia_fallecimiento, $request->mes_fallecimiento, $request->anno_fallecimiento);
-        }
+      if (!empty($request['anno_fallecimiento'])) {
+        $this->fallecimiento_id = Fecha::sync($this->fallecimiento_id, [
+          'dia'  => $request['dia_fallecimiento'] ?? null,
+          'mes'  => $request['mes_fallecimiento'] ?? null,
+          'anno' => $request['anno_fallecimiento'] ?? null
+        ]);
       }
 
       return $this->save();
@@ -296,33 +235,28 @@ class Personaje extends Model
   }
 
   /**
-   * Elimina el personaje y sus datos relacionados.
+   * Elimina el personaje y sus recursos relacionados (imágenes y fechas).
    *
    * @return bool|null
+   * @throws \Exception
    */
-  public function eliminar_personaje()
+  protected static function booted()
   {
-    return DB::transaction(function () {
-      //Borrar fechas relacionadas si existen
-      if ($this->nacimiento_id) {
-        Fecha::destroy($this->nacimiento_id);
-      }
-      if ($this->fallecimiento_id) {
-        Fecha::destroy($this->fallecimiento_id);
-      }
+    static::deleting(function ($personaje) {
+      // Llamamos al servicio para limpiar el disco y la DB
+      //$imageService = new \App\Services\ImageService();
+      //$imageService->deleteImagesByOwner('personajes', $personaje->id);
+      //Versión alternativa con service container, para evitar inyección directa y facilitar testing/mocking
+      app(\App\Services\ImageService::class)->deleteImagesByOwner('personajes', $personaje->id);
 
-      //Borrar el retrato físico sin borrar el default
-      if ($this->retrato && $this->retrato !== 'default.png') {
-        Storage::disk('public')->delete('retratos/' . $this->retrato);
+      //Borrado de fechas
+      if ($personaje->nacimiento_id) {
+        \App\Models\Fecha::destroy($personaje->nacimiento_id);
       }
 
-      //Borrar imágenes de Summernote relacionadas
-      $imageService = new ImageService();
-      $imageService->deleteImagesByOwner('personajes', $this->id);
-
-      //Borrar el personaje
-      return $this->delete();
+      if ($personaje->fallecimiento_id) {
+        \App\Models\Fecha::destroy($personaje->fallecimiento_id);
+      }
     });
   }
-
 }

@@ -82,8 +82,8 @@ class Fecha extends Model
    */
   public static function sync(?int $id, array $data): ?int
   {
-    $dia  = $data['dia'] ?? 0;
-    $mes  = $data['mes'] ?? 0;
+    $dia  = $data['dia'] ?? null;
+    $mes  = $data['mes'] ?? null;
     $anno = $data['anno'] ?? null;
 
     // Si no hay año, interpretamos que la fecha no debe existir

@@ -59,7 +59,7 @@
         <ul class="list-group list-group-unbordered mb-3">
           <li class="list-group-item">
             <b><i class="fa-solid fa-dna mr-1"></i> Especie</b>
-            <span class="float-right text-muted">{{ $personaje->especie }}</span>
+            <span class="float-right text-muted">{{ $personaje->especie->nombre }}</span>
           </li>
           <li class="list-group-item">
             <b><i class="fas fa-venus-mars mr-1"></i> Sexo</b>

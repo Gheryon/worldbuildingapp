@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Especie;
 use App\Models\Fecha;
-use App\Models\imagen;
 use App\Models\Personaje;
 use Exception;
 use Illuminate\Http\Request;
+use App\Http\Requests\PersonajeRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -41,7 +41,10 @@ class PersonajeController extends Controller
       'orden'  => $orden,
       'especie'   => $especie_id,
       'search' => $terminoBusqueda
-    ])->paginate(18);
+    ]) // IMPORTANTE: Incluir siempre las FK (especie_id) para que el 'with' funcione.
+      ->select('id', 'nombre', 'retrato', 'especie_id', 'sexo')
+      ->paginate(18)
+      ->withQueryString();
 
     $especies = Especie::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
@@ -64,24 +67,13 @@ class PersonajeController extends Controller
   /**
    * Store a newly created resource in storage.
    */
-  public function store(Request $request)
+  public function store(PersonajeRequest $request)
   {
-    $validacion = $request->validate([
-      'nombre' => 'required|max:256',
-      'nombre_familia' => 'nullable|max:256',
-      'causa_fallecimiento' => 'nullable|max:256',
-      'sexo' => 'required',
-      'select_especie' => 'required',
-      'dnacimiento' => 'nullable|integer|min:1|max:30',
-      'anacimiento' => 'nullable|integer',
-      'dfallecimiento' => 'nullable|integer|min:1|max:30',
-      'afallecimiento' => 'nullable|integer',
-      'retrato' => 'nullable|file|image|mimes:jpg,png,gif|max:10240',
-    ]);
+    $datosValidados = $request->validated();
 
     try {
       // Llamada a la lógica del modelo
-      $personaje = Personaje::store_personaje($request);
+      $personaje = Personaje::store_personaje($datosValidados);
 
       return redirect()->route('personajes.index')
         ->with('success', 'Personaje ' . $personaje->nombre . ' añadido correctamente.');
@@ -170,22 +162,11 @@ class PersonajeController extends Controller
    */
   public function update(Request $request, $id)
   {
-    $request->validate([
-      'nombre' => 'required|max:256',
-      'nombre_familia' => 'nullable|max:256',
-      'causa_fallecimiento' => 'nullable|max:256',
-      'sexo' => 'required',
-      'select_especie' => 'required',
-      'dnacimiento' => 'nullable|integer|min:1|max:30',
-      'anacimiento' => 'nullable|integer',
-      'dfallecimiento' => 'nullable|integer|min:1|max:30',
-      'afallecimiento' => 'nullable|integer',
-      'retrato' => 'file|image|mimes:jpg,png,gif|max:10240',
-    ]);
+    $datosValidados = $request->validated();
 
     try {
       $personaje = Personaje::findOrFail($id); //obtiene el personaje en bbdd
-      $personaje->update_personaje($request); //lo actualiza con el request
+      $personaje->update_personaje($datosValidados); //lo actualiza con el request
 
       return redirect()->route('personajes.index')
         ->with('success', 'Personaje ' . $personaje->nombre . ' actualizado con éxito.');
@@ -212,7 +193,9 @@ class PersonajeController extends Controller
       $nombre = $personaje->nombre; // Guardamos el nombre para el mensaje
 
       // Llamamos a la lógica centralizada en el modelo
-      $personaje->eliminar_personaje();
+      DB::transaction(function () use ($personaje) {
+        $personaje->delete();
+      });
 
       return redirect()->route('personajes.index')
         ->with('success', "El personaje {$nombre} ha sido eliminado correctamente.");
