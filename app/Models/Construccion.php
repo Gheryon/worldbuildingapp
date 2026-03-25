@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use App\Services\ImageService;
 use App\Traits\HandlesRichTextImages;
 
 class Construccion extends Model
@@ -211,6 +210,8 @@ class Construccion extends Model
   protected static function booted()
   {
     static::deleting(function ($construccion) {
+      $construccion->asentamiento()->update(['asentamiento_id' => null]);
+
       // Llamamos al servicio para limpiar el disco y la DB
       $imageService = new \App\Services\ImageService();
       $imageService->deleteImagesByOwner('construcciones', $construccion->id);
