@@ -25,16 +25,15 @@ class Personaje extends Model
     'profesion',
     'lugar_nacimiento',
     'causa_fallecimiento',
-    'descripcion_fisica',
     'descripcion_corta',
-    'personalidad',
+    'biografia',
+    'descripcion_fisica',
     'salud',
     'personalidad',
     'deseos',
     'miedos',
     'magia',
     'educacion',
-    'biografia',
     'religion',
     'familia',
     'politica',
@@ -242,6 +241,22 @@ class Personaje extends Model
   protected static function booted()
   {
     static::deleting(function ($personaje) {
+      // Borrado del retrato físico (si no es el default)
+      if ($personaje->retrato && $personaje->retrato !== 'default.png') {
+        $path = 'retratos/' . $personaje->retrato;
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+          \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+        }
+      }
+
+      // Desvincular Asentamientos
+      // Usamos el Query Builder para un update masivo rápido sin disparar eventos de Asentamiento
+      \App\Models\Asentamiento::where('gobernante_id', $personaje->id)
+        ->update(['gobernante_id' => null]);
+
+      // Desvincular Organizaciones
+      $personaje->organizacionesGobernadas()->update(['lider_id' => null]);
+
       // Llamamos al servicio para limpiar el disco y la DB
       //$imageService = new \App\Services\ImageService();
       //$imageService->deleteImagesByOwner('personajes', $personaje->id);

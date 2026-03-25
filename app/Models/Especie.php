@@ -129,6 +129,8 @@ class Especie extends Model
   protected static function booted()
   {
     static::deleting(function ($especie) {
+      \App\Models\Personaje::where('especie_id', $especie->id)
+        ->update(['especie_id' => null]);
       // Llamamos al servicio para limpiar el disco y la DB
       //$imageService = new \App\Services\ImageService();
       //$imageService->deleteImagesByOwner('especies', $especie->id);
