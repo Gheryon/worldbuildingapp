@@ -36,7 +36,6 @@ Route::controller(App\Http\Controllers\AsentamientoController::class)->group(fun
   Route::get('/asentamientos/{id}/edit', 'edit')->name('asentamiento.edit');
   Route::put('/asentamientos/{id}', 'update')->name('asentamiento.update');
   Route::delete('/asentamiento/destroy', 'destroy')->name('asentamiento.destroy');
-  Route::get('/asentamientos', 'search')->name('asentamientos.search');
 });
 
 /*******configuracion routes********/
@@ -147,10 +146,11 @@ Route::controller(App\Http\Controllers\ReligionesController::class)->group(funct
 });
 
 /*******timelines routes********/
-Route::get('/timelines/index/{orden?}/{cronologia?}', [App\Http\Controllers\TimelineController::class, 'index'])->name('timelines.index');
-Route::post('/timelines/store', [App\Http\Controllers\TimelineController::class, 'store'])->name('evento.store');
-Route::get('/timelines/{id}/edit', [App\Http\Controllers\TimelineController::class, 'edit'])->name('evento.edit');
-Route::delete('/timelines/destroy', [App\Http\Controllers\TimelineController::class, 'destroy'])->name('evento.destroy');
+Route::get('/timelines/index/', [App\Http\Controllers\EventosController::class, 'index'])->name('timelines.index');
+Route::post('/timelines/store', [App\Http\Controllers\EventosController::class, 'store'])->name('evento.store');
+Route::delete('/timelines/destroy', [App\Http\Controllers\EventosController::class, 'destroy'])->name('evento.destroy');
+Route::get('/timelines/{id}/edit', [App\Http\Controllers\EventosController::class, 'edit'])->name('evento.edit');
+Route::put('/timelines/{id}', [App\Http\Controllers\EventosController::class, 'update'])->name('evento.update');
 
 /*******relatos routes********/
 Route::controller(App\Http\Controllers\ArticuloController::class)->group(function () {

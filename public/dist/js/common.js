@@ -39,9 +39,9 @@ $(document).ready(function () {
   }
 
   //$(function () {
-    $('form[data-prevent-loss="true"]').each(function () {
-      prevenirPerdidaDatos('#' + $(this).attr('id'));
-    });
+  $('form[data-prevent-loss="true"]').each(function () {
+    prevenirPerdidaDatos('#' + $(this).attr('id'));
+  });
   //});
 
   /** Inicialización de Summernote con configuración personalizada.
@@ -84,5 +84,54 @@ $(document).ready(function () {
         }
       }
     });
+  });
+
+  /*=============Timelines===============*/
+  $(document).on('click', '.editar', function () {
+    const id = $(this).data('id');
+    const urlEdit = window.AppConfig.routeEdit.replace(':id', id);
+    const urlUpdate = window.AppConfig.routeUpdate.replace(':id', id);
+    
+    //Limpiar el formulario
+    $('#form-evento')[0].reset();
+
+    $.ajax({
+      url: urlEdit,
+      method: 'GET',
+      success: function (data) {
+        console.log(data);
+        //Cambiar visualmente el modal
+        $('#nuevoEventoLabel').text('Editar evento');
+        $('#submit-crear-button').text('Actualizar cambios');
+
+        //Cambiar el action y el método (Laravel necesita spoofing de PUT)
+        $('#form-evento').attr('action', urlUpdate);
+        if ($('#method_spoofing').length === 0) {
+          $('#form-evento').append('<input type="hidden" name="_method" id="method_spoofing" value="PUT">');
+        }
+
+        //Poblar campos
+        $('input[name="nombre"]').val(data.nombre);
+        $('input[name="dia"]').val(data.dia);
+        $('input[name="mes"]').val(data.mes);
+        $('input[name="anno"]').val(data.anno);
+        $('#form_tipo').val(data.tipo);
+        $('#form_categoria').val(data.categoria);
+
+        // 5. Cargar contenido en Summernote
+        $('#descripcion').summernote('code', data.descripcion);
+
+        $('#nuevo-evento').modal('show');
+      }
+    });
+  });
+
+  // IMPORTANTE: Limpiar el formulario cuando se cierre el modal para que "Nuevo Evento" vuelva a estar vacío
+  $('#nuevo-evento').on('hidden.bs.modal', function () {
+    $(this).find('form')[0].reset();
+    $('#method_spoofing').remove();
+    $('#form-evento').attr('action', "{{ route('evento.store') }}");
+    $('#nuevoEventoLabel').text('Guardar');
+    $('#descripcion').summernote('code', '');
   });
 });
