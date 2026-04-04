@@ -30,14 +30,14 @@ class Fecha extends Model
   {
     // Si el ID es nulo o 0 (valor por defecto en tu lógica), evitamos la consulta
     if (!$id || $id <= 1) {
-      return "Desconocida";
+      return "Desconocida/Sin especificar";
     }
 
     try {
       $fecha = self::find($id);
 
       if (!$fecha) {
-        return "Desconocida";
+        return "Desconocida/Sin especificar";
       }
 
       //si dia y mes son 0, devolvemos solo el año
