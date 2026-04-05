@@ -267,7 +267,7 @@
 <script>
   // Inyectamos los datos del servidor a variables de JS
   window.ubicacionesData = {
-    "App\\Models\\Asentamiento": {!!$asentamientos-> toJson() !!},
+    "App\\Models\\Asentamiento": {!!$asentamientos->toJson() !!},
     "App\\Models\\Lugar": {!!$lugares->toJson() !!}
   };
   // Pasamos el ID antiguo para mantener la selección en caso de error de validación

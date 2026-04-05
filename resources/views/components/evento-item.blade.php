@@ -1,6 +1,17 @@
 @props(['evento'])
 
 @php
+// Mapeo de categorías a grosor de borde en píxeles
+$anchosBorde = [
+'local' => '1px',
+'regional' => '3px',
+'continental' => '5px',
+'global' => '7px',
+'universal' => '12px',
+];
+
+$grosor = $anchosBorde[$evento->categoria] ?? '1px';
+
 //Configuración de estilos e iconos según el tipo
 $config = match($evento->tipo) {
 'nace_personaje', 'nacimiento', 'personajes' => [
@@ -58,9 +69,11 @@ default => null,
 
 <div>
   <i class="fas {{ $config['icon'] }} bg-{{ $config['color'] }}"></i>
-  <div class="border border-{{$config['color']}} timeline-item shadow-sm">
+  <div class="border border-{{$config['color']}} timeline-item shadow-sm" style="border-left-width: {{ $grosor }} !important; border-left-style: solid;">
     <span class="time">
-      <i class="fas fa-layer-group"></i> {{ ucfirst($evento->categoria ?? 'Local') }}
+      <i class="fas fa-layer-group"></i> <b class="{{ in_array($evento->categoria, ['global', 'universal']) ? 'text-danger' : '' }}">
+    {{ ucfirst($evento->categoria ?? 'Local') }}
+  </b>
     </span>
 
     <h3 class="timeline-header">
