@@ -95,15 +95,7 @@ Route::post('/galeria/store', [App\Http\Controllers\ImagenController::class, 'st
 Route::get('/galeria/limpiar_imagenes', [App\Http\Controllers\ImagenController::class, 'limpiar_imagenes'])->name('galeria.limpiar_imagenes');
 
 /*******lugares routes********/
-Route::controller(App\Http\Controllers\LugaresController::class)->group(function () {
-  Route::get('/lugares/index/{orden?}/{tipo?}', 'index')->name('lugares.index');
-  Route::get('/lugares/create', 'create')->name('lugar.create');
-  Route::post('/lugares/store', 'store')->name('lugar.store');
-  Route::get('/lugares/{id}/edit', 'edit')->name('lugar.edit');
-  Route::put('/lugares/{id}', 'update')->name('lugar.update');
-  Route::delete('/lugar/destroy', 'destroy')->name('lugar.destroy');
-  Route::get('/lugares/{id}', 'show')->name('lugar.show');
-});
+Route::resource('lugares', App\Http\Controllers\LugaresController::class);
 
 /*******nombres routes********/
 Route::controller(App\Http\Controllers\NombresController::class)->group(function () {

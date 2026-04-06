@@ -6,7 +6,7 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-  <a href="{{route('lugar.create')}}" class="btn btn-dark">Nuevo lugar</a>
+  <a href="{{route('lugares.create')}}" class="btn btn-dark">Nuevo lugar</a>
 </li>
 <li class="nav-item ml-2">
   <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
@@ -49,7 +49,6 @@
 
 <div class="row">
   @forelse($lugares as $lugar)
-  <!--<x-lugar-card :lugar="$lugar" />-->
   <x-lugar-card-2 :lugar="$lugar" />
   
   @empty
@@ -57,7 +56,7 @@
     <div class="callout callout-info">
       <h5>No se encontraron lugares</h5>
       <p>Intenta ajustar los filtros o crea uno nuevo.</p>
-      <a href="{{route('lugar.create')}}" class="btn btn-dark text-light">Crear nuevo lugar</a>
+      <a href="{{route('lugares.create')}}" class="btn btn-dark text-light">Crear nuevo lugar</a>
     </div>
   </div>
   @endforelse
@@ -71,12 +70,11 @@
 
 <x-modal-delete
   id="eliminar-lugar"
-  :route="route('lugar.destroy')"
   message="Estás a punto de eliminar el siguiente lugar de forma permanente:" />
 @endsection
 
 @section('specific-scripts')
-<script src="{{asset('dist/js/config.js')}}"></script>
+<script src="{{asset('dist/js/common.js')}}"></script>
 <script>
   $(function() {
 

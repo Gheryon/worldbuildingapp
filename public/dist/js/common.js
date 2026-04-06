@@ -5,6 +5,42 @@ $(document).ready(function () {
     }
   });
 
+  /**Prepara el modal de borrado en vistas index 
+    llevando el id a borrar al modal de confirmacion de las vistas index*/
+  $(document).on('click', '.borrar', function (e) {
+    const btn = $(this);
+
+    // Extraer datos del botón
+    const id = btn.data('id');
+    const nombre = btn.data('nombre');
+    const url = btn.data('url');
+    const targetModal = btn.data('target');
+
+    console.log('nombre:', nombre);
+    console.log('id:', id);
+    console.log('url:', url);
+    // Buscar el modal específico en el DOM
+    const modal = $(targetModal);
+
+    if (modal.length) {
+      const $form = modal.find('form');
+
+      //Actualizar la URL de acción del formulario
+      if (url) {
+        $form.attr('action', url);
+      }
+      modal.find('#id_borrar').val(id);
+      modal.find('#nombre_borrado').val(nombre);
+      modal.find('#nombre-borrar').text(nombre);
+    }
+  });
+
+  //evita el doble envio en el formulario de borrar
+  $('#form-confirmar-borrar').on('submit', function () {
+    const $btn = $(this).find('#confirmar-borrar-button');
+    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Eliminando...');
+  });
+
   /**
  * Previene la pérdida de datos en formularios no guardados.
  * @param {string} formId - El ID del formulario a monitorear.
@@ -91,7 +127,7 @@ $(document).ready(function () {
     const id = $(this).data('id');
     const urlEdit = window.AppConfig.routeEdit.replace(':id', id);
     const urlUpdate = window.AppConfig.routeUpdate.replace(':id', id);
-    
+
     //Limpiar el formulario
     $('#form-evento')[0].reset();
 

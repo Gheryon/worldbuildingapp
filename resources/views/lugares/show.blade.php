@@ -9,7 +9,7 @@
 <a href="{{route('lugares.index')}}" class="btn btn-dark">Volver</a>
 </li>
 <li class="nav-item ml-2">
-<a href="{{route('lugar.edit', ['id'=> $lugar->id] )}}" class="btn btn-dark ml-2">Editar</a>
+<a href="{{route('lugares.edit', $lugar->id )}}" class="btn btn-dark ml-2">Editar</a>
 </li>
 @endsection
 

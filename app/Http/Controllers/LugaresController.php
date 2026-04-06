@@ -6,6 +6,8 @@ use App\Models\Lugar;
 use App\Models\TipoLugar;
 use Exception;
 use Illuminate\Http\Request;
+use App\Http\Requests\LugarRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class LugaresController extends Controller
@@ -61,18 +63,13 @@ class LugaresController extends Controller
   /**
    * Store a newly created resource in storage.
    */
-  public function store(Request $request)
+  public function store(LugarRequest $request)
   {
-    $request->validate([
-      'nombre' => 'required|max:256',
-      'select_tipo' => 'required|exists:TipoLugar,id',
-      'nivel_peligro' => 'nullable|string|max:256',
-      'dificultad_acceso' => 'nullable|string|max:50',
-    ]);
+    $datosValidados = $request->validated();
 
     try {
       // Llamada a la lógica del modelo
-      $lugar = Lugar::store_lugar($request);
+      $lugar = Lugar::store_lugar($datosValidados);
 
       return redirect()->route('lugares.index')
         ->with('success', 'Lugar ' . $lugar->nombre . ' añadido correctamente.');
@@ -128,18 +125,13 @@ class LugaresController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, $id)
+  public function update(LugarRequest $request, $id)
   {
-    $request->validate([
-      'nombre' => 'required|max:256',
-      'select_tipo' => 'required|exists:TipoLugar,id',
-      'nivel_peligro' => 'nullable|string|max:256',
-      'dificultad_acceso' => 'nullable|string|max:50',
-    ]);
+    $datosValidados = $request->validated();
 
     try {
       $lugar = Lugar::findOrFail($id); //obtiene el lugar en bbdd
-      $lugar->update_lugar($request); //se actualiza con el request
+      $lugar->update_lugar($datosValidados); //se actualiza con los datos validados
 
       return redirect()->route('lugares.index')
         ->with('success', 'Lugar ' . $lugar->nombre . ' actualizado con éxito.');
@@ -156,13 +148,21 @@ class LugaresController extends Controller
    */
   public function destroy(Request $request)
   {
+    // Validamos que el ID venga en la petición
+    $request->validate([
+      'id_borrar' => 'required|integer|exists:lugares,id'
+    ]);
+
     try {
       $lugar = Lugar::findOrFail($request->id_borrar);
+      $nombre = $lugar->nombre; // Guardado del nombre para el mensaje.
 
-      $lugar->delete_lugar();
+     DB::transaction(function () use ($lugar) {
+        $lugar->delete();
+      });
 
       return redirect()->route('lugares.index')
-        ->with('success', $request->nombre_borrado . ' borrado correctamente.');
+        ->with('success', $nombre . ' borrado correctamente.');
     } catch (\Exception $e) {
       Log::error('Error al borrar lugar: ' . $e->getMessage());
       return redirect()->route('lugares.index')

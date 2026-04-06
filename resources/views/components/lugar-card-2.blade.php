@@ -12,12 +12,13 @@
       <div class="d-flex justify-content-between align-items-center">
         <span class="small text-muted"><i class="fas fa-skull-crossbones mr-1"></i> Peligro: {{ $lugar->nivel_peligro ?? 'Seguro' }}</span>
         <div class="btn-group">
-          <a href="{{ route('lugar.show', $lugar->id) }}" title="Ver detalles" class="btn btn-sm btn-outline-secondary border-0"><i class="fas fa-eye"></i></a>
-          <a href="{{ route('lugar.edit', $lugar->id) }}" title="Editar" class="btn btn-sm btn-outline-secondary border-0"><i class="fas fa-pen"></i></a>
+          <a href="{{ route('lugares.show', $lugar->id) }}" title="Ver detalles" class="btn btn-sm btn-outline-secondary border-0"><i class="fas fa-eye"></i></a>
+          <a href="{{ route('lugares.edit', $lugar->id) }}" title="Editar" class="btn btn-sm btn-outline-secondary border-0"><i class="fas fa-pen"></i></a>
           <button type="button"
           class="borrar btn btn-sm btn-outline-secondary border-0"
           data-id="{{ $lugar->id }}"
           data-nombre="{{ $lugar->nombre }}"
+          data-url="{{ route('lugares.destroy', $lugar->id) }}"
           data-toggle="modal"
           data-target="#eliminar-lugar"
           title="Eliminar">

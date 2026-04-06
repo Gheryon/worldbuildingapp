@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <form id="form-edit-lugar" data-prevent-loss="true" class="needs-validation" action="{{route('lugar.update', $lugar->id)}}" method="post" enctype="multipart/form-data">
+  <form id="form-edit-lugar" data-prevent-loss="true" class="needs-validation" action="{{route('lugares.update', $lugar->id)}}" method="post" enctype="multipart/form-data">
     @csrf
     @method('PUT')
 

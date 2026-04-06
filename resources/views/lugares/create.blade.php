@@ -21,14 +21,14 @@
     </div>
   </div>
 
-  <form id="form-create-lugar" data-prevent-loss="true" class="needs-validation" action="{{route('lugar.store')}}" method="post" enctype="multipart/form-data">
+  <form id="form-create-lugar" data-prevent-loss="true" class="needs-validation" action="{{route('lugares.store')}}" method="post" enctype="multipart/form-data">
     @csrf
 
     {{-- Botón de Acción Superior --}}
     <div class="row mb-3">
       <div class="col-12 d-flex justify-content-end">
         <button type="submit" class="btn btn-success btn-lg shadow-sm">
-          <i class="fas fa-plus-circle mr-2"></i> Crear Lugar
+          <i class="fas fa-plus-circle mr-2"></i> Guardar Lugar
         </button>
       </div>
     </div>

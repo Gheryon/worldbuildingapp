@@ -43,6 +43,20 @@ class Lugar extends Model
     'tipo_lugar_id' => 'integer',
   ];
 
+  // Mapeo: 'columna_en_db' => 'nombre_input_formulario'
+  public static $richTextFields = [
+    'descripcion_breve' => 'descripcion_breve',
+    'geografia'         => 'geografia',
+    'ecosistema'        => 'ecosistema',
+    'clima'             => 'clima',
+    'fenomeno_unico'    => 'fenomeno_unico',
+    'flora_fauna'       => 'flora_fauna',
+    'recursos'          => 'recursos',
+    'historia'          => 'historia',
+    'rumores'           => 'rumores',
+    'otros'             => 'otros'
+  ];
+
   /**
    * Relación con el tipo de lugar.
    */
@@ -111,48 +125,16 @@ class Lugar extends Model
   /**
    * Almacena un nuevo lugar en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $request
    * @return \App\Models\Lugar
    */
-  public static function store_lugar($request)
+  public static function store_lugar(array $request)
   {
     return DB::transaction(function () use ($request) {
-      $lugar = self::create([
-        'nombre'            => $request->nombre,
-        'otros_nombres'     => $request->otros_nombres,
-        'tipo_lugar_id'     => $request->select_tipo,
-        'nivel_peligro'     => $request->nivel_peligro,
-        'tipo_peligro'      => $request->tipo_peligro,
-        'dificultad_acceso' => $request->dificultad_acceso,
-        'estacionalidad'    => $request->estacionalidad,
-        'es_secreto'        => $request->has('es_secreto')
-      ]);
+      $lugar = self::create($request);
 
       // Procesado de campos de Summernote
-      $imageService = new ImageService();
-      // Mapeo: 'columna_en_db' => 'nombre_input_formulario'
-      $camposRichText = [
-        'descripcion_breve' => 'descripcion_breve',
-        'geografia'         => 'geografia',
-        'ecosistema'        => 'ecosistema',
-        'clima'             => 'clima',
-        'fenomeno_unico'    => 'fenomeno_unico',
-        'flora_fauna'       => 'flora_fauna',
-        'recursos'          => 'recursos',
-        'historia'          => 'historia',
-        'rumores'           => 'rumores',
-        'otros'             => 'otros'
-      ];
-
-      foreach ($camposRichText as $columna => $input) {
-        if ($request->filled($input)) {
-          $lugar->$columna = $imageService->processSummernoteImages(
-            $request->$input,
-            "lugares",
-            $lugar->id
-          );
-        }
-      }
+      $lugar->processRichTextImages($request, self::$richTextFields, 'lugares');
 
       // Guardamos los cambios finales (rutas de imágenes y fechas)
       $lugar->save();
@@ -164,48 +146,17 @@ class Lugar extends Model
   /**
    * Actualiza un lugar existente en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $request
    * @return \App\Models\Lugar
    */
-  public function update_lugar($request)
+  public function update_lugar(array $request)
   {
     return DB::transaction(function () use ($request) {
       //Campos básicos
-      $this->fill([
-        'nombre'            => $request->nombre,
-        'otros_nombres'     => $request->otros_nombres,
-        'tipo_lugar_id'     => $request->select_tipo,
-        'nivel_peligro'     => $request->nivel_peligro,
-        'tipo_peligro'      => $request->tipo_peligro,
-        'dificultad_acceso' => $request->dificultad_acceso,
-        'estacionalidad'    => $request->estacionalidad,
-        'es_secreto'        => $request->has('es_secreto')
-      ]);
+      $this->fill($request);
 
       // Procesado campos RichText (Summernote)
-      $imageService = new ImageService();
-      $campos = [
-        'descripcion_breve' => 'descripcion_breve',
-        'geografia'         => 'geografia',
-        'ecosistema'        => 'ecosistema',
-        'clima'             => 'clima',
-        'fenomeno_unico'    => 'fenomeno_unico',
-        'flora_fauna'       => 'flora_fauna',
-        'recursos'          => 'recursos',
-        'historia'          => 'historia',
-        'rumores'           => 'rumores',
-        'otros'             => 'otros'
-      ];
-
-      foreach ($campos as $campo) {
-        if ($request->filled($campo)) {
-          $this->$campo = $imageService->processSummernoteImages(
-            $request->$campo,
-            "organizaciones",
-            $this->id
-          );
-        }
-      }
+      $this->processRichTextImages($request, self::$richTextFields, 'lugares');
 
       return $this->save();
     });
@@ -214,16 +165,20 @@ class Lugar extends Model
   /**
    * Elimina el lugar y todos sus recursos asociados (archivos y registros).
    *
+   * @return bool|null
+   * @throws \Exception
    */
-  public function delete_lugar()
+  protected static function booted()
   {
-    return DB::transaction(function () {
-      //Borrar imágenes de Summernote usando el servicio
-      $imageService = new ImageService();
-      $imageService->deleteImagesByOwner('lugares', $this->id);
+    static::deleting(function ($lugar) {
+      // Desvincular lugares
+      // Usamos el Query Builder para un update masivo rápido sin disparar eventos de Asentamiento
+      \App\Models\Conflicto::where('ubicacion_principal', $lugar->id)
+        ->update(['ubicacion_principal' => null]);
 
-      //Eliminar el lugar
-      return $this->delete();
+      // Llamamos al servicio para limpiar el disco y la DB
+      app(\App\Services\ImageService::class)->deleteImagesByOwner('lugares', $lugar->id);
+
     });
   }
 }

@@ -17,7 +17,7 @@
         </button>
       </div>
 
-      <form action="{{ $route }}" method="POST" id="form-confirmar-borrar">
+      <form action="" method="POST" id="form-confirmar-borrar">
         @csrf
         @method('DELETE')
 
@@ -29,7 +29,6 @@
           </div>
 
           {{-- Inputs ocultos para el controlador --}}
-          <input type="hidden" name="id_borrar" id="id_borrar">
           <input type="hidden" name="nombre_borrado" id="nombre_borrado">
         </div>
 

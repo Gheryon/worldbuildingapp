@@ -68,10 +68,10 @@
   <script>
     // Pasamos las variables de sesión de PHP a un objeto JS
     const sessionData = {
-      success: "{{ session('message') }}",
-      error: "{{ session('error') }}",
-      info: "{{ session('info') }}",
-      warning: "{{ session('warning') }}"
+      success: @json(session('message')),
+      error: @json(session('error')),
+      info: @json(session('info')),
+      warning: @json(session('warning'))
     };
 
     // Ejecutamos la función del archivo externo
