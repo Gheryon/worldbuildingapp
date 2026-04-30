@@ -52,7 +52,7 @@ default => ['color' => 'blue', 'icon' => 'fa-calendar-day', 'label' => ''],
 // Mapeamos el tipo de evento a su ruta correspondiente en Laravel
 $route = match(true) {
 in_array($evento->tipo, ['nace_personaje', 'muere_personaje', 'personajes', 'nacimiento', 'defuncion'])
-=> route('personaje.show', $evento->id),
+=> route('personajes.show', $evento->id),
 
 in_array($evento->tipo, ['ini_conflicto', 'fin_conflicto', 'conflicto', 'conflictos'])
 => route('conflicto.show', $evento->id),

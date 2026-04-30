@@ -151,7 +151,7 @@
 
             @if($organizacion->lider_id)
             <strong class="mt-2"><i class="fas fa-chess-king mr-1"></i>Líder:</strong>
-            <p class="text-muted"><a href="{{route('personaje.show', [$organizacion->lider->id] )}}">{{$organizacion->lider->nombre}}</a></p>
+            <p class="text-muted"><a href="{{route('personajes.show', [$organizacion->lider->id] )}}">{{$organizacion->lider->nombre}}</a></p>
             @endif
 
             @if($organizacion->organizacion_padre_id)

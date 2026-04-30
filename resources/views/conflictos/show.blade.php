@@ -120,7 +120,7 @@
                   @endforeach
                   @foreach($conflicto->personajes->where('pivot.lado', 'atacante') as $per)
                   <li class="small ml-2">
-                    <a href="{{route('personaje.show', $per->id)}}" class="personaje-link">
+                    <a href="{{route('personajes.show', $per->id)}}" class="personaje-link">
                       <img class="retrato-mini" src="{{ asset("storage/retratos/" . ($per->retrato ?? 'default.png')) }}" alt="Retrato de {{ $per->nombre }}">
                       {{ $per->nombre }}
                     </a>
@@ -142,7 +142,7 @@
                   @endforeach
                   @foreach($conflicto->personajes->where('pivot.lado', 'defensor') as $per)
                   <li class="small ml-2">
-                    <a href="{{route('personaje.show', $per->id)}}" class="personaje-link">
+                    <a href="{{route('personajes.show', $per->id)}}" class="personaje-link">
                       <img class="retrato-mini" src="{{ asset("storage/retratos/" . ($per->retrato ?? 'default.png')) }}" alt="Retrato de {{ $per->nombre }}">
                       {{ $per->nombre }}
                     </a>

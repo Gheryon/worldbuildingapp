@@ -60,7 +60,7 @@
           <ul class="nav nav-pills flex-column">
             @foreach($articulo->personajes_relevantes as $personaje)
             <li class="nav-item">
-              <a href="{{route('personaje.show', $personaje->id)}}" class="nav-link personaje-link text-dark">
+              <a href="{{route('personajes.show', $personaje->id)}}" class="nav-link personaje-link text-dark">
                 <img class="retrato-mini" src="{{ asset("storage/retratos/" . ($personaje->retrato ?? 'default.png')) }}" alt="Retrato de {{ $personaje->nombre }}">
                  {{ $personaje->nombre }}
               </a>

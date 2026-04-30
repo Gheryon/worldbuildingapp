@@ -116,15 +116,7 @@ Route::controller(App\Http\Controllers\OrganizacionController::class)->group(fun
 });
 
 /*******personajes routes********/
-Route::controller(App\Http\Controllers\PersonajeController::class)->group(function () {
-  Route::get('/personajes', 'index')->name('personajes.index');
-  Route::get('/personajes/create', 'create')->name('personaje.create');
-  Route::post('/personajes/store', 'store')->name('personaje.store');
-  Route::get('/personajes/{id}/edit', 'edit')->name('personaje.edit');
-  Route::put('/personajes/{id}', 'update')->name('personaje.update');
-  Route::delete('/personaje/destroy', 'destroy')->name('personaje.destroy');
-  Route::get('/personaje/{id}', 'show')->name('personaje.show');
-});
+Route::resource('personajes', App\Http\Controllers\PersonajeController::class);
 
 /*******religiones routes********/
 Route::controller(App\Http\Controllers\ReligionesController::class)->group(function () {

@@ -6,7 +6,7 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-  <a href="{{route('personaje.create')}}" class="btn btn-dark">Nuevo personaje</a>
+  <a href="{{route('personajes.create')}}" class="btn btn-dark">Nuevo personaje</a>
 </li>
 <li class="nav-item ml-2">
   <select id="filter_especie" class="form-control ml-2" name="filter_especie">
@@ -70,13 +70,13 @@
 
       <div class="card-footer">
         <div class="btn-group w-100" role="group">
-          <a href="{{ route('personaje.show', $personaje->id) }}" class="btn btn-info btn-sm" title="Ver">
+          <a href="{{ route('personajes.show', $personaje->id) }}" class="btn btn-info btn-sm" title="Ver">
             <i class="fas fa-id-card"></i>
           </a>
-          <a href="{{ route('personaje.edit', $personaje->id) }}" class="btn btn-success btn-sm" title="Editar">
+          <a href="{{ route('personajes.edit', $personaje->id) }}" class="btn btn-success btn-sm" title="Editar">
             <i class="fas fa-pencil-alt"></i>
           </a>
-          <button type="button" class="btn btn-danger btn-sm borrar" data-id="{{ $personaje->id }}" data-nombre="{{ $personaje->nombre }}" data-toggle="modal" data-target="#eliminar-personaje">
+          <button type="button" class="btn btn-danger btn-sm borrar" data-id="{{ $personaje->id }}" data-nombre="{{ $personaje->nombre }}" data-url="{{ route('personajes.destroy', $personaje->id) }}" data-toggle="modal" data-target="#eliminar-personaje">
             <i class="fas fa-trash"></i>
           </button>
         </div>
@@ -88,7 +88,7 @@
     <div class="callout callout-info">
       <h5>No se encontraron personajes</h5>
       <p>Intenta ajustar los filtros o crea uno nuevo.</p>
-      <a href="{{route('personaje.create')}}" class="btn btn-dark text-light">Crear nuevo personaje</a>
+      <a href="{{route('personajes.create')}}" class="btn btn-dark text-light">Crear nuevo personaje</a>
     </div>
   </div>
   @endforelse
@@ -102,14 +102,12 @@
 
 <x-modal-delete 
     id="eliminar-personaje" 
-    :route="route('personaje.destroy')" 
     message="Estás a punto de eliminar el siguiente personaje de forma permanente:"
 />
 @endsection
 
 @section('specific-scripts')
-<!-- articulos javascript -->
-<script src="{{asset('dist/js/config.js')}}"></script>
+<script src="{{asset('dist/js/common.js')}}"></script>
 <script>
   $(function() {
 

@@ -160,18 +160,17 @@ class PersonajeController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(PersonajeRequest $request, $id)
+  public function update(PersonajeRequest $request, Personaje $personaje)
   {
     $datosValidados = $request->validated();
 
     try {
-      $personaje = Personaje::findOrFail($id); //obtiene el personaje en bbdd
-      $personaje->update_personaje($datosValidados); //lo actualiza con el request
+      $personaje->update_personaje($datosValidados);
 
       return redirect()->route('personajes.index')
         ->with('success', 'Personaje ' . $personaje->nombre . ' actualizado con éxito.');
     } catch (\Exception $e) {
-      Log::error("Error actualizando personaje ID {$id}: " . $e->getMessage());
+      Log::error("Error actualizando personaje ID {$personaje->id}: " . $e->getMessage());
       return redirect()->back()
         ->withInput()
         ->with('error', 'Error al actualizar: ' . $e->getMessage());
@@ -181,18 +180,11 @@ class PersonajeController extends Controller
   /**
    * Remove the specified resource from storage.
    */
-  public function destroy(Request $request)
+  public function destroy(Personaje $personaje)
   {
-    // Validamos que el ID venga en la petición
-    $request->validate([
-      'id_borrar' => 'required|integer|exists:personajes,id'
-    ]);
+    $nombre = $personaje->nombre;
 
     try {
-      $personaje = Personaje::findOrFail($request->id_borrar);
-      $nombre = $personaje->nombre; // Guardamos el nombre para el mensaje
-
-      // Llamamos a la lógica centralizada en el modelo
       DB::transaction(function () use ($personaje) {
         $personaje->delete();
       });
@@ -200,7 +192,7 @@ class PersonajeController extends Controller
       return redirect()->route('personajes.index')
         ->with('success', "El personaje {$nombre} ha sido eliminado correctamente.");
     } catch (\Exception $e) {
-      Log::error("Error al eliminar personaje ID {$request->id_borrar}: " . $e->getMessage());
+      Log::error("Error al eliminar personaje ID {$personaje->id}: " . $e->getMessage());
 
       return redirect()->route('personajes.index')
         ->with('error', 'No se pudo eliminar el personaje. Consulte los logs para más detalles.');

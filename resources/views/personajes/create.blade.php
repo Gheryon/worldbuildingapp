@@ -20,7 +20,7 @@
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-create-personaje" class="position-relative needs-validation" action="{{route('personaje.store')}}" method="post" enctype="multipart/form-data">
+    <form id="form-create-personaje" class="position-relative needs-validation" action="{{route('personajes.store')}}" method="post" enctype="multipart/form-data">
     @csrf
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">

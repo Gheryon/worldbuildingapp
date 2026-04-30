@@ -20,7 +20,7 @@
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-edit-personaje" class="position-relative needs-validation" action="{{route('personaje.update', $personaje->id )}}" method="post" enctype="multipart/form-data">
+    <form id="form-edit-personaje" class="position-relative needs-validation" action="{{route('personajes.update', $personaje->id )}}" method="post" enctype="multipart/form-data">
     @csrf
     @method('PUT')
     <div class="row justify-content-md-center">

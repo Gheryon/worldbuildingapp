@@ -98,7 +98,7 @@
                @if(isset($asentamiento->gobernante_id))
               <li class="list-group-item">
                 <small class="d-block text-muted">Gobernado por:</small>
-                <a href="{{route('personaje.show', $asentamiento->gobernante_id)}}">{{$asentamiento->gobernante->nombre}}</a>
+                <a href="{{route('personajes.show', $asentamiento->gobernante_id)}}">{{$asentamiento->gobernante->nombre}}</a>
               </li>
               @endif
 
