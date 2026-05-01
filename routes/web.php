@@ -105,15 +105,8 @@ Route::controller(App\Http\Controllers\NombresController::class)->group(function
 });
 
 /*******organizaciones routes********/
-Route::controller(App\Http\Controllers\OrganizacionController::class)->group(function () {
-  Route::get('/organizaciones/index', 'index')->name('organizaciones.index');
-  Route::get('/organizaciones/create', 'create')->name('organizacion.create');
-  Route::post('/organizaciones/store', 'store')->name('organizacion.store');
-  Route::get('/organizaciones/{id}/edit', 'edit')->name('organizacion.edit');
-  Route::put('/organizaciones/{id}', 'update')->name('organizacion.update');
-  Route::delete('/organizacion/destroy', 'destroy')->name('organizacion.destroy');
-  Route::get('/organizaciones/{id}', 'show')->name('organizacion.show');
-});
+//laravel convierte el plural a singular automáticamente, pero en castellano en este caso pasa a 'organizacione', lo cual da error, por eso se fuerza a usar 'organizacion' como parámetro singular en la ruta
+Route::resource('organizaciones', App\Http\Controllers\OrganizacionController::class)->parameters(['organizaciones' => 'organizacion']);
 
 /*******personajes routes********/
 Route::resource('personajes', App\Http\Controllers\PersonajeController::class);

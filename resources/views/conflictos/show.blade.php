@@ -112,7 +112,7 @@
                 <ul class="list-unstyled mb-0">
                   @foreach($conflicto->organizaciones->where('pivot.lado', 'atacante') as $org)
                   <li class="mb-1">
-                    <a href="{{route('organizacion.show', $org->id)}}" class="personaje-link font-weight-bold">
+                    <a href="{{route('organizaciones.show', $org->id)}}" class="personaje-link font-weight-bold">
                       <img class="retrato-mini" src="{{ asset("storage/escudos/" . ($org->escudo ?? 'default.png')) }}" alt="Escudo de {{ $org->nombre }}">
                       {{ $org->nombre }}
                     </a>
@@ -134,7 +134,7 @@
                 <ul class="list-unstyled mb-0">
                   @foreach($conflicto->organizaciones->where('pivot.lado', 'defensor') as $org)
                   <li class="mb-1">
-                    <a href="{{route('organizacion.show', $org->id)}}" class="personaje-link font-weight-bold">
+                    <a href="{{route('organizaciones.show', $org->id)}}" class="personaje-link font-weight-bold">
                       <img class="retrato-mini" src="{{ asset("storage/escudos/" . ($org->escudo ?? 'default.png')) }}" alt="Escudo de {{ $org->nombre }}">
                       {{ $org->nombre }}
                     </a>

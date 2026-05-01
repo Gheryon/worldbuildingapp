@@ -20,7 +20,7 @@
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-create-organization" class="position-relative needs-validation" action="{{route('organizacion.store')}}" method="post" enctype="multipart/form-data">
+  <form id="form-create-organization" class="position-relative needs-validation" action="{{route('organizaciones.store')}}" method="post" enctype="multipart/form-data">
     @csrf
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
@@ -47,7 +47,7 @@
             <div class="row">
               <div class="col-md-3">
                 <label for="select_tipo" class="form-label">Tipo de organización</label>
-                <select class="form-select form-control" name="select_tipo" id="select_tipo" @if($tipo_organizacion->count()>0)required @endif>
+                <select class="form-select form-control @error('select_tipo') is-invalid @enderror" name="select_tipo" id="select_tipo" @if($tipo_organizacion->count()>0)required @endif>
                   <option selected disabled value="">Elegir</option>
                   @if($tipo_organizacion->count()>0)
                   @foreach($tipo_organizacion as $tipo)
@@ -61,21 +61,27 @@
               </div>
               <div class="col-md">
                 <label for="select_lider" class="form-label">Soberano</label>
-                <select class="form-select form-control" name="select_lider" id="select_lider">
+                <select class="form-select form-control @error('select_lider') is-invalid @enderror" name="select_lider" id="select_lider">
                   <option selected disabled value="">Elegir</option>
                   @foreach($personajes as $id => $nombre)
                   <option value="{{$id}}">{{$nombre}}</option>
                   @endforeach
                 </select>
+                @error('select_lider')
+                <small style="color: red">{{$message}}</small>
+                @enderror
               </div>
               <div class="col-md">
                 <label for="select_organizacion_padre" class="form-label">Controlado por</label>
-                <select class="form-select form-control" name="select_organizacion_padre" id="select_organizacion_padre">
+                <select class="form-select form-control @error('select_organizacion_padre') is-invalid @enderror" name="select_organizacion_padre" id="select_organizacion_padre">
                   <option selected disabled value="">Elegir</option>
                   @foreach($paises as $id => $nombre)
                   <option value="{{$id}}">{{$nombre}}</option>
                   @endforeach
                 </select>
+                @error('select_organizacion_padre')
+                <small style="color: red">{{$message}}</small>
+                @enderror
               </div>
             </div>
             <div class="row">
@@ -93,11 +99,14 @@
               <div class="col-md-5">
                 <div class="form-group">
                   <label for="religiones" class="form-label mt-2">Religiones presentes</label>
-                  <select class="select2" multiple="multiple" name="religiones[]" id="religiones" data-placeholder="Selecciona religiones...">
+                  <select class="select2 @error('religiones') is-invalid @enderror" multiple="multiple" name="religiones[]" id="religiones" data-placeholder="Selecciona religiones...">
                     @foreach($religiones as $id => $nombre)
                     <option value="{{$id}}" {{ (is_array(old('religiones')) && in_array($id, old('religiones'))) ? 'selected' : '' }}>{{$nombre}}</option>
                     @endforeach
                   </select>
+                @error('religiones')
+                <small style="color: red">{{$message}}</small>
+                @enderror
                 </div>
               </div>
             </div>

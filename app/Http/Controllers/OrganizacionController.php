@@ -7,8 +7,9 @@ use App\Models\TipoOrganizacion;
 use App\Models\Fecha;
 use App\Models\Personaje;
 use App\Models\Religion;
-use Exception;
 use Illuminate\Http\Request;
+use App\Http\Requests\OrganizacionRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class OrganizacionController extends Controller
@@ -73,33 +74,13 @@ class OrganizacionController extends Controller
   /**
    * Store a newly created resource in storage.
    */
-  public function store(Request $request)
+  public function store(OrganizacionRequest $request)
   {
-    $validacion = $request->validate([
-      'nombre' => 'required|max:255',
-      'lema' => 'nullable|max:512',
-      'gentilicio' => 'nullable|max:128',
-      'capital' => 'nullable|max:128',
-      'escudo' => 'nullable|file|image|mimes:jpg,png,gif|max:10240',
-      //selects
-      'religiones' => 'nullable|array',
-      'religiones.*' => 'exists:religiones,id',
-      'select_tipo' => 'required|exists:tipo_organizacion,id',
-      'select_lider' => 'nullable|exists:personajes,id',
-      'select_organizacion_padre' => 'nullable',
-      'select_organizacion_padre.*' => 'exists:organizaciones,id',
-      //fechas
-      'dia_fundacion' => 'nullable|integer|min:1|max:30',
-      'mes_fundacion' => 'nullable|integer',
-      'anno_fundacion' => 'nullable|integer',
-      'dia_disolucion' => 'nullable|integer|min:1|max:30',
-      'mes_disolucion' => 'nullable|integer',
-      'anno_disolucion' => 'nullable|integer',
-    ]);
+    $datosValidados = $request->validated();
 
     try {
       // Llamada a la lógica del modelo
-      $organizacion = Organizacion::store_organizacion($request);
+      $organizacion = Organizacion::store_organizacion($datosValidados);
 
       return redirect()->route('organizaciones.index')
         ->with('success', 'Organización ' . $organizacion->nombre . ' añadida correctamente.');
@@ -191,38 +172,17 @@ class OrganizacionController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, $id)
+  public function update(OrganizacionRequest $request, Organizacion $organizacion)
   {
-    $validacion = $request->validate([
-      'nombre' => 'required|max:255',
-      'lema' => 'nullable|max:512',
-      'gentilicio' => 'nullable|max:128',
-      'capital' => 'nullable|max:128',
-      'escudo' => 'nullable|file|image|mimes:jpg,png,gif|max:10240',
-      //selects
-      'religiones' => 'nullable|array',
-      'religiones.*' => 'exists:religiones,id',
-      'select_tipo' => 'required|exists:tipo_organizacion,id',
-      'select_lider' => 'nullable|exists:personajes,id',
-      'select_organizacion_padre' => 'nullable',
-      'select_organizacion_padre.*' => 'exists:organizaciones,id',
-      //fechas
-      'dia_fundacion' => 'nullable|integer|min:1|max:30',
-      'mes_fundacion' => 'nullable|integer',
-      'anno_fundacion' => 'nullable|integer',
-      'dia_disolucion' => 'nullable|integer|min:1|max:30',
-      'mes_disolucion' => 'nullable|integer',
-      'anno_disolucion' => 'nullable|integer',
-    ]);
+    $datosValidados = $request->validated();
 
     try {
-      $organizacion = Organizacion::findOrFail($id); //obtiene la organizacion en bbdd
-      $organizacion->update_organizacion($request); //se actualiza con el request
+      $organizacion->update_organizacion($datosValidados);
 
       return redirect()->route('organizaciones.index')
         ->with('success', 'Organización ' . $organizacion->nombre . ' actualizada con éxito.');
     } catch (\Exception $e) {
-      Log::error("Error actualizando organización ID {$id}: " . $e->getMessage());
+      Log::error("Error actualizando organización ID {$organizacion->id}: " . $e->getMessage());
       return redirect()->back()
         ->withInput()
         ->with('error', 'Error al actualizar: ' . $e->getMessage());
@@ -232,17 +192,19 @@ class OrganizacionController extends Controller
   /**
    * Remove the specified resource from storage.
    */
-  public function destroy(Request $request)
+  public function destroy(Organizacion $organizacion)
   {
-    try {
-      $organizacion = Organizacion::findOrFail($request->id_borrar);
+    $nombre = $organizacion->nombre;
 
-      $organizacion->delete_organizacion();
+    try {
+      DB::transaction(function () use ($organizacion) {
+        $organizacion->delete();
+      });
 
       return redirect()->route('organizaciones.index')
-        ->with('success', $request->nombre_borrado . ' borrado correctamente.');
+        ->with('success', 'La organización' . $nombre . ' ha sido borrada correctamente.');
     } catch (\Exception $e) {
-      Log::error('Error al borrar organización: ' . $e->getMessage());
+      Log::error("Error al eliminar organización ID {$organizacion->id}: " . $e->getMessage());
       return redirect()->route('organizaciones.index')
         ->with('error', 'No se pudo borrar la organización.');
     }

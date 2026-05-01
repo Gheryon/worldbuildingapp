@@ -329,38 +329,38 @@ class Organizacion extends Model
   }
 
 
-  /**
-   * Elimina la organización y todos sus recursos asociados (archivos y registros).
-   *
-   */
-  public function delete_organizacion()
+  protected static function booted()
   {
-    return DB::transaction(function () {
-      //Borrar fechas asociadas
-      if ($this->fundacion_id) {
-        Fecha::destroy($this->fundacion_id);
-      }
-      if ($this->disolucion_id) {
-        Fecha::destroy($this->disolucion_id);
-      }
-
-      //Borrar escudo si no es el por defecto
-      if ($this->escudo !== 'default.png') {
-        $pathEscudo = public_path('storage/escudos/' . $this->escudo);
-        if (file_exists($pathEscudo)) {
-          unlink($pathEscudo);
+    static::deleting(function ($organizacion) {
+      // Borrado del escudo físico (si no es el default)
+      if ($organizacion->escudo && $organizacion->escudo !== 'default.png') {
+        $path = 'escudos/' . $organizacion->escudo;
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+          \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
         }
       }
 
-      //Borrar imágenes de Summernote usando el servicio
-      $imageService = new ImageService();
-      $imageService->deleteImagesByOwner('organizaciones', $this->id);
+      // Borrado de imágenes de Summernote
+      app(\App\Services\ImageService::class)->deleteImagesByOwner('organizaciones', $organizacion->id);
 
-      //Borrar relación con religiones (tabla pivote)
-      $this->religiones()->detach();
+      // Borrado de relaciones con religiones (tabla pivote)
+      $organizacion->religiones()->detach();
 
-      //Eliminar la organización
-      return $this->delete();
+      // Desvincular asentamientos controlados
+      \App\Models\Asentamiento::where('organizacion_id', $organizacion->id)
+        ->update(['organizacion_id' => null]);
+
+      // Desvincular organizaciones subordinadas
+      $organizacion->subordinates()->update(['organizacion_padre_id' => null]);
+
+      // Borrado de fechas
+      if ($organizacion->fundacion_id) {
+        \App\Models\Fecha::destroy($organizacion->fundacion_id);
+      }
+
+      if ($organizacion->disolucion_id) {
+        \App\Models\Fecha::destroy($organizacion->disolucion_id);
+      }
     });
   }
 }

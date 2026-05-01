@@ -61,7 +61,7 @@ in_array($evento->tipo, ['ini_asentamiento', 'fin_asentamiento', 'asentamiento',
 => route('asentamiento.show', $evento->id),
 
 in_array($evento->tipo, ['ini_organizacion', 'fin_organizacion', 'organizacion', 'organizaciones'])
-=> route('organizacion.show', $evento->id),
+=> route('organizaciones.show', $evento->id),
 
 default => null,
 };

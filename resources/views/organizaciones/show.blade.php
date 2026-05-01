@@ -7,187 +7,188 @@
 @section('navbar-buttons')
 <li class="nav-item ml-2">
   <a href="{{route('organizaciones.index')}}" class="btn btn-dark">Volver</a>
-  <a href="{{route('organizacion.edit', ['id'=> $organizacion->id] )}}" class="btn btn-dark ml-2">Editar</a>
+</li>
+<li class="nav-item ml-2">
+  <a href="{{route('organizaciones.edit', $organizacion->id )}}" class="btn btn-dark ml-2">Editar</a>
 </li>
 @endsection
 
 @section('content')
-<section class="content mt-4">
-  <div class="container-fluid">
-    <div class="row">
-      {{-- Columna principal: información --}}
-      <div class="col-md-8">
-        <div class="card card-outline card-dark">
-          <div class="card-header">
-            <h1 class="card-title" style="font-size: 2rem;">
-              {{ $organizacion->nombre }}
-            </h1>
+<div class="container-fluid py-5 page">
+  <div class="container">
+    {{-- Encabezado --}}
+    <div class="row mb-5">
+      <div class="col-12 text-center text-md-left border-bottom-dark pb-3">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
+          <div>
+            <h1 class="display-4 font-weight-bold mb-1 text-primary-custom">{{ $organizacion->nombre }}</h1>
+            <p class="lead text-secondary-custom font-italic">
+              {{ $organizacion->tipo->nombre ?? 'Tipo desconocido' }}
+              @if($organizacion->lema)
+              — "{{ $organizacion->lema }}"
+              @endif
+            </p>
           </div>
-          <div class="card-body">
-            @if ($organizacion->descripcion_breve)
-            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-align-left mr-2"></i>Descripción breve</h2>
-            <div class="ml-4 mb-3">{!! $organizacion->descripcion_breve !!}</div>
-            @endif
+        </div>
+      </div>
+    </div>
 
-            @if ($organizacion->historia)
-            <h2 class="border-bottom pb-2 mb-3"><i class="fas fa-scroll mr-2"></i>Historia</h2>
-            <div class="ml-4 mb-3">{!! $organizacion->historia !!}</div>
-            @endif
+    <div class="row">
+      {{-- Columna Principal: Contenido --}}
+      <div class="col-lg-8">
+        <div class="pr-lg-4">
 
-            {{-- Sección de estructura y política --}}
-            @php
-            $hasInternal = $organizacion->estructura || $organizacion->geopolitica || $organizacion->militar;
-            @endphp
+          @if ($organizacion->descripcion_breve)
+          <section class="mb-5">
+            <h2 class="h3 font-weight-bold mb-3 text-secondary-custom">
+              <i class="fas fa-feather-alt mr-2 opacity-75"></i>Resumen
+            </h2>
+            <div class="article-body text-justify">
+              {!! clean($organizacion->descripcion_breve) !!}
+            </div>
+          </section>
+          @endif
 
-            @if ($hasInternal)
-            <h2 class="border-bottom pb-2 mb-3">Estructura, política y militar</h2>
+          @php
+          $secciones = [
+          ['titulo' => 'Historia', 'campo' => $organizacion->historia, 'icono' => 'fa-scroll'],
+          ['titulo' => 'Estructura organizativa', 'campo' => $organizacion->estructura, 'icono' => 'fa-sitemap'],
+          ['titulo' => 'Geopolítica', 'campo' => $organizacion->geopolitica, 'icono' => 'fa-globe-americas'],
+          ['titulo' => 'Poder militar', 'campo' => $organizacion->militar, 'icono' => 'fa-shield-alt'],
+          ['titulo' => 'Demografía', 'campo' => $organizacion->demografia, 'icono' => 'fa-users'],
+          ['titulo' => 'Cultura y tradiciones', 'campo' => $organizacion->cultura, 'icono' => 'fa-theater-masks'],
+          ['titulo' => 'Presencia religiosa', 'campo' => $organizacion->religion, 'icono' => 'fa-monument'],
+          ['titulo' => 'Educación', 'campo' => $organizacion->educacion, 'icono' => 'fa-graduation-cap'],
+          ['titulo' => 'Tecnología y ciencia', 'campo' => $organizacion->tecnologia, 'icono' => 'fa-microchip'],
+          ['titulo' => 'Economía y comercio', 'campo' => $organizacion->economia, 'icono' => 'fa-coins'],
+          ['titulo' => 'Extensión y territorio', 'campo' => $organizacion->territorio, 'icono' => 'fa-map'],
+          ['titulo' => 'Recursos naturales', 'campo' => $organizacion->recursos_naturales, 'icono' => 'fa-leaf'],
+          ['titulo' => 'Otros detalles', 'campo' => $organizacion->otros, 'icono' => 'fa-plus-circle'],
+          ];
+          @endphp
 
-
-            @if ($organizacion->estructura)
-            <h5><i class="fas fa-sitemap mr-2"></i>Estructura organizativa</h5>
-            <div class="ml-4 mb-3">{!! $organizacion->estructura !!}</div>
-            @endif
-
-            @if ($organizacion->geopolitica)
-            <h5><i class="fas fa-globe-americas mr-2"></i>Geopolítica</h5>
-            <div class="ml-4 mb-3">{!! $organizacion->geopolitica !!}</div>
-            @endif
-
-            @if ($organizacion->militar)
-            <h5><i class="fas fa-shield-alt mr-2"></i>Poder militar</h5>
-            <div class="ml-4 mb-3">{!! $organizacion->militar !!}</div>
-            @endif
-            @endif
-
-            {{-- Sección de sociedad y cultura --}}
-            @php
-            $hasSocial = $organizacion->demografia || $organizacion->cultura || $organizacion->religion || $organizacion->educacion;
-            @endphp
-
-            @if ($hasSocial)
-            <h2 class="border-bottom pb-2 mt-4 mb-3">Sociedad y cultura</h2>
-
-            @if ($organizacion->demografia)
-            <h5><i class="fas fa-users mr-2"></i>Demografía</h5>
-            <div class="ml-4 mb-3">{!! $organizacion->demografia !!}</div>
-            @endif
-
-            @if ($organizacion->cultura)
-            <h5><i class="fas fa-theater-masks mr-2"></i>Cultura y tradiciones</h5>
-            <div class="ml-4 mb-3">{!! $organizacion->cultura !!}</div>
-            @endif
-
-            @if ($organizacion->religion)
-            <h5><i class="fas fa-monument mr-2"></i>Presencia religiosa</h5>
-            <div class="ml-4 mb-3">{!! $organizacion->religion !!}</div>
-            @endif
-
-            @if ($organizacion->educacion)
-            <h5><i class="fas fa-graduation-cap mr-2"></i>Educación</h5>
-            <div class="ml-4 mb-3">{!! $organizacion->educacion !!}</div>
-            @endif
-            @endif
-
-            {{-- Sección de Economía y Recursos --}}
-            @php
-            $hasEco = $organizacion->tecnologia || $organizacion->economia || $organizacion->recursos_naturales || $organizacion->territorio;
-            @endphp
-
-            @if ($hasEco)
-            <h2 class="border-bottom pb-2 mt-4 mb-3">Recursos y Territorio</h2>
-
-            @if ($organizacion->territorio)
-            <h5><i class="fas fa-map mr-2"></i>Extensión y territorio</h5>
-            <div class="ml-4 mb-3">{!! $organizacion->territorio !!}</div>
-            @endif
-
-            @if ($organizacion->economia)
-            <h5><i class="fas fa-coins mr-2"></i>Economía y comercio</h5>
-            <div class="ml-4 mb-3">{!! $organizacion->economia !!}</div>
-            @endif
-
-            @if ($organizacion->recursos_naturales)
-            <h5><i class="fas fa-leaf mr-2"></i>Recursos naturales</h5>
-            <div class="ml-4 mb-3">{!! $organizacion->recursos_naturales !!}</div>
-            @endif
-
-            @if ($organizacion->tecnologia)
-            <h5><i class="fas fa-microchip mr-2"></i>Tecnología y ciencia</h5>
-            <div class="ml-4 mb-3">{!! $organizacion->tecnologia !!}</div>
-            @endif
-            @endif
-
-            @if ($organizacion->otros)
-            <h2 class="border-bottom pb-2 mt-4 mb-3"><i class="fas fa-plus-circle mr-2"></i>Otros detalles</h2>
-            <div class="ml-4">{!! $organizacion->otros !!}</div>
-            @endif
-          </div>{{-- fin card-body --}}
+          @foreach($secciones as $seccion)
+          @if($seccion['campo'])
+          <section class="mb-4">
+            <h2 class="h3 font-weight-bold mb-3 text-secondary-custom">
+              <i class="fas {{ $seccion['icono'] }} mr-2 opacity-75"></i>{{ $seccion['titulo'] }}
+            </h2>
+            <div class="article-body text-justify">
+              {!! clean($seccion['campo']) !!}
+            </div>
+          </section>
+          @endif
+          @endforeach
         </div>
       </div>
 
-      {{-- Columna lateral: ficha técnica --}}
-      <div class="col-md-4">
-        <div class="card card-dark">
-          <div class="card-header">
-            <h3 class="card-title">Ficha de organización</h3>
+      {{-- Columna Lateral: Ficha Técnica --}}
+      <div class="col-lg-4">
+        <div class="card shadow-sm border-0 sticky-top sidebar-infobox" style="top: 2rem;">
+
+          <div class="card-header bg-dark-custom text-white font-weight-bold py-3 text-center">
+            <i class="fas fa-landmark mr-2"></i> Ficha de Organización
           </div>
-          <div class="card-body" id="content-right">
-            <h3>Escudo</h3>
-            <div class="row">
-              <img alt="escudo" id="escudo" class="img-thumbnail shadow-sm mb-3" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" width="300" height="300">
+
+          <div class="card-body p-0">
+            {{-- Escudo --}}
+            <div class="p-3 border-bottom text-center bg-light">
+              <img alt="Escudo de {{ $organizacion->nombre }}"
+                class="img-fluid rounded shadow-sm"
+                src="{{ asset('storage/escudos/' . $organizacion->escudo) }}"
+                style="max-height: 350px; width: 100%; object-fit: cover;">
             </div>
-            <strong class="mt-2"><i class="fas fa-tags mr-1"></i>Tipo</strong>
-            <p class="text-muted">{{$organizacion->tipo->nombre}}</p>
+            <ul class="list-group list-group-flush">
 
-            @if ($organizacion->capital_nombre)
-            <strong class="mt-2"><i class="fa-solid fa-building-columns mr-1"></i>Capital</strong>
-            <p class="text-muted">{{$organizacion->capital_nombre}}</p>
-            @endif
+              <li class="list-group-item">
+                <small class="d-block text-muted text-uppercase font-weight-bold">Tipo</small>
+                <span><i class="fas fa-tags mr-1"></i> {{ $organizacion->tipo->nombre ?? 'Desconocido' }}</span>
+              </li>
 
-            @if ($organizacion->gentilicio)
-            <strong class="mt-2"><i class="fas fa-user-tag mr-1"></i>Gentilicio</strong>
-            <p class="text-muted">{{$organizacion->gentilicio}}</p>
-            @endif
+              @if($organizacion->capital_nombre)
+              <li class="list-group-item">
+                <small class="d-block text-muted text-uppercase font-weight-bold">Capital</small>
+                <span><i class="fa-solid fa-building-columns mr-1"></i> {{ $organizacion->capital_nombre }}</span>
+              </li>
+              @endif
 
-            @if($organizacion->lider_id)
-            <strong class="mt-2"><i class="fas fa-chess-king mr-1"></i>Líder:</strong>
-            <p class="text-muted"><a href="{{route('personajes.show', [$organizacion->lider->id] )}}">{{$organizacion->lider->nombre}}</a></p>
-            @endif
+              @if($organizacion->gentilicio)
+              <li class="list-group-item">
+                <small class="d-block text-muted text-uppercase font-weight-bold">Gentilicio</small>
+                <span><i class="fas fa-user-tag mr-1"></i> {{ $organizacion->gentilicio }}</span>
+              </li>
+              @endif
 
-            @if($organizacion->organizacion_padre_id)
-            <strong><i class="fas fa-link mr-1"></i>Controlado por:</strong>
-            <p class="text-muted">
-              <a href="{{ route('organizacion.show', $organizacion->organizacion_padre->id) }}">{{ $organizacion->organizacion_padre->nombre }}</a>
-            </p>
-            @endif
+              @if($organizacion->lider_id)
+              <li class="list-group-item">
+                <small class="d-block text-muted text-uppercase font-weight-bold">Líder</small>
+                <span><i class="fas fa-chess-king mr-1"></i>
+                  <a href="{{route('personajes.show', $organizacion->lider->id)}}">
+                <img class="retrato-mini" src="{{ asset("storage/retratos/" . ($organizacion->lider->retrato ?? 'default.png')) }}" alt="Retrato de {{ $organizacion->lider->nombre }}">
+                 {{ $organizacion->lider->nombre }}
+              </a>
+                </span>
+              </li>
+              @endif
 
-            @if ($organizacion->fundacion_id)
-            <strong><i class="fas fa-calendar-plus mr-1"></i>Fundación:</strong>
-            <p class="text-muted">{{ $fundacion }}</p>
-            @endif
-            @if ($organizacion->disolucion_id)
-            <strong><i class="fas fa-calendar-times mr-1"></i>Disolución:</strong>
-            <p class="text-muted">{{ $disolucion}}</p>
-            @endif
+              @if($organizacion->organizacion_padre_id)
+              <li class="list-group-item">
+                <small class="d-block text-muted text-uppercase font-weight-bold">Controlado por</small>
+                <span>
+                  <a href="{{route('organizaciones.show', $organizacion->organizacion_padre->id )}}">
+                    <img class="retrato-mini" src="{{ asset("storage/escudos/" . ($organizacion->organizacion_padre->escudo ?? 'default.png')) }}" alt="Escudo de {{ $organizacion->organizacion_padre->nombre }}">
+                    {{$organizacion->organizacion_padre->nombre}}
+                  </a>
+                </span>
+              </li>
+              @endif
 
-            @if($organizacion->religiones->isNotEmpty())
-            <strong class="mt-2"><i class="fas fa-praying-hands mr-1"></i>Religiones:</strong>
-            @foreach($organizacion->religiones as $religion)
-            <p class="ml-1 mr-2 mb-0"><a href="{{route('religion.show', [$religion->id] )}}">{{$religion->nombre}}</a></p>
-            @endforeach
-            @endif
+              @if($organizacion->fundacion_id)
+              <li class="list-group-item">
+                <small class="d-block text-muted text-uppercase font-weight-bold">Fundación</small>
+                <span><i class="fas fa-calendar-plus mr-1"></i> {{ $fundacion }}</span>
+              </li>
+              @endif
 
-            @if($organizacion->subordinates->isNotEmpty())
-            <strong class="mt-3"><i class="fas fa-sitemap mr-1"></i>Organizaciones subordinadas:</strong>
-            @foreach($organizacion->subordinates as $subordinate)
-            <p class="ml-1 mr-2 mb-0"><a href="{{route('organizacion.show', [$subordinate->id] )}}">{{$subordinate->nombre}}</a></p>
-            @endforeach
-            @endif
+              @if($organizacion->disolucion_id)
+              <li class="list-group-item">
+                <small class="d-block text-muted text-uppercase font-weight-bold">Disolución</small>
+                <span><i class="fas fa-calendar-times mr-1"></i> {{ $disolucion }}</span>
+              </li>
+              @endif
+
+              @if($organizacion->religiones->isNotEmpty())
+              <li class="list-group-item">
+                <small class="d-block text-muted text-uppercase font-weight-bold">Religiones presentes</small>
+                @foreach($organizacion->religiones as $religion)
+                <p class="ml-1 mr-2 mb-0">
+                  <a href="{{route('religion.show', [$religion->id] )}}">
+                    <img class="retrato-mini" src="{{ asset("storage/escudos/" . ($religion->escudo ?? 'default.png')) }}" alt="Escudo de {{ $religion->nombre }}">
+                    {{$religion->nombre}}
+                  </a>
+                </p>
+                @endforeach
+              </li>
+              @endif
+
+              @if($organizacion->subordinates->isNotEmpty())
+              <li class="list-group-item">
+                <small class="d-block text-muted text-uppercase font-weight-bold">Organizaciones subordinadas:</small>
+                @foreach($organizacion->subordinates as $subordinate)
+                <p class="ml-1 mr-2 mb-0">
+                  <a href="{{route('organizaciones.show', [$subordinate->id] )}}">
+                    <img class="retrato-mini" src="{{ asset("storage/escudos/" . ($subordinate->escudo ?? 'default.png')) }}" alt="Escudo de {{ $subordinate->nombre }}">
+                    {{$subordinate->nombre}}
+                  </a>
+                </p>
+                @endforeach
+              </li>
+              @endif
+            </ul>
           </div>
         </div>
       </div>
     </div>
   </div>
-</section>
-<!-- /.content -->
+</div>
 @endsection
