@@ -31,6 +31,7 @@ return new class extends Migration
       $table->text('doctrina')->nullable();
       $table->text('sagrado')->nullable();
       $table->text('fiestas')->nullable();
+      $table->text('sobrenatural')->nullable();
       $table->text('politica')->nullable();
       $table->text('estructura')->nullable();
       $table->text('sectas')->nullable();
