@@ -5,16 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\Eloquent\Collection;
 use App\Services\ImageService;
 use App\Enums\TipoTeismo;
+use App\Traits\HandlesRichTextImages;
 
 class Religion extends Model
 {
-  use HasFactory;
+  use HasFactory, HandlesRichTextImages;
 
   protected $table = 'religiones';
   protected $primaryKey = 'id';
@@ -33,6 +32,7 @@ class Religion extends Model
     'doctrina',
     'sagrado',
     'fiestas',
+    'sobrenatural',
     'politica',
     'estructura',
     'sectas',
@@ -42,7 +42,25 @@ class Religion extends Model
   ];
 
   protected $casts = [
+    'fundacion_id' => 'integer',
+    'disolucion_id' => 'integer',
     'tipo_teismo' => TipoTeismo::class,
+  ];
+
+  // Mapeo: 'columna_en_db' => 'nombre_input_formulario'
+  public static $richTextFields = [
+    'clase_sacerdotal' => 'clase_sacerdotal',
+    'descripcion' => 'descripcion',
+    'historia' => 'historia',
+    'cosmologia' => 'cosmologia',
+    'doctrina' => 'doctrina',
+    'sagrado' => 'sagrado',
+    'fiestas' => 'fiestas',
+    'sobrenatural' => 'sobrenatural',
+    'politica' => 'politica',
+    'estructura' => 'estructura',
+    'sectas' => 'sectas',
+    'otros' => 'otros',
   ];
 
   /**
@@ -92,63 +110,41 @@ class Religion extends Model
   /**
    * Almacena una nueva religión en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $request
    * @return \App\Models\Religion
    */
-  public static function store_religion($request)
+  public static function store_religion(array $request)
   {
     return DB::transaction(function () use ($request) {
+      // Manejo del escudo
+      if (isset($request['escudo']) && $request['escudo'] instanceof \Illuminate\Http\UploadedFile) {
+        $path = $request['escudo']->store('escudos', 'public');
+        $request['escudo'] = basename($path);
+      } else {
+        $request['escudo'] = "default.png";
+      }
       // Crear registro
-      $religion = self::create([
-        'nombre' => $request->nombre,
-        'lema' => $request->lema,
-        'tipo_teismo' => $request->tipo_teismo,
-        'estatus_legal' => $request->estatus_legal,
-        'deidades' => $request->deidades,
-        'escudo' => 'default.png', // Valor temporal, se actualizará después
-      ]);
+      $religion = self::create($request);
 
-      // Procesado de campos de Summernote
-      $imageService = new ImageService();
-      $camposRichText = [
-        'clase_sacerdotal' => 'clase_sacerdotal',
-        'descripcion' => 'descripcion',
-        'historia' => 'historia',
-        'cosmologia' => 'cosmologia',
-        'doctrina' => 'doctrina',
-        'sagrado' => 'sagrado',
-        'fiestas' => 'fiestas',
-        'politica' => 'politica',
-        'estructura' => 'estructura',
-        'sectas' => 'sectas',
-        'otros' => 'otros'
-      ];
+      // Procesado de campos Summernote
+      $religion->processRichTextImages($request, self::$richTextFields, 'religiones');
 
-      foreach ($camposRichText as $columna => $input) {
-        if ($request->filled($input)) {
-          $religion->$columna = $imageService->processSummernoteImages(
-            $request->$input,
-            "religiones",
-            $religion->id
-          );
-        }
+      //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
+      if (!empty($request['anno_fundacion'])) {
+        $religion->fundacion_id = Fecha::sync(null, [
+          'dia'  => $request['dia_fundacion'] ?? null,
+          'mes'  => $request['mes_fundacion'] ?? null,
+          'anno' => $request['anno_fundacion'] ?? null
+        ]);
       }
 
-      //Procesar Fechas
-      $religion->fundacion_id = Fecha::store_fecha(
-        $request->dia_fundacion,
-        $request->mes_fundacion,
-        $request->anno_fundacion
-      );
-
-      $religion->disolucion_id = Fecha::store_fecha(
-        $request->dia_disolucion,
-        $request->mes_disolucion,
-        $request->anno_disolucion
-      );
-
-      //Procesar escudo
-      $religion->escudo = self::handleEscudoUpload($request);
+      if (!empty($request['anno_disolucion'])) {
+        $religion->disolucion_id = Fecha::sync(null, [
+          'dia'  => $request['dia_disolucion'] ?? null,
+          'mes'  => $request['mes_disolucion'] ?? null,
+          'anno' => $request['anno_disolucion'] ?? null
+        ]);
+      }
 
       $religion->save();
 
@@ -159,68 +155,45 @@ class Religion extends Model
   /**
    * Actualiza una religión existente en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $request
    * @return \App\Models\Religion
    */
-  public function update_religion($request)
+  public function update_religion(array $request)
   {
     return DB::transaction(function () use ($request) {
       // Campos básicos
-      $this->fill([
-        'nombre' => $request->nombre,
-        'lema' => $request->lema,
-        'tipo_teismo' => $request->tipo_teismo,
-        'estatus_legal' => $request->estatus_legal,
-        'deidades' => $request->deidades,
-      ]);
+      $this->fill($request);
 
       //Manejo del escudo (Solo si se sube uno nuevo)
-      if ($request->hasFile('escudo')) {
+      if (isset($request['escudo']) && $request['escudo'] instanceof \Illuminate\Http\UploadedFile) {
         // Borrar escudo anterior si no es el default
         if ($this->escudo !== 'default.png') {
           $oldPath = public_path('storage/escudos/' . $this->escudo);
           if (file_exists($oldPath)) unlink($oldPath);
         }
-        $this->escudo = self::handleEscudoUpload($request);
+        $path = $request['escudo']->store('escudos', 'public');
+        $request['escudo'] = basename($path);
       }
 
-      // Procesado de campos de Summernote
-      $imageService = new ImageService();
-      $camposRichText = [
-        'clase_sacerdotal' => 'clase_sacerdotal',
-        'descripcion' => 'descripcion',
-        'historia' => 'historia',
-        'cosmologia' => 'cosmologia',
-        'doctrina' => 'doctrina',
-        'sagrado' => 'sagrado',
-        'fiestas' => 'fiestas',
-        'politica' => 'politica',
-        'estructura' => 'estructura',
-        'sectas' => 'sectas',
-        'otros' => 'otros'
-      ];
+      // Procesado de campos Summernote
+      $this->processRichTextImages($request, self::$richTextFields, 'religiones');
 
-      foreach ($camposRichText as $columna => $input) {
-        if ($request->filled($input)) {
-          $this->$columna = $imageService->processSummernoteImages(
-            $request->$input,
-            "religiones",
-            $this->id
-          );
-        }
+      //Actualizado de fechas
+      //Procesar Fechas, si existe fundacion_id o disolucion_id se actualiza, si no se crea. Si no hay año no se guarda fecha
+      if (!empty($request['anno_fundacion'])) {
+        $this->fundacion_id = Fecha::sync($this->fundacion_id, [
+          'dia'  => $request['dia_fundacion'] ?? null,
+          'mes'  => $request['mes_fundacion'] ?? null,
+          'anno' => $request['anno_fundacion'] ?? null
+        ]);
       }
 
-      //Procesar Fechas, si existe fundacion_id o disolucion_id se actualiza, si no se crea
-      if ($this->fundacion_id) {
-        Fecha::update_fecha($request->dia_fundacion, $request->mes_fundacion, $request->anno_fundacion, $this->fundacion_id);
-      } else {
-        $this->fundacion_id = Fecha::store_fecha($request->dia_fundacion, $request->mes_fundacion, $request->anno_fundacion);
-      }
-
-      if ($this->disolucion_id) {
-        Fecha::update_fecha($request->dia_disolucion, $request->mes_disolucion, $request->anno_disolucion, $this->disolucion_id);
-      } else {
-        $this->disolucion_id = Fecha::store_fecha($request->dia_disolucion, $request->mes_disolucion, $request->anno_disolucion);
+      if (!empty($request['anno_disolucion'])) {
+        $this->disolucion_id = Fecha::sync($this->disolucion_id, [
+          'dia'  => $request['dia_disolucion'] ?? null,
+          'mes'  => $request['mes_disolucion'] ?? null,
+          'anno' => $request['anno_disolucion'] ?? null
+        ]);
       }
 
       return $this->save();
@@ -247,6 +220,25 @@ class Religion extends Model
       return $nombreArchivo;
     }
     return "default.png";
+  }
+
+  protected static function booted(): void
+  {
+    static::deleting(function (Religion $religion) {
+      $imageService = new ImageService();
+      $imageService->deleteImagesByOwner('religiones', $religion->id);
+
+      if ($religion->escudo && $religion->escudo !== 'default.png') {
+        Storage::disk('public')->delete('escudos/' . $religion->escudo);
+      }
+
+      if ($religion->fundacion_id) {
+        Fecha::destroy($religion->fundacion_id);
+      }
+      if ($religion->disolucion_id) {
+        Fecha::destroy($religion->disolucion_id);
+      }
+    });
   }
 
   /**

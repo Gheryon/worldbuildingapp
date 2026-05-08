@@ -20,7 +20,7 @@
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-create-religion" class="position-relative needs-validation" action="{{route('religion.update', $religion->id)}}" method="post" enctype="multipart/form-data">
+  <form id="form-create-religion" class="position-relative needs-validation" action="{{route('religiones.update', $religion->id)}}" method="post" enctype="multipart/form-data">
     @csrf
     @method('PUT')
     <div class="row justify-content-md-center">
@@ -125,6 +125,7 @@
               <div class="col-md-6">
                 <x-textarea-input name="cosmologia" label="Cosmología" :value="$religion->cosmologia" />
                 <x-textarea-input name="doctrina" label="Doctrina" :value="$religion->doctrina" />
+                <x-textarea-input name="sobrenatural" label="Seres, leyendas y creencias sobrenaturales" :value="$religion->sobrenatural" />
               </div>
               <div class="col-md-6">
                 <x-textarea-input name="sagrado" label="Lugares y objetos sagrados" :value="$religion->sagrado" />

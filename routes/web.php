@@ -112,15 +112,8 @@ Route::resource('organizaciones', App\Http\Controllers\OrganizacionController::c
 Route::resource('personajes', App\Http\Controllers\PersonajeController::class);
 
 /*******religiones routes********/
-Route::controller(App\Http\Controllers\ReligionesController::class)->group(function () {
-  Route::get('/religiones/index', 'index')->name('religiones.index');
-  Route::get('/religiones/create', 'create')->name('religion.create');
-  Route::post('/religiones/store', 'store')->name('religion.store');
-  Route::get('/religiones/{id}/edit', 'edit')->name('religion.edit');
-  Route::put('/religiones/{id}', 'update')->name('religion.update');
-  Route::delete('/religiones/destroy', 'destroy')->name('religion.destroy');
-  Route::get('/religiones/{id}', 'show')->name('religion.show');
-});
+// laravel convierte de 'religiones' a 'religione' (incorrecto en castellano), se fuerza a 'religion'
+Route::resource('religiones', App\Http\Controllers\ReligionesController::class)->parameters(['religiones' => 'religion']);
 
 /*******timelines routes********/
 Route::get('/timelines/index/', [App\Http\Controllers\EventosController::class, 'index'])->name('timelines.index');

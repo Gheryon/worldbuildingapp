@@ -6,7 +6,7 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-  <a href="{{route('religion.create')}}" class="btn btn-dark">Nueva religion</a>
+  <a href="{{route('religiones.create')}}" class="btn btn-dark">Nueva religion</a>
 </li>
 <x-order-input name="orden" label="Orden" :orden="$orden" />
 
@@ -47,9 +47,9 @@
       <!-- /.card-body -->
       <div class="card-footer">
         <div class="row text-right">
-          <a href="{{route('religion.show',$religion->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-          <a href="{{route('religion.edit',$religion->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-          <button data-id="{{$religion->id}}" data-nombre="{{$religion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-religion"><i class="fas fa-trash mr-1"></i></button>
+          <a href="{{route('religiones.show',$religion->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+          <a href="{{route('religiones.edit',$religion->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+          <button data-id="{{$religion->id}}" data-nombre="{{$religion->nombre}}" data-url="{{route('religiones.destroy',$religion->id)}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-religion"><i class="fas fa-trash mr-1"></i></button>
         </div>
       </div>
     </div>
@@ -59,7 +59,7 @@
     <div class="callout callout-info">
       <h5>No se encontraron religiones</h5>
       <p>Intenta ajustar los filtros o crea una nueva.</p>
-      <a href="{{route('religion.create')}}" class="btn btn-dark text-light">Crear nueva religión</a>
+      <a href="{{route('religiones.create')}}" class="btn btn-dark text-light">Crear nueva religión</a>
     </div>
   </div>
   @endforelse
@@ -73,14 +73,12 @@
 
 <x-modal-delete 
     id="eliminar-religion" 
-    :route="route('religion.destroy')" 
     message="Estás a punto de eliminar la siguiente religión de forma permanente:"
 />
 @endsection
 
 @section('specific-scripts')
-<script src="{{asset('dist/js/config.js')}}"></script>
-<script src="{{asset('dist/js/mensajes.js')}}"></script>
+<script src="{{asset('dist/js/common.js')}}"></script>
 <script>
   $(function() {
 

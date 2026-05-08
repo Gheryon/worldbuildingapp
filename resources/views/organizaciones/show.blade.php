@@ -162,7 +162,7 @@
                 <small class="d-block text-muted text-uppercase font-weight-bold">Religiones presentes</small>
                 @foreach($organizacion->religiones as $religion)
                 <p class="ml-1 mr-2 mb-0">
-                  <a href="{{route('religion.show', [$religion->id] )}}">
+                  <a href="{{route('religiones.show', $religion->id)}}">
                     <img class="retrato-mini" src="{{ asset("storage/escudos/" . ($religion->escudo ?? 'default.png')) }}" alt="Escudo de {{ $religion->nombre }}">
                     {{$religion->nombre}}
                   </a>
