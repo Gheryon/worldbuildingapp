@@ -79,15 +79,7 @@ Route::controller(App\Http\Controllers\EnlacesController::class)->group(function
 });
 
 /*******especies routes********/
-Route::controller(App\Http\Controllers\EspecieController::class)->group(function () {
-  Route::get('/especies/index/{orden?}', 'index')->name('especies.index');
-  Route::get('/especies/create', 'create')->name('especie.create');
-  Route::post('/especies/store', 'store')->name('especie.store');
-  Route::get('/especies/{id}/edit', 'edit')->name('especie.edit');
-  Route::put('/especies/{id}', 'update')->name('especie.update');
-  Route::delete('/especie/destroy', 'destroy')->name('especie.destroy');
-  Route::get('/especies/{id}', 'show')->name('especie.show');
-});
+Route::resource('especies', App\Http\Controllers\EspecieController::class)->parameters(['especies' => 'especie']);
 
 /*******imagenes routes********/
 Route::get('/galeria/index', [App\Http\Controllers\ImagenController::class, 'index'])->name('galeria.index');

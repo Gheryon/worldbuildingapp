@@ -16,7 +16,7 @@
       <p class="text-muted small text-uppercase mb-0">
         {{ $especie->reino }} | {{ $especie->clase_taxonomica }}
       </p>
-      <span class="badge badge-pill {{ $especie->estatus == 'Extinta' ? 'badge-danger' : 'badge-success' }} x-small mt-2">
+      <span class="badge badge-pill {{ $especie->estatus == 'Extinta' ? 'badge-danger' : ($especie->estatus == 'En peligro' ? 'badge-warning text-dark' : 'badge-success') }} x-small mt-2">
         {{ $especie->estatus }}
       </span>
     </div>
@@ -55,13 +55,13 @@
   <div class="card-footer bg-white border-0 text-center pb-3">
     <hr class="mx-4 my-0 mb-3">
     <div class="btn-group border rounded-pill overflow-hidden shadow-sm">
-        <a href="{{ route('especie.show', $especie->id) }}" class="btn btn-white btn-sm px-3 border-right text-muted hover-primary" title="Ver">
+        <a href="{{ route('especies.show', $especie->id) }}" class="btn btn-white btn-sm px-3 border-right text-muted hover-primary" title="Ver">
             <i class="fas fa-eye text-info"></i>
         </a>
-        <a href="{{ route('especie.edit', $especie->id) }}" class="btn btn-white btn-sm px-3 border-right text-muted hover-success" title="Editar">
+        <a href="{{ route('especies.edit', $especie->id) }}" class="btn btn-white btn-sm px-3 border-right text-muted hover-success" title="Editar">
             <i class="fas fa-edit text-success"></i>
         </a>
-        <button class="borrar btn btn-white btn-sm px-3 text-muted hover-danger" data-id="{{ $especie->id }}" data-nombre="{{ $especie->nombre }}" data-toggle="modal" data-target="#eliminar-especie" title="Eliminar">
+        <button class="borrar btn btn-white btn-sm px-3 text-muted hover-danger" data-id="{{ $especie->id }}" data-nombre="{{ $especie->nombre }}" data-url="{{ route('especies.destroy', $especie->id) }}" data-toggle="modal" data-target="#eliminar-especie" title="Eliminar">
             <i class="fas fa-trash text-danger"></i>
         </button>
     </div>

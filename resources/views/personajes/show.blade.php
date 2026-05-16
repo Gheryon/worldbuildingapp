@@ -104,7 +104,7 @@
               <li class="list-group-item">
                 <small class="d-block text-muted text-uppercase font-weight-bold">Especie</small>
                 <span><i class="fas fa-dna mr-1"></i>
-                  <a href="{{ route('especie.show', $personaje->especie_id) }}" class="text-primary-custom">{{ $personaje->especie->nombre }}</a>
+                  <a href="{{ route('especies.show', $personaje->especie_id) }}" class="text-primary-custom">{{ $personaje->especie->nombre }}</a>
                 </span>
               </li>
 

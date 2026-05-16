@@ -20,7 +20,7 @@
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-create-especie" class="position-relative needs-validation" action="{{route('especie.store')}}" method="post" enctype="multipart/form-data">
+  <form id="form-create-especie" class="position-relative needs-validation" action="{{route('especies.store')}}" method="post" enctype="multipart/form-data">
     @csrf
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
@@ -36,7 +36,7 @@
           </div>
           <div class="col-md">
             <label for="reino" class="form-label mt-2">Reino</label>
-            <select class="form-select form-control" name="reino" id="reino" required>
+            <select class="form-select form-control @error('reino') is-invalid @enderror" name="reino" id="reino" required>
               <option selected disabled value="">Elegir</option>
               @foreach(['Animalia', 'Fungi', 'Monera', 'Plantae', 'Protista'] as $reino)
               <option value="{{ $reino }}"
@@ -45,10 +45,15 @@
               </option>
               @endforeach
             </select>
+            @error('reino')
+            <span class="invalid-feedback" role="alert">
+              <strong>{{ $message }}</strong>
+            </span>
+            @enderror
           </div>
           <div class="col-md">
             <label for="clase_taxonomica" class="form-label mt-2">Clase taxonómica</label>
-            <select class="form-select form-control" name="clase_taxonomica" id="clase_taxonomica" required>
+            <select class="form-select form-control @error('clase_taxonomica') is-invalid @enderror" name="clase_taxonomica" id="clase_taxonomica" required>
               <option selected disabled value="">Elegir</option>
               @foreach(['Anfibio', 'Arácnidos', 'Ave', 'Insectos', 'Mamífero', 'Reptil', 'Peces'] as $clase)
               <option value="{{ $clase }}"
@@ -57,10 +62,15 @@
               </option>
               @endforeach
             </select>
+            @error('clase_taxonomica')
+            <span class="invalid-feedback" role="alert">
+              <strong>{{ $message }}</strong>
+            </span>
+            @enderror
           </div>
           <div class="col-md">
             <label for="locomocion" class="form-label mt-2">Locomoción</label>
-            <select class="form-select form-control" name="locomocion" id="locomocion" required>
+            <select class="form-select form-control @error('locomocion') is-invalid @enderror" name="locomocion" id="locomocion" required>
               <option selected disabled value="">Elegir</option>
               @foreach(['Acuático', 'Caminante', 'Escalador', 'Mixto', 'Terrestre', 'Volador'] as $locomocion)
               <option value="{{ $locomocion }}"
@@ -69,10 +79,15 @@
               </option>
               @endforeach
             </select>
+            @error('locomocion')
+            <span class="invalid-feedback" role="alert">
+              <strong>{{ $message }}</strong>
+            </span>
+            @enderror
           </div>
           <div class="col-md">
             <label for="organizacion_social" class="form-label mt-2">Organización social</label>
-            <select class="form-select form-control" name="organizacion_social" id="organizacion_social" required>
+            <select class="form-select form-control @error('organizacion_social') is-invalid @enderror" name="organizacion_social" id="organizacion_social" required>
               <option selected disabled value="">Elegir</option>
               @foreach(['Clan familiar', 'Colonia', 'Manada', 'Rebaño', 'Solitaria'] as $organizacion)
               <option value="{{ $organizacion }}"
@@ -81,6 +96,11 @@
               </option>
               @endforeach
             </select>
+            @error('organizacion_social')
+            <span class="invalid-feedback" role="alert">
+              <strong>{{ $message }}</strong>
+            </span>
+            @enderror
           </div>
         </div>
         <div class="row">
@@ -103,7 +123,7 @@
         <div class="row">
           <div class="col-md">
             <label for="dieta" class="form-label mt-2">Dieta</label>
-            <select class="form-select form-control" name="dieta" id="dieta" required>
+            <select class="form-select form-control @error('dieta') is-invalid @enderror" name="dieta" id="dieta" required>
               <option selected disabled value="">Elegir</option>
               @foreach(['Carnívoro', 'Herbívoro', 'Insectívoro', 'Omnívoro'] as $dieta)
               <option value="{{ $dieta }}"
@@ -112,10 +132,15 @@
               </option>
               @endforeach
             </select>
+            @error('dieta')
+            <span class="invalid-feedback" role="alert">
+              <strong>{{ $message }}</strong>
+            </span>
+            @enderror
           </div>
           <div class="col-md">
             <label for="rareza" class="form-label mt-2">Rareza</label>
-            <select class="form-select form-control" name="rareza" id="rareza" required>
+            <select class="form-select form-control @error('rareza') is-invalid @enderror" name="rareza" id="rareza" required>
               <option selected disabled value="">Elegir</option>
               @foreach(['Común', 'Legendario', 'Mítológico', 'Raro'] as $rareza)
               <option value="{{ $rareza }}"
@@ -124,15 +149,25 @@
               </option>
               @endforeach
             </select>
+            @error('rareza')
+            <span class="invalid-feedback" role="alert">
+              <strong>{{ $message }}</strong>
+            </span>
+            @enderror
           </div>
           <div class="col-md">
             <label for="estatus" class="form-label mt-2">Estatus</label>
-            <select class="form-select form-control" name="estatus" id="estatus" required>
+            <select class="form-select form-control @error('estatus') is-invalid @enderror" name="estatus" id="estatus" required>
               <option selected disabled value="">Elegir</option>
               <option value="Viva">Viva</option>
               <option value="En peligro">En peligro</option>
               <option value="Extinta">Extinta</option>
             </select>
+            @error('estatus')
+            <span class="invalid-feedback" role="alert">
+              <strong>{{ $message }}</strong>
+            </span>
+            @enderror
           </div>
         </div>
       </div>
@@ -207,6 +242,22 @@
     $('.summernote-lite').summernote({
       height: 150
     })
+
+    // Prevención de pérdida de datos
+    let formChanged = false;
+    $('#form-create-especie').on('change', 'input, select, textarea', function() {
+      formChanged = true;
+    });
+
+    $(window).on('beforeunload', function() {
+      if (formChanged) {
+        return "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?";
+      }
+    });
+
+    $('#form-create-especie').on('submit', function() {
+      $(window).off('beforeunload'); // Desactivar alerta al enviar el formulario
+    });
   });
 </script>
 @endsection

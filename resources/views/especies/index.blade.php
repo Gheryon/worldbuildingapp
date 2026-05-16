@@ -6,7 +6,7 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-  <a href="{{route('especie.create')}}" class="btn btn-dark">Nueva especie</a>
+  <a href="{{route('especies.create')}}" class="btn btn-dark">Nueva especie</a>
 </li>
 
 <x-order-input name="orden" label="Orden" :orden="$orden" />
@@ -50,7 +50,7 @@
     <div class="callout callout-info">
       <h5>No se encontraron especies</h5>
       <p>Intenta ajustar los filtros o crea una nueva.</p>
-      <a href="{{route('especie.create')}}" class="btn btn-dark text-light">Crear nueva especie</a>
+      <a href="{{route('especies.create')}}" class="btn btn-dark text-light">Crear nueva especie</a>
     </div>
   </div>
   @endforelse
@@ -64,13 +64,12 @@
 
 <x-modal-delete 
     id="eliminar-especie" 
-    :route="route('especie.destroy')" 
     message="Estás a punto de eliminar la siguiente especie de forma permanente:"
 />
 @endsection
 
 @section('specific-scripts')
-<script src="{{asset('dist/js/config.js')}}"></script>
+<script src="{{asset('dist/js/common.js')}}"></script>
 <script>
   $(function() {
 
