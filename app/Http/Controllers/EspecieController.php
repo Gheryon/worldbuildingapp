@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Especie;
-use Exception;
 use Illuminate\Http\Request;
 use App\Http\Requests\EspecieRequest;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class EspecieController extends Controller
@@ -74,12 +72,9 @@ class EspecieController extends Controller
   /**
    * Display the specified resource.
    */
-  public function show($id)
+  public function show(Especie $especie)
   {
     try {
-      // Cargamos la especie con sus fechas
-      $especie = Especie::findOrFail($id);
-
       return view('especies.show', compact('especie'));
     } catch (\Exception $e) {
       Log::error("Error al mostrar especie: " . $e->getMessage());
@@ -91,14 +86,11 @@ class EspecieController extends Controller
   /**
    * Show the form for editing the specified resource.
    */
-  public function edit($id)
+  public function edit(Especie $especie)
   {
     try {
-      //obtener especie
-      $especie = Especie::findOrFail($id);
       return view('especies.edit', compact('especie'));
     } catch (\Exception $e) {
-      // Si hay un error de lógica, redirigimos con un mensaje flash
       return redirect()->route('especies.index')
         ->with('error', 'No se pudo cargar la especie: ' . $e->getMessage());
     }
@@ -107,12 +99,11 @@ class EspecieController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(EspecieRequest $request, $id)
+  public function update(EspecieRequest $request, Especie $especie)
   {
     $datosValidados = $request->validated();
 
     try {
-      $especie = Especie::findOrFail($id);
       $especie->update_especie($datosValidados);
 
       return redirect()->route('especies.index')
@@ -135,26 +126,17 @@ class EspecieController extends Controller
   /**
    * Remove the specified resource from storage.
    */
-  public function destroy(Request $request)
+  public function destroy(Especie $especie)
   {
-    $id = $request->id_borrar;
+    $nombre = $especie->nombre;
 
     try {
-      $especie = Especie::findOrFail($id);
-      $nombre = $especie->nombre;
-
-      DB::transaction(function () use ($especie) {
-        $especie->delete();
-      });
-
+      $especie->delete();
 
       return redirect()->route('especies.index')
         ->with('success', "La especie '{$nombre}' y sus recursos han sido eliminados.");
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-      return redirect()->route('especies.index')
-        ->with('error', 'La especie que intenta eliminar no existe.');
     } catch (\Exception $e) {
-      Log::error("Error crítico al eliminar especie ID {$id}: " . $e->getMessage());
+      Log::error("Error crítico al eliminar especie ID {$especie->id}: " . $e->getMessage());
 
       return redirect()->route('especies.index')
         ->with('error', 'No se pudo completar la eliminación debido a un error interno.');
