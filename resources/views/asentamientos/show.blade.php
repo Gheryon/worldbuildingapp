@@ -8,7 +8,7 @@
   <a href="{{route('asentamientos.index')}}" class="btn btn-dark">Volver</a>
 </li>
 <li class="nav-item ml-2">
-  <a href="{{route('asentamiento.edit', ['id'=> $asentamiento->id] )}}" class="btn btn-dark ml-2">Editar</a>
+  <a href="{{route('asentamientos.edit', $asentamiento->id )}}" class="btn btn-dark ml-2">Editar</a>
 </li>
 @endsection
 

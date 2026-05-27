@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <form id="form-edit-asentamiento" class="needs-validation" action="{{route('asentamiento.update', $asentamiento->id )}}" method="post" enctype="multipart/form-data">
+  <form id="form-edit-asentamiento" class="needs-validation" action="{{route('asentamientos.update', $asentamiento->id )}}" method="post" enctype="multipart/form-data">
     @csrf
     @method('PUT')
 

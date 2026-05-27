@@ -6,7 +6,7 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-  <a href="{{route('asentamiento.create')}}" class="btn btn-dark">Nuevo asentamiento</a>
+  <a href="{{route('asentamientos.create')}}" class="btn btn-dark">Nuevo asentamiento</a>
 </li>
 <li class="nav-item ml-2">
   <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
@@ -57,9 +57,9 @@
       <!-- /.card-body -->
       <div class="card-footer">
         <div class="row text-right">
-          <a href="{{route('asentamiento.show',$asentamiento->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col col-sm-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-          <a href="{{route('asentamiento.edit',$asentamiento->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col col-sm-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-          <button data-id="{{$asentamiento->id}}" data-nombre="{{$asentamiento->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col col-sm-4" data-toggle="modal" data-target="#eliminar-asentamiento"><i class="fas fa-trash mr-1"></i></button>
+          <a href="{{route('asentamientos.show',$asentamiento->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col col-sm-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+          <a href="{{route('asentamientos.edit',$asentamiento->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col col-sm-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+          <button data-id="{{$asentamiento->id}}" data-nombre="{{$asentamiento->nombre}}" data-url="{{ route('asentamientos.destroy', $asentamiento->id) }}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col col-sm-4" data-toggle="modal" data-target="#eliminar-asentamiento"><i class="fas fa-trash mr-1"></i></button>
         </div>
       </div>
     </div>
@@ -69,7 +69,7 @@
     <div class="callout callout-info">
       <h5>No se encontraron asentamientos</h5>
       <p>Intenta ajustar los filtros o crea uno nuevo.</p>
-      <a href="{{route('asentamiento.create')}}" class="btn btn-dark text-light">Crear nuevo asentamiento</a>
+      <a href="{{route('asentamientos.create')}}" class="btn btn-dark text-light">Crear nuevo asentamiento</a>
     </div>
   </div>
   @endforelse
@@ -83,13 +83,11 @@
 
 <x-modal-delete
   id="eliminar-asentamiento"
-  :route="route('asentamiento.destroy')"
   message="Estás a punto de eliminar el siguiente asentamiento de forma permanente:" />
 @endsection
 
 @section('specific-scripts')
-<script src="{{asset('dist/js/config.js')}}"></script>
-<script src="{{asset('dist/js/mensajes.js')}}"></script>
+<script src="{{asset('dist/js/common.js')}}"></script>
 <script>
   $(function() {
     function redirigirConFiltros() {

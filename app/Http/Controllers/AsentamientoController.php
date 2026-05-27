@@ -112,14 +112,14 @@ class AsentamientoController extends Controller
   /**
    * Display the specified resource.
    */
-  public function show($id)
+  public function show(Asentamiento $asentamiento)
   {
     try {
       // Cargamos el asentamiento con sus fechas, tipo, religiones y ruler
-      $asentamiento = Asentamiento::with([
+      $asentamiento->load([
         'tipo',
         'controlado_por',
-      ])->findOrFail($id);
+      ]);
 
       // Formateamos las fechas para la vista
       $fundacion = Fecha::get_fecha_string($asentamiento->fundacion_id);
@@ -129,17 +129,17 @@ class AsentamientoController extends Controller
     } catch (\Exception $e) {
       Log::error("Error al mostrar asentamiento: " . $e->getMessage());
       return redirect()->route('asentamientos.index')
-        ->with('error', 'Organización no encontrada.');
+        ->with('error', 'Asentamiento no encontrado.');
     }
   }
 
   /**
    * Show the form for editing the specified resource.
    */
-  public function edit($id)
+  public function edit(Asentamiento $asentamiento)
   {
     // Obtener el asentamiento a editar
-    $asentamiento = Asentamiento::with(['fecha_fundacion', 'fecha_disolucion'])->findOrFail($id);
+    $asentamiento->load(['fecha_fundacion', 'fecha_disolucion']);
 
     // Obtener todos los paises almacenados, sólo id y nombre
     $paises = Organizacion::orderBy('nombre', 'asc')->pluck('nombre', 'id');
@@ -156,18 +156,17 @@ class AsentamientoController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(AsentamientoRequest $request, $id)
+  public function update(AsentamientoRequest $request, Asentamiento $asentamiento)
   {
     $datosValidados = $request->validated();
 
     try {
-      $asentamiento = Asentamiento::findOrFail($id); //obtiene el asentamiento en bbdd
       $asentamiento->update_asentamiento($datosValidados); //se actualiza con los datos validados
 
       return redirect()->route('asentamientos.index')
         ->with('success', 'Asentamiento ' . $asentamiento->nombre . ' actualizado con éxito.');
     } catch (\Exception $e) {
-      Log::error("Error actualizando asentamiento ID {$id}: " . $e->getMessage());
+      Log::error("Error actualizando asentamiento ID {$asentamiento->id}: " . $e->getMessage());
       return redirect()->back()
         ->withInput()
         ->with('error', 'Error al actualizar: ' . $e->getMessage());
@@ -177,17 +176,15 @@ class AsentamientoController extends Controller
   /**
    * Remove the specified resource from storage.
    */
-  public function destroy(Request $request)
+  public function destroy(Asentamiento $asentamiento)
   {
     try {
-      $asentamiento = Asentamiento::findOrFail($request->id_borrar);
-
       DB::transaction(function () use ($asentamiento) {
         $asentamiento->delete();
       });
 
       return redirect()->route('asentamientos.index')
-        ->with('success', $request->nombre_borrado . ' borrado correctamente.');
+        ->with('success', $asentamiento->nombre . ' borrado correctamente.');
     } catch (\Exception $e) {
       Log::error('Error al borrar asentamiento: ' . $e->getMessage());
       return redirect()->route('asentamientos.index')

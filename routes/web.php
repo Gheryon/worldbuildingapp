@@ -28,15 +28,7 @@ Route::controller(App\Http\Controllers\ArticuloController::class)->group(functio
 });
 
 /*******asentamientos routes********/
-Route::controller(App\Http\Controllers\AsentamientoController::class)->group(function () {
-  Route::get('/asentamientos/index/{orden?}/{tipo?}', 'index')->name('asentamientos.index');
-  Route::get('/asentamientos/create', 'create')->name('asentamiento.create');
-  Route::post('/asentamientos/store', 'store')->name('asentamiento.store');
-  Route::get('/asentamientos/{id}', 'show')->name('asentamiento.show');
-  Route::get('/asentamientos/{id}/edit', 'edit')->name('asentamiento.edit');
-  Route::put('/asentamientos/{id}', 'update')->name('asentamiento.update');
-  Route::delete('/asentamiento/destroy', 'destroy')->name('asentamiento.destroy');
-});
+Route::resource('asentamientos', App\Http\Controllers\AsentamientoController::class);
 
 /*******configuracion routes********/
 Route::controller(App\Http\Controllers\ConfigurationController::class)->group(function () {
@@ -79,6 +71,7 @@ Route::controller(App\Http\Controllers\EnlacesController::class)->group(function
 });
 
 /*******especies routes********/
+// laravel convierte de 'especies' a 'especy' (incorrecto en castellano), se fuerza a 'especie'
 Route::resource('especies', App\Http\Controllers\EspecieController::class)->parameters(['especies' => 'especie']);
 
 /*******imagenes routes********/

@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <form id="form-create-asentamiento" data-prevent-loss="true" class="needs-validation" action="{{route('asentamiento.store')}}" method="post" enctype="multipart/form-data">
+  <form id="form-create-asentamiento" data-prevent-loss="true" class="needs-validation" action="{{route('asentamientos.store')}}" method="post" enctype="multipart/form-data">
     @csrf
 
     {{-- Botón de Acción Superior --}}
