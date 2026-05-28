@@ -16,13 +16,13 @@
     </div>
     <div class="card-footer bg-light border-0 justify-content-center d-flex">
       <div class="btn-group border rounded-pill overflow-hidden shadow-sm">
-        <a href="{{ route('conflicto.show', $conflicto->id) }}" class="btn btn-white btn-sm px-3 border-right text-muted hover-primary" title="Ver">
+        <a href="{{ route('conflictos.show', $conflicto->id) }}" class="btn btn-white btn-sm px-3 border-right text-muted hover-primary" title="Ver">
             <i class="fas fa-eye text-info"></i>
         </a>
-        <a href="{{ route('conflicto.edit', $conflicto->id) }}" class="btn btn-white btn-sm px-3 border-right text-muted hover-success" title="Editar">
+        <a href="{{ route('conflictos.edit', $conflicto->id) }}" class="btn btn-white btn-sm px-3 border-right text-muted hover-success" title="Editar">
             <i class="fas fa-edit text-success"></i>
         </a>
-        <button class="borrar btn btn-white btn-sm px-3 text-muted hover-danger" data-id="{{ $conflicto->id }}" data-nombre="{{ $conflicto->nombre }}" data-toggle="modal" data-target="#eliminar-conflicto" title="Eliminar">
+        <button class="borrar btn btn-white btn-sm px-3 text-muted hover-danger" data-id="{{ $conflicto->id }}" data-nombre="{{ $conflicto->nombre }}" data-url="{{ route('conflictos.destroy', $conflicto->id) }}" data-toggle="modal" data-target="#eliminar-conflicto" title="Eliminar">
             <i class="fas fa-trash text-danger"></i>
         </button>
     </div>

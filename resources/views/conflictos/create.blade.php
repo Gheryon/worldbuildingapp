@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <form id="form-create-conflicto" data-prevent-loss="true" class="needs-validation" action="{{route('conflicto.store')}}" method="post">
+  <form id="form-create-conflicto" data-prevent-loss="true" class="needs-validation" action="{{route('conflictos.store')}}" method="post">
     @csrf
 
     {{-- Botón de Acción Superior --}}
@@ -49,21 +49,23 @@
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="tipo_conflicto_id" class="form-label font-weight-bold">Tipo de conflicto</label>
-                <select class="form-control select2bs4" name="tipo_conflicto_id" id="tipo_conflicto_id">
+                <select class="form-control select2bs4 @error('tipo_conflicto_id') is-invalid @enderror" name="tipo_conflicto_id" id="tipo_conflicto_id">
                   <option selected disabled value="">Elegir tipo...</option>
                   @foreach($tipos_conflicto as $tipo)
                   <option value="{{$tipo->id}}" {{ old('tipo_conflicto_id') == $tipo->id ? 'selected' : '' }}>{{$tipo->nombre}}</option>
                   @endforeach
                 </select>
+                @error('tipo_conflicto_id') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-6 mb-3">
                 <label for="conflicto_padre_id" class="form-label font-weight-bold">Conflicto padre</label>
-                <select class="form-control select2bs4" name="conflicto_padre_id" id="conflicto_padre_id">
+                <select class="form-control select2bs4 @error('conflicto_padre_id') is-invalid @enderror" name="conflicto_padre_id" id="conflicto_padre_id">
                   <option value="" selected>Conflicto independiente</option>
                   @foreach($conflictos as $id => $nombre)
                   <option value="{{$id}}" {{ old('conflicto_padre_id') == $id ? 'selected' : '' }}>{{$nombre}}</option>
                   @endforeach
                 </select>
+                @error('conflicto_padre_id') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
             </div>
           </div>
@@ -73,16 +75,18 @@
             <label class="form-label font-weight-bold"><i class="fas fa-map-marker-alt mr-1"></i> Ubicación principal</label>
             <div class="row">
               <div class="col-md-5 mb-3">
-                <select class="form-control" name="ubicacion_principal_type" id="ubicacion_type">
+                <select class="form-control @error('ubicacion_principal_type') is-invalid @enderror" name="ubicacion_principal_type" id="ubicacion_type">
                   <option value="App\Models\Asentamiento" {{ old('ubicacion_principal_type') == 'App\Models\Asentamiento' ? 'selected' : '' }}>Asentamiento</option>
                   <option value="App\Models\Lugar" {{ old('ubicacion_principal_type') == 'App\Models\Lugar' ? 'selected' : '' }}>Lugar geográfico</option>
                 </select>
+                @error('ubicacion_principal_type') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-7 mb-3">
-                <select class="form-control select2bs4" name="ubicacion_principal_id" id="ubicacion_id">
+                <select class="form-control select2bs4 @error('ubicacion_principal_id') is-invalid @enderror" name="ubicacion_principal_id" id="ubicacion_id">
                   <option value="">Seleccionar destino...</option>
                   {{-- Se llena vía JS según el tipo --}}
                 </select>
+                @error('ubicacion_principal_id') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-12 mb-3">
                 <x-text-input name="tipo_localizacion" label="Tipo de localización" placeholder="Ej: terrestre, aéreo, mixto, etc..." :value="old('tipo_localizacion')" />
@@ -157,13 +161,14 @@
                   <label for="personajes_atacantes" class="font-weight-bold">
                     <i class="fas fa-sword mr-1"></i> Líderes/Participantes Atacantes
                   </label>
-                  <select name="personajes_atacantes[]" id="personajes_atacantes" class="form-control select2bs4" multiple="multiple" data-placeholder="Seleccionar atacantes...">
+                  <select name="personajes_atacantes[]" id="personajes_atacantes" class="form-control select2bs4 @error('personajes_atacantes') is-invalid @enderror" multiple="multiple" data-placeholder="Seleccionar atacantes...">
                     @foreach($personajes as $id => $nombre)
                     <option value="{{ $id }}" {{ (collect(old('personajes_atacantes'))->contains($id)) ? 'selected' : '' }}>
                       {{ $nombre }}
                     </option>
                     @endforeach
                   </select>
+                  @error('personajes_atacantes') <small class="text-danger d-block">{{ $message }}</small> @enderror
                   <small class="form-text text-muted">Personajes que iniciaron o lideraron la ofensiva.</small>
                 </div>
               </div>
@@ -174,13 +179,14 @@
                   <label for="personajes_defensores" class="font-weight-bold">
                     <i class="fas fa-shield mr-1"></i> Líderes/Participantes Defensores
                   </label>
-                  <select name="personajes_defensores[]" id="personajes_defensores" class="form-control select2bs4" multiple="multiple" data-placeholder="Seleccionar defensores...">
+                  <select name="personajes_defensores[]" id="personajes_defensores" class="form-control select2bs4 @error('personajes_defensores') is-invalid @enderror" multiple="multiple" data-placeholder="Seleccionar defensores...">
                     @foreach($personajes as $id => $nombre)
                     <option value="{{ $id }}" {{ (collect(old('personajes_defensores'))->contains($id)) ? 'selected' : '' }}>
                       {{ $nombre }}
                     </option>
                     @endforeach
                   </select>
+                  @error('personajes_defensores') <small class="text-danger d-block">{{ $message }}</small> @enderror
                   <small class="form-text text-muted">Personajes que defendieron o resistieron.</small>
                 </div>
               </div>
@@ -192,13 +198,14 @@
                   <label for="paises_atacantes" class="font-weight-bold">
                     <i class="fas fa-sword mr-1"></i> Países atacantes
                   </label>
-                  <select name="paises_atacantes[]" id="paises_atacantes" class="form-control select2bs4" multiple="multiple" data-placeholder="Seleccionar atacantes...">
+                  <select name="paises_atacantes[]" id="paises_atacantes" class="form-control select2bs4 @error('paises_atacantes') is-invalid @enderror" multiple="multiple" data-placeholder="Seleccionar atacantes...">
                     @foreach($paises as $id => $nombre)
                     <option value="{{ $id }}" {{ (collect(old('paises_atacantes'))->contains($id)) ? 'selected' : '' }}>
                       {{ $nombre }}
                     </option>
                     @endforeach
                   </select>
+                  @error('paises_atacantes') <small class="text-danger d-block">{{ $message }}</small> @enderror
                   <small class="form-text text-muted">Países que iniciaron o lideraron la ofensiva.</small>
                 </div>
               </div>
@@ -209,13 +216,14 @@
                   <label for="paises_defensores" class="font-weight-bold">
                     <i class="fas fa-shield mr-1"></i> Países defensores
                   </label>
-                  <select name="paises_defensores[]" id="paises_defensores" class="form-control select2bs4" multiple="multiple" data-placeholder="Seleccionar defensores...">
+                  <select name="paises_defensores[]" id="paises_defensores" class="form-control select2bs4 @error('paises_defensores') is-invalid @enderror" multiple="multiple" data-placeholder="Seleccionar defensores...">
                     @foreach($paises as $id => $nombre)
                     <option value="{{ $id }}" {{ (collect(old('paises_defensores'))->contains($id)) ? 'selected' : '' }}>
                       {{ $nombre }}
                     </option>
                     @endforeach
                   </select>
+                  @error('paises_defensores') <small class="text-danger d-block">{{ $message }}</small> @enderror
                   <small class="form-text text-muted">Países que defendieron o resistieron.</small>
                 </div>
               </div>

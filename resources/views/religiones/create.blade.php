@@ -20,7 +20,7 @@
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-create-religion" class="position-relative needs-validation" action="{{route('religiones.store')}}" method="post" enctype="multipart/form-data">
+  <form id="form-create-religion" data-prevent-loss="true" class="position-relative needs-validation" action="{{route('religiones.store')}}" method="post" enctype="multipart/form-data">
     @csrf
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
@@ -53,15 +53,16 @@
               <div class="col-md-3">
                 <div class="form-group mt-2">
                   <label for="tipo_teismo">Tipo de Teísmo</label>
-                  <select name="tipo_teismo" id="tipo_teismo" class="form-control select2">
+                  <select name="tipo_teismo" id="tipo_teismo" class="form-control select2 @error('tipo_teismo') is-invalid @enderror">
                     <option value="" selected disabled>Selecciona una doctrina...</option>
                     @foreach(\App\Models\Religion::getTiposTeismo() as $value => $label)
                     <option value="{{ $value }}"
-                      {{ (old('tipo_teismo') == $value || (isset($religion) && $religion->tipo_teismo?->value == $value)) ? 'selected' : '' }}>
+                      {{ (old('tipo_teismo') == $value) ? 'selected' : '' }}>
                       {{ $label }}
                     </option>
                     @endforeach
                   </select>
+                  @error('tipo_teismo') <small class="text-danger d-block">{{ $message }}</small> @enderror
                 </div>
               </div>
               <div class="col-md">
@@ -70,12 +71,13 @@
               <div class="col-md">
                 <div class="form-group mt-2">
                   <label for="estatus_legal" class="form-label">Estatus legal</label>
-                  <select class="form-select form-control" name="estatus_legal" id="estatus_legal" required>
+                  <select class="form-select form-control @error('estatus_legal') is-invalid @enderror" name="estatus_legal" id="estatus_legal" required>
                     <option selected disabled value="">Elegir</option>
                     @foreach(['Activa', 'Clandestina', 'Extinta', 'Perseguida'] as $status)
                     <option value="{{ $status }}" {{ old('estatus_legal') == $status ? 'selected' : '' }}>{{ $status }}</option>
                     @endforeach
                   </select>
+                  @error('estatus_legal') <small class="text-danger d-block">{{ $message }}</small> @enderror
                 </div>
               </div>
             </div>
@@ -163,15 +165,6 @@
 @section('specific-scripts')
 <script>
   $(function() {
-    // Summernote
-    $('.summernote').summernote({
-      height: 300
-    })
-
-    $('.summernote-lite').summernote({
-      height: 150
-    })
-
     //Preview de escudo antes de subirla
     document.getElementById('escudo').onchange = evt => {
       const [file] = document.getElementById('escudo').files
@@ -179,6 +172,8 @@
         document.getElementById('escudo-preview').src = URL.createObjectURL(file)
       }
     }
+
   });
 </script>
+<script src="{{asset('dist/js/common.js')}}"></script>
 @endsection

@@ -125,15 +125,15 @@ class ConflictoController extends Controller
   /**
    * Display the specified resource.
    */
-  public function show($id)
+  public function show(Conflicto $conflicto)
   {
     try {
-      $conflicto = Conflicto::with([
+      $conflicto->load([
         'tipoConflicto',
         'personajes',
         'organizaciones',
         'conflictoPadre',
-      ])->findorfail($id);
+      ]);
 
       // Obtención de las fechas formateadas para la vista
       $fecha_inicio = Fecha::get_fecha_string($conflicto->fecha_inicio_id);
@@ -150,7 +150,7 @@ class ConflictoController extends Controller
   /**
    * Show the form for editing the specified resource.
    */
-  public function edit($id)
+  public function edit(Conflicto $conflicto)
   {
     try {
       // Obtener todos los tipos de conflictos almacenados
@@ -172,13 +172,13 @@ class ConflictoController extends Controller
       $asentamientos = Asentamiento::orderby('nombre', 'asc')->pluck('nombre', 'id') ?? [];
 
       // Obtener la construccion
-      $conflicto = Conflicto::with([
+      $conflicto->load([
         'tipoConflicto',
         'personajes',
         'organizaciones',
         'fechaInicio',
         'fechaFin',
-      ])->findorfail($id);
+      ]);
 
       // Extraemos los IDs actuales por bando para pre-seleccionarlos en la vista
       $personajesAtacantesIds = $conflicto->personajes()->wherePivot('lado', 'atacante')->pluck('personajes.id')->toArray();
@@ -198,17 +198,16 @@ class ConflictoController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(ConflictoRequest $request, $id)
+  public function update(ConflictoRequest $request, Conflicto $conflicto)
   {
     $datosValidados = $request->validated();
     try {
-      $conflicto = Conflicto::findOrFail($id); //obtiene el conflicto en bbdd
       $conflicto->update_conflicto($datosValidados);
 
       return redirect()->route('conflictos.index')
         ->with('success', 'Conflicto ' . $conflicto->nombre . ' actualizado con éxito.');
     } catch (\Exception $e) {
-      Log::error("Error actualizando conflicto ID {$id}: " . $e->getMessage());
+      Log::error("Error actualizando conflicto ID {$conflicto->id}: " . $e->getMessage());
       return redirect()->back()
         ->withInput()
         ->with('error', 'Error al actualizar: ' . $e->getMessage());
@@ -218,17 +217,15 @@ class ConflictoController extends Controller
   /**
    * Remove the specified resource from storage.
    */
-  public function destroy(Request $request)
+  public function destroy(Conflicto $conflicto)
   {
     try {
-      $conflicto = Conflicto::findOrFail($request->id_borrar);
-
       DB::transaction(function () use ($conflicto) {
         $conflicto->delete();
       });
 
       return redirect()->route('conflictos.index')
-        ->with('success', $request->nombre_borrado . ' borrado correctamente.');
+        ->with('success', $conflicto->nombre . ' borrado correctamente.');
     } catch (\Exception $e) {
       Log::error('Error al borrar conflicto: ' . $e->getMessage());
       return redirect()->route('conflictos.index')

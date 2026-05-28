@@ -6,7 +6,7 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-  <a href="{{route('conflicto.create')}}" class="btn btn-dark"><i class="fas fa-plus-circle mr-1"></i> Nuevo conflicto</a>
+  <a href="{{route('conflictos.create')}}" class="btn btn-dark"><i class="fas fa-plus-circle mr-1"></i> Nuevo conflicto</a>
 </li>
 <li class="nav-item ml-2">
   <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
@@ -65,26 +65,25 @@
     <div class="callout callout-info">
       <h5>No se encontraron conflictos</h5>
       <p>Intenta ajustar los filtros o crea uno nuevo.</p>
-      <a href="{{route('conflicto.create')}}" class="btn btn-dark text-light">Crear nuevo conflicto</a>
-    </div>
-  </div>
-  @endforelse
-</div>
-
-<div class="row">
-  <div class="col-12 d-flex justify-content-center mt-4">
-    {{ $conflictos->appends(request()->query())->links('pagination::bootstrap-4') }}
-  </div>
-</div>
-
-<x-modal-delete
-  id="eliminar-conflicto"
-  :route="route('conflicto.destroy')"
-  message="Estás a punto de eliminar el siguiente conflicto de forma permanente:" />
+       <a href="{{route('conflictos.create')}}" class="btn btn-dark text-light">Crear nuevo conflicto</a>
+     </div>
+   </div>
+   @endforelse
+ </div>
+ 
+ <div class="row">
+   <div class="col-12 d-flex justify-content-center mt-4">
+     {{ $conflictos->appends(request()->query())->links('pagination::bootstrap-4') }}
+   </div>
+ </div>
+ 
+ <x-modal-delete
+   id="eliminar-conflicto"
+   message="Estás a punto de eliminar el siguiente conflicto de forma permanente:" />
 @endsection
 
 @section('specific-scripts')
-<script src="{{asset('dist/js/config.js')}}"></script>
+<script src="{{asset('dist/js/common.js')}}"></script>
 <script>
  $(function() {
 

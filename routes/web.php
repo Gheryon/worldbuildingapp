@@ -41,15 +41,7 @@ Route::controller(App\Http\Controllers\ConfigurationController::class)->group(fu
 });
 
 /*******conflictos routes********/
-Route::controller(App\Http\Controllers\ConflictoController::class)->group(function () {
-  Route::get('/conflictos/index/{orden?}/{tipo?}', 'index')->name('conflictos.index');
-  Route::get('/conflictos/create', 'create')->name('conflicto.create');
-  Route::post('/conflictos/store', 'store')->name('conflicto.store');
-  Route::get('/conflictos/{id}/edit', 'edit')->name('conflicto.edit');
-  Route::put('/conflictos/{id}', 'update')->name('conflicto.update');
-  Route::delete('/conflicto/destroy', 'destroy')->name('conflicto.destroy');
-  Route::get('/conflictos/{id}', 'show')->name('conflicto.show');
-});
+Route::resource('conflictos', App\Http\Controllers\ConflictoController::class);
 
 /*******construcciones routes********/
 Route::controller(App\Http\Controllers\ConstruccionController::class)->group(function () {
