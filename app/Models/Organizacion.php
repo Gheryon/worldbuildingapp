@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Services\ImageService;
+use App\Traits\HandlesRichTextImages;
 
 class Organizacion extends Model
 {
-  use HasFactory;
+  use HasFactory, HandlesRichTextImages;
 
   protected $table = 'organizaciones';
   protected $primaryKey = 'id';
@@ -52,6 +53,24 @@ class Organizacion extends Model
     'asentamiento_id' => 'integer',
     'organizacion_padre_id' => 'integer',
     'tipo_organizacion_id' => 'integer',
+  ];
+
+  // Mapeo: 'columna_en_db' => 'nombre_input_formulario'
+  public static $richTextFields = [
+    'demografia' => 'demografia',
+    'descripcion_breve' => 'descripcion_breve',
+    'estructura' => 'estructura',
+    'geopolitica' => 'geopolitica',
+    'militar' => 'militar',
+    'cultura' => 'cultura',
+    'tecnologia' => 'tecnologia',
+    'educacion' => 'educacion',
+    'historia' => 'historia',
+    'religion' => 'religion',
+    'territorio' => 'territorio',
+    'economia' => 'economia',
+    'recursos_naturales' => 'recursos_naturales',
+    'otros' => 'otros'
   ];
 
   /**
@@ -136,83 +155,45 @@ class Organizacion extends Model
   /**
    * Almacena una nueva organización en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $request
    * @return \App\Models\Organizacion
    */
-  public static function store_organizacion($request)
+  public static function store_organizacion(array $request)
   {
     return DB::transaction(function () use ($request) {
-      $organizacion = self::create([
-        'nombre' => $request->nombre,
-        'gentilicio' => $request->gentilicio,
-        'capital_nombre' => $request->capital,
-        'lema' => $request->lema,
-        'lider_id' => $request->select_lider,
-        'organizacion_padre_id' => $request->select_organizacion_padre,
-        'tipo_organizacion_id' => $request->select_tipo,
-        'escudo' => 'default.png', // Valor temporal, se actualizará después
-      ]);
-
-      // Manejo de la subida del escudo
-      $organizacion->escudo = self::handleEscudoUpload($request);
-
-      // Procesado de campos de Summernote
-      $imageService = new ImageService();
-      $camposRichText = [
-        'demografia' => 'demografia',
-        'descripcion_breve' => 'descripcion_breve',
-        'estructura' => 'estructura',
-        'geopolitica' => 'geopolitica',
-        'militar' => 'militar',
-        'cultura' => 'cultura',
-        'tecnologia' => 'tecnologia',
-        'educacion' => 'educacion',
-        'historia' => 'historia',
-        'religion' => 'religion',
-        'territorio' => 'territorio',
-        'economia' => 'economia',
-        'recursos_naturales' => 'recursos_naturales',
-        'otros' => 'otros'
-      ];
-
-      foreach ($camposRichText as $columna => $input) {
-        if ($request->filled($input)) {
-          //$organizacion->$columna = app(ImagenController::class)
-          //->store_for_summernote($request->$input, "organizaciones", $organizacion->id);
-          $organizacion->$columna = $imageService->processSummernoteImages(
-            $request->$input,
-            "organizaciones",
-            $organizacion->id
-          );
-        }
+      // Manejo del escudo
+      if (isset($request['escudo']) && $request['escudo'] instanceof \Illuminate\Http\UploadedFile) {
+        $path = $request['escudo']->store('escudos', 'public');
+        $request['escudo'] = basename($path);
+      } else {
+        $request['escudo'] = "default.png";
       }
+
+      $organizacion = self::create($request);
+
+      // Procesado de campos Summernote
+      $organizacion->processRichTextImages($request, self::$richTextFields, 'organizaciones');
 
       //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
-      if ($request->filled('anno_fundacion')) {
-        $organizacion->fundacion_id = Fecha::store_fecha(
-          $request->dia_fundacion,
-          $request->mes_fundacion,
-          $request->anno_fundacion
-        );
+      if (!empty($request['anno_fundacion'])) {
+        $organizacion->fundacion_id = Fecha::sync(null, [
+          'dia'  => $request['dia_fundacion'] ?? null,
+          'mes'  => $request['mes_fundacion'] ?? null,
+          'anno' => $request['anno_fundacion'] ?? null
+        ]);
       }
 
-      if ($request->filled('anno_disolucion')) {
-        $organizacion->disolucion_id = Fecha::store_fecha(
-          $request->dia_disolucion,
-          $request->mes_disolucion,
-          $request->anno_disolucion
-        );
+      if (!empty($request['anno_disolucion'])) {
+        $organizacion->disolucion_id = Fecha::sync(null, [
+          'dia'  => $request['dia_disolucion'] ?? null,
+          'mes'  => $request['mes_disolucion'] ?? null,
+          'anno' => $request['anno_disolucion'] ?? null
+        ]);
       }
 
       // Guardado de Religiones (Tabla pivote)
-      if ($request->filled('religiones')) {
-        /*foreach ($request->input('religiones') as $religionId) {
-          DB::table('religion_presence')->insert([
-            'organizacion' => $organizacion->id,
-            'religion'     => $religionId
-          ]);
-        }*/
-        $organizacion->religiones()->attach($request->religiones);
+      if (!empty($request['religiones']) && is_array($request['religiones'])) {
+        $organizacion->religiones()->sync($request['religiones']);
       }
 
       // Guardamos los cambios finales (rutas de imágenes y fechas)
@@ -225,82 +206,55 @@ class Organizacion extends Model
   /**
    * Actualiza una organización existente en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $request
    * @return \App\Models\Organizacion
    */
-  public function update_organizacion($request)
+  public function update_organizacion(array $request)
   {
     return DB::transaction(function () use ($request) {
-      //Campos básicos
-      $this->fill([
-        'nombre'               => $request->nombre,
-        'gentilicio'           => $request->gentilicio,
-        'capital_nombre'              => $request->capital,
-        'lema'                 => $request->lema,
-        'lider_id'             => $request->select_lider,
-        'organizacion_padre_id' => $request->select_organizacion_padre,
-        'tipo_organizacion_id' => $request->select_tipo,
-      ]);
-
       //Manejo del escudo (Solo si se sube uno nuevo)
-      if ($request->hasFile('escudo')) {
+      if (isset($request['escudo']) && $request['escudo'] instanceof \Illuminate\Http\UploadedFile) {
         // Borrar escudo anterior si no es el default
         if ($this->escudo !== 'default.png') {
           $oldPath = public_path('storage/escudos/' . $this->escudo);
           if (file_exists($oldPath)) unlink($oldPath);
         }
-        $this->escudo = self::handleEscudoUpload($request);
+        $path = $request['escudo']->store('escudos', 'public');
+        $request['escudo'] = basename($path);
       }
+
+      //Campos básicos
+      $this->fill($request);
 
       // Procesado campos RichText (Summernote)
-      $imageService = new ImageService();
-      $campos = [
-        'demografia',
-        'descripcion_breve',
-        'estructura',
-        'geopolitica',
-        'militar',
-        'cultura',
-        'tecnologia',
-        'educacion',
-        'historia',
-        'religion',
-        'territorio',
-        'economia',
-        'recursos_naturales',
-        'otros'
-      ];
-
-      foreach ($campos as $campo) {
-        if ($request->filled($campo)) {
-          $this->$campo = $imageService->processSummernoteImages(
-            $request->$campo,
-            "organizaciones",
-            $this->id
-          );
-        }
-      }
+      $this->processRichTextImages($request, self::$richTextFields, 'organizaciones');
 
       //Actualizado de fechas
       //Procesar Fechas, si existe fundacion_id o disolucion_id se actualiza, si no se crea. Si no hay año no se guarda fecha
-      if ($this->fundacion_id) {
-        Fecha::update_fecha($request->dia_fundacion, $request->mes_fundacion, $request->anno_fundacion, $this->fundacion_id);
-      } else {
-        if ($request->filled('anno_fundacion')) {
-          $this->fundacion_id = Fecha::store_fecha($request->dia_fundacion, $request->mes_fundacion, $request->anno_fundacion);
-        }
+      if (!empty($request['anno_fundacion'])) {
+        $this->fundacion_id = Fecha::sync($this->fundacion_id, [
+          'dia'  => $request['dia_fundacion'] ?? null,
+          'mes'  => $request['mes_fundacion'] ?? null,
+          'anno' => $request['anno_fundacion'] ?? null
+        ]);
       }
 
-      if ($this->disolucion_id) {
-        Fecha::update_fecha($request->dia_disolucion, $request->mes_disolucion, $request->anno_disolucion, $this->disolucion_id);
-      } else {
-        if ($request->filled('anno_disolucion')) {
-          $this->disolucion_id = Fecha::store_fecha($request->dia_disolucion, $request->mes_disolucion, $request->anno_disolucion);
-        }
+      if (!empty($request['anno_disolucion'])) {
+        $this->disolucion_id = Fecha::sync($this->disolucion_id, [
+          'dia'  => $request['dia_disolucion'] ?? null,
+          'mes'  => $request['mes_disolucion'] ?? null,
+          'anno' => $request['anno_disolucion'] ?? null
+        ]);
       }
 
-      //Sincronizar religiones
-      $this->religiones()->sync($request->input('religiones', []));
+      //Sincronizar religiones (tabla pivote)
+      if (isset($request['religiones']) && is_array($request['religiones'])) {
+        // Sincroniza los IDs del array, eliminando los que ya no estén
+        $this->religiones()->sync($request['religiones']);
+      } else {
+        // Si el campo viene vacío o no viene (y quieres desvincular todas)
+        $this->religiones()->detach();
+      }
 
       return $this->save();
     });
