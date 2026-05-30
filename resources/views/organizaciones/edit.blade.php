@@ -20,7 +20,7 @@
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-edit-organization" class="position-relative needs-validation" action="{{route('organizaciones.update', $organizacion->id)}}" method="post" enctype="multipart/form-data">
+  <form id="form-edit-organization" data-prevent-loss="true" class="position-relative needs-validation" action="{{route('organizaciones.update', $organizacion->id)}}" method="post" enctype="multipart/form-data">
     @csrf
     @method('PUT')
     <div class="row justify-content-md-center">
@@ -208,15 +208,6 @@
 @section('specific-scripts')
 <script>
   $(function() {
-    // Summernote
-    $('.summernote').summernote({
-      height: 300
-    })
-
-    $('.summernote-lite').summernote({
-      height: 150
-    })
-
     //Preview de escudo antes de subirla
     document.getElementById('escudo').onchange = evt => {
       const [file] = document.getElementById('escudo').files
@@ -235,4 +226,5 @@
 
   });
 </script>
+<script src="{{asset('dist/js/common.js')}}"></script>
 @endsection

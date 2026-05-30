@@ -20,7 +20,7 @@
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-create-organization" class="position-relative needs-validation" action="{{route('organizaciones.store')}}" method="post" enctype="multipart/form-data">
+  <form id="form-create-organization" data-prevent-loss="true" class="position-relative needs-validation" action="{{route('organizaciones.store')}}" method="post" enctype="multipart/form-data">
     @csrf
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
@@ -203,14 +203,6 @@
 @section('specific-scripts')
 <script>
   $(function() {
-    // Summernote
-    $('.summernote').summernote({
-      height: 300
-    })
-
-    $('.summernote-lite').summernote({
-      height: 150
-    })
 
     //Preview de escudo antes de subirla
     document.getElementById('escudo').onchange = evt => {
@@ -230,4 +222,5 @@
 
   });
 </script>
+<script src="{{asset('dist/js/common.js')}}"></script>
 @endsection
