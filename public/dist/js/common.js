@@ -90,7 +90,7 @@ $(document).ready(function () {
 
     $(this).summernote({
       // Si tiene el atributo data-height usa ese, si no, usa el default según el tipo
-      height: $(this).data('height') || (isLite ? 200 : 600),
+      height: $(this).data('height') || (isLite ? 300 : 800),
       lang: 'es-ES',
       placeholder: $(this).attr('placeholder') || 'Escribe aquí...',
       toolbar: isLite ? [
