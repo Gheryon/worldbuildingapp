@@ -141,9 +141,10 @@
           {{-- Pestaña magia --}}
           <div class="tab-pane fade" id="tab-magia">
             <div class="custom-control custom-switch mb-3">
-              <input type="checkbox" class="custom-control-input" id="es_conflicto_magico" name="es_conflicto_magico" value="1" {{ old('es_conflicto_magico') ? 'checked' : '' }}>
+              <input type="checkbox" class="custom-control-input @error('es_conflicto_magico') is-invalid @enderror" id="es_conflicto_magico" name="es_conflicto_magico" value="1" {{ old('es_conflicto_magico') ? 'checked' : '' }}>
               <label class="custom-control-label" for="es_conflicto_magico">¿Involucró magia significativa?</label>
             </div>
+            @error('es_conflicto_magico') <small class="text-danger d-block">{{ $message }}</small> @enderror
             <div class="row">
               <div class="col-md-6"><x-textarea-input name="hechizos_decisivos" label="Hechizos decisivos" :value="old('hechizos_decisivos')" /></div>
               <div class="col-md-6"><x-textarea-input name="armas_magicas_empleadas" label="Artefactos y armas mágicas" :value="old('armas_magicas_empleadas')" /></div>

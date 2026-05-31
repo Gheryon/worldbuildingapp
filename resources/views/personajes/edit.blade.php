@@ -52,16 +52,12 @@
             <div class="row mt-2">
               <div class="col-md-2">
                 <label for="sexo">Sexo</label>
-                <select class="form-control mt-2" name="sexo" id="sexo" required>
+                <select class="form-control @error('sexo') is-invalid @enderror mt-2" name="sexo" id="sexo" required>
                   <option selected disabled value="">Elegir</option>
                   <option {{ old('sexo', $personaje->sexo) == 'Hombre' ? 'selected' : '' }}>Hombre</option>
                   <option {{ old('sexo', $personaje->sexo) == 'Mujer' ? 'selected' : '' }}>Mujer</option>
                 </select>
-                @error('sexo')
-                <span class="invalid-feedback" role="alert">
-                  <strong>{{ $message }}</strong>
-                </span>
-                @enderror
+                @error('sexo') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-3">
                 <label for="select_especie">Especie</label>
@@ -111,10 +107,8 @@
         <div class="col-md-3 mt-2 mb-2">
           <label for="retrato" class="form-label">Retrato</label>
           <img alt="retrato" id="retrato-img" src="{{asset("storage/retratos/{$personaje->retrato}")}}" class="img-fluid" width="185" height="180">
-          <input type="file" name="retrato" class="form-control" id="retrato">
-          @error('retrato')
-          <small style="color: red">{{$message}}</small>
-          @enderror
+          <input type="file" name="retrato" class="form-control @error('retrato') is-invalid @enderror" id="retrato">
+          @error('retrato') <small class="text-danger d-block">{{ $message }}</small> @enderror
         </div>
         </div>
       </div>

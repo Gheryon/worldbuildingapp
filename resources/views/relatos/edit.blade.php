@@ -42,7 +42,7 @@
 
           <div class="col-md-4 mb-3">
             <label for="personajes" class="form-label">Personajes relevantes</label>
-            <select class="form-select form-control" multiple="multiple" data-placeholder="Personajes" name="personajes[]" id="personajes" style="width: 100%;">
+            <select class="form-select form-control @error('personajes') is-invalid @enderror" multiple="multiple" data-placeholder="Personajes" name="personajes[]" id="personajes" style="width: 100%;">
               @php
               // 1. Prioridad: lo que el usuario acaba de marcar (si hubo error de validación)
               // 2. Si no, los IDs que ya existen en la relación del modelo

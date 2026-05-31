@@ -53,33 +53,33 @@
             <div class="row">
               <div class="col-md-4 mb-3">
                 <label for="select_tipo" class="form-label font-weight-bold">Tipo de lugar</label>
-                <select class="form-control select2bs4" name="select_tipo" id="select_tipo" required>
+                <select class="form-control select2bs4 @error('select_tipo') is-invalid @enderror" name="select_tipo" id="select_tipo" required>
                   <option selected disabled value="">Elegir tipo...</option>
                   @foreach($tipos as $tipo)
                   <option value="{{$tipo->id}}" {{ old('select_tipo') == $tipo->id ? 'selected' : '' }}>{{$tipo->nombre}}</option>
                   @endforeach
                 </select>
-            @error('select_tipo')
-            <small style="color: red">{{$message}}</small>
-            @enderror
+                @error('select_tipo') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-4 mb-3">
                 <label for="nivel_peligro" class="form-label font-weight-bold">Nivel de peligro</label>
-                <select class="form-control select2bs4" name="nivel_peligro" id="nivel_peligro">
+                <select class="form-control select2bs4 @error('nivel_peligro') is-invalid @enderror" name="nivel_peligro" id="nivel_peligro">
                   <option selected value="">Elegir nivel...</option>
                   @foreach(['Ninguno', 'Bajo', 'Moderado', 'Alto', 'Mortal', 'Desconocido'] as $nivel)
                   <option value="{{ $nivel }}" {{ old('nivel_peligro') == $nivel ? 'selected' : '' }}>{{ $nivel }}</option>
                   @endforeach
                 </select>
+                @error('nivel_peligro') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-4 mb-3">
                 <label for="tipo_peligro" class="form-label font-weight-bold">Naturaleza del peligro</label>
-                <select class="form-control select2bs4" name="tipo_peligro" id="tipo_peligro">
+                <select class="form-control select2bs4 @error('tipo_peligro') is-invalid @enderror" name="tipo_peligro" id="tipo_peligro">
                   <option selected value="">Elegir origen...</option>
                   @foreach(['Mágico', 'Fauna', 'Clima', 'Geológico', 'Político', 'Sobrenatural', 'Ninguno'] as $t_pel)
                   <option value="{{ $t_pel }}" {{ old('tipo_peligro') == $t_pel ? 'selected' : '' }}>{{ $t_pel }}</option>
                   @endforeach
                 </select>
+                @error('tipo_peligro') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
             </div>
           </div>
@@ -89,12 +89,13 @@
             <div class="row">
               <div class="col-12 mb-3">
                 <label for="dificultad_acceso" class="form-label font-weight-bold">Accesibilidad</label>
-                <select class="form-control select2bs4" name="dificultad_acceso" id="dificultad_acceso">
+                <select class="form-control select2bs4 @error('dificultad_acceso') is-invalid @enderror" name="dificultad_acceso" id="dificultad_acceso">
                   <option selected value="">Elegir dificultad...</option>
                   @foreach(['Muy fácil', 'Fácil', 'Moderada', 'Difícil', 'Extrema'] as $dif)
                   <option value="{{ $dif }}" {{ old('dificultad_acceso') == $dif ? 'selected' : '' }}>{{ $dif }}</option>
                   @endforeach
                 </select>
+                @error('dificultad_acceso') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-12 mb-3">
                 <x-text-input name="estacionalidad" label="Estacionalidad" placeholder="Ej: Solo en invierno" :value="old('estacionalidad')" />
@@ -102,9 +103,10 @@
               <div class="col-12">
                 <label class="form-label font-weight-bold">Estado</label>
                 <div class="custom-control custom-switch mt-1">
-                  <input type="checkbox" class="custom-control-input" id="es_secreto" name="es_secreto" {{ old('es_secreto') ? 'checked' : '' }}>
+                  <input type="checkbox" class="custom-control-input @error('es_secreto') is-invalid @enderror" id="es_secreto" name="es_secreto" {{ old('es_secreto') ? 'checked' : '' }}>
                   <label class="custom-control-label font-weight-normal" for="es_secreto">Marcar como lugar secreto</label>
                 </div>
+                @error('es_secreto') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
             </div>
           </div>

@@ -50,11 +50,12 @@
             <div class="row mt-3">
               <div class="col-md-2">
                 <label for="sexo">Sexo</label>
-                <select class="form-control mt-2" name="sexo" id="sexo" required>
+                <select class="form-control @error('sexo') is-invalid @enderror mt-2" name="sexo" id="sexo" required>
                   <option selected disabled value="">Elegir</option>
                   <option {{ old('sexo') == 'Hombre' ? 'selected' : '' }}>Hombre</option>
                   <option {{ old('sexo') == 'Mujer' ? 'selected' : '' }}>Mujer</option>
                 </select>
+                @error('sexo') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-3">
                 <label for="select_especie">Especie</label>
@@ -98,10 +99,8 @@
               </div>
               <div class="col-md">
                 <label for="causa_fallecimiento" class="form-label mt-2">Causa de fallecimiento</label>
-                <input type="text" name="causa_fallecimiento" class="form-control" id="causa_fallecimiento" value="{{old('causa_fallecimiento')}}" placeholder="Ej: Enfermedad, accidente, asesinato...">
-                @error('causa_fallecimiento')
-                <small style="color: red">{{$message}}</small>
-                @enderror
+                <input type="text" name="causa_fallecimiento" class="form-control @error('causa_fallecimiento') is-invalid @enderror" id="causa_fallecimiento" value="{{old('causa_fallecimiento')}}" placeholder="Ej: Enfermedad, accidente, asesinato...">
+                @error('causa_fallecimiento') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
             </div>
           </div>
@@ -110,7 +109,8 @@
             <div class="mb-2">
               <img id="retrato-preview" src="{{asset('storage/retratos/default.png')}}" class="img-fluid" style="width: 200px; height: 200px; object-fit: cover;">
             </div>
-            <input type="file" name="retrato" class="form-control-file" id="retrato">
+            <input type="file" name="retrato" class="form-control @error('retrato') is-invalid @enderror" id="retrato">
+            @error('retrato') <small class="text-danger d-block">{{ $message }}</small> @enderror
           </div>
         </div>
       </div>

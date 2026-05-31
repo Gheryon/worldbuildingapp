@@ -53,31 +53,31 @@
             <div class="row">
               <div class="col-md-4 mb-3">
                 <label for="select_tipo" class="form-label font-weight-bold">Tipo</label>
-                <select class="form-control select2bs4" name="select_tipo" id="select_tipo" required>
+                <select class="form-control select2bs4 @error('select_tipo') is-invalid @enderror" name="select_tipo" id="select_tipo" required>
                   <option selected disabled value="">Elegir...</option>
                   @foreach($tipos_asentamientos as $tipo)
                   <option value="{{$tipo->id}}" {{ old('select_tipo', $asentamiento->tipo_asentamiento_id) == $tipo->id ? 'selected' : '' }}>{{$tipo->nombre}}</option>
                   @endforeach
                 </select>
+                @error('select_tipo') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-4 mb-3">
                 <label for="estatus" class="form-label font-weight-bold">Estatus actual</label>
-                <select class="form-control select2bs4" name="estatus" id="estatus" required>
+                <select class="form-control select2bs4 @error('estatus') is-invalid @enderror" name="estatus" id="estatus" required>
                   <option selected value="">Elegir...</option>
                   @foreach(['Abandonado', 'En ruinas', 'Habitado', 'Secreto', 'Olvidado'] as $est)
                   <option value="{{ $est }}" {{ old('estatus', $asentamiento->estatus) == $est ? 'selected' : '' }}>{{ $est }}</option>
                   @endforeach
                 </select>
+                @error('estatus') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-4 mb-3">
                 <label for="poblacion" class="form-label font-weight-bold">Población estimada</label>
                 <div class="input-group">
                   <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-users"></i></span></div>
-                  <input type="number" name="poblacion" class="form-control" id="poblacion" placeholder="Ej: 5000" value="{{ old('poblacion', $asentamiento->poblacion) }}">
-                  @error('poblacion')
-                  <small style="color: red">{{$message}}</small>
-                  @enderror
+                  <input type="number" name="poblacion" class="form-control @error('poblacion') is-invalid @enderror" id="poblacion" placeholder="Ej: 5000" value="{{ old('poblacion', $asentamiento->poblacion) }}">
                 </div>
+                @error('poblacion') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
             </div>
           </div>
@@ -86,21 +86,23 @@
           <div class="col-md-4 border-left">
             <div class="mb-3">
               <label for="select_owner" class="form-label font-weight-bold">Controlado por:</label>
-              <select class="form-control select2bs4" name="select_owner" id="select_owner">
+              <select class="form-control select2bs4 @error('select_owner') is-invalid @enderror" name="select_owner" id="select_owner">
                 <option value="">Independiente / Ninguno</option>
                 @foreach($paises as $id => $nombre)
                 <option value="{{$id}}" {{ old('select_owner', $asentamiento->organizacion_id) == $id ? 'selected' : '' }}>{{$nombre}}</option>
                 @endforeach
               </select>
+              @error('select_owner') <small class="text-danger d-block">{{ $message }}</small> @enderror
             </div>
             <div class="mb-3">
               <label for="select_gobernante" class="form-label font-weight-bold">Gobernante local</label>
-              <select class="form-control select2bs4" name="select_gobernante" id="select_gobernante">
+              <select class="form-control select2bs4 @error('select_gobernante') is-invalid @enderror" name="select_gobernante" id="select_gobernante">
                 <option value="">Sin gobernante especificado</option>
                 @foreach($personajes as $id => $nombre)
                 <option value="{{$id}}" {{ old('select_gobernante', $asentamiento->gobernante_id) == $id ? 'selected' : '' }}>{{$nombre}}</option>
                 @endforeach
               </select>
+              @error('select_gobernante') <small class="text-danger d-block">{{ $message }}</small> @enderror
             </div>
           </div>
         </div>
