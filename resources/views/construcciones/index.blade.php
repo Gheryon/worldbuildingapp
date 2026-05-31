@@ -6,7 +6,7 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-  <a href="{{route('construccion.create')}}" class="btn btn-dark">Nueva construcción</a>
+  <a href="{{route('construcciones.create')}}" class="btn btn-dark">Nueva construcción</a>
 </li>
 <li class="nav-item ml-2">
   <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
@@ -62,9 +62,9 @@
       <!-- /.card-body -->
       <div class="card-footer">
         <div class="row text-right">
-          <a href="{{route('construccion.show',$construccion->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-          <a href="{{route('construccion.edit',$construccion->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-          <button data-id="{{$construccion->id}}" data-nombre="{{$construccion->nombre}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-construccion"><i class="fas fa-trash mr-1"></i></button>
+          <a href="{{route('construcciones.show',$construccion->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
+          <a href="{{route('construcciones.edit',$construccion->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
+          <button data-id="{{$construccion->id}}" data-nombre="{{$construccion->nombre}}" data-url="{{ route('construcciones.destroy', $construccion->id) }}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-construccion"><i class="fas fa-trash mr-1"></i></button>
         </div>
       </div>
     </div>
@@ -74,7 +74,7 @@
     <div class="callout callout-info">
       <h5>No se encontraron construcciones</h5>
       <p>Intenta ajustar los filtros o crear una nueva.</p>
-      <a href="{{route('construccion.create')}}" class="btn btn-dark text-light">Crear nueva construcción</a>
+      <a href="{{route('construcciones.create')}}" class="btn btn-dark text-light">Crear nueva construcción</a>
     </div>
   </div>
   @endforelse
@@ -88,12 +88,11 @@
 
 <x-modal-delete
   id="eliminar-construccion"
-  :route="route('construccion.destroy')"
   message="Estás a punto de eliminar la siguiente construcción de forma permanente:" />
 @endsection
 
 @section('specific-scripts')
-<script src="{{asset('dist/js/config.js')}}"></script>
+<script src="{{asset('dist/js/common.js')}}"></script>
 <script>
   $(function() {
 

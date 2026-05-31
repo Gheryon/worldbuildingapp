@@ -2,16 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group.
-|
-*/
-
 Route::get('/', function () {
   return view('main');
 });
@@ -44,15 +34,7 @@ Route::controller(App\Http\Controllers\ConfigurationController::class)->group(fu
 Route::resource('conflictos', App\Http\Controllers\ConflictoController::class);
 
 /*******construcciones routes********/
-Route::controller(App\Http\Controllers\ConstruccionController::class)->group(function () {
-  Route::get('/construcciones/index/{orden?}/{tipo?}', 'index')->name('construcciones.index');
-  Route::get('/construcciones/create', 'create')->name('construccion.create');
-  Route::post('/construcciones/store', 'store')->name('construccion.store');
-  Route::get('/construcciones/{id}/edit', 'edit')->name('construccion.edit');
-  Route::put('/construcciones/{id}', 'update')->name('construccion.update');
-  Route::delete('/construccion/destroy', 'destroy')->name('construccion.destroy');
-  Route::get('/construcciones/{id}', 'show')->name('construccion.show');
-});
+Route::resource('construcciones', App\Http\Controllers\ConstruccionController::class)->parameters(['construcciones' => 'construccion']);
 
 /*******enlaces routes********/
 Route::controller(App\Http\Controllers\EnlacesController::class)->group(function () {

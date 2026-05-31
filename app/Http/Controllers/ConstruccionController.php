@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Asentamiento;
 use App\Models\Construccion;
 use App\Models\Fecha;
-use App\Models\imagen;
 use App\Models\TipoConstruccion;
 use App\Http\Requests\ConstruccionRequest;
-use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -171,15 +170,16 @@ class ConstruccionController extends Controller
   /**
    * Remove the specified resource from storage.
    */
-  public function destroy(Request $request)
+  public function destroy(Construccion $construccion)
   {
     try {
-      $construccion = Construccion::findOrFail($request->id_borrar);
-
-      $construccion->delete();
+      $nombre = $construccion->nombre;
+      DB::transaction(function () use ($construccion) {
+        $construccion->delete();
+      });
 
       return redirect()->route('construcciones.index')
-        ->with('success', $request->nombre_borrado . ' borrado correctamente.');
+        ->with('success', $nombre . ' borrado correctamente.');
     } catch (\Exception $e) {
       Log::error('Error al borrar construccion: ' . $e->getMessage());
       return redirect()->route('construcciones.index')

@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <form id="form-create-construccion" data-prevent-loss="true" class="needs-validation" action="{{route('construccion.store')}}" method="post" enctype="multipart/form-data">
+  <form id="form-create-construccion" data-prevent-loss="true" class="needs-validation" action="{{route('construcciones.store')}}" method="post" enctype="multipart/form-data">
     @csrf
 
     {{-- Botón de Acción Superior --}}
@@ -51,70 +51,78 @@
               </div>
               <div class="col-md-3 mb-3">
                 <label for="tipo_construccion_id" class="form-label font-weight-bold mt-2">Tipo</label>
-                <select class="form-control select2bs4" name="tipo_construccion_id" id="tipo_construccion_id" required>
+                <select class="form-control select2bs4 @error('tipo_construccion_id') is-invalid @enderror" name="tipo_construccion_id" id="tipo_construccion_id" required>
                   <option selected disabled value="">Elegir tipo...</option>
                   @foreach($tipos as $tipo)
                   <option value="{{$tipo->id}}" {{ old('tipo_construccion_id') == $tipo->id ? 'selected' : '' }}>{{$tipo->nombre}}</option>
                   @endforeach
                 </select>
+                @error('tipo_construccion_id') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
             </div>
             <div class="row">
               <div class="col-md-4 mb-3">
                 <label for="estatus" class="form-label font-weight-bold">Estatus actual</label>
-                <select class="form-control select2bs4" name="estatus" id="estatus" required>
+                <select class="form-control select2bs4 @error('estatus') is-invalid @enderror" name="estatus" id="estatus" required>
                   <option selected value="">Elegir...</option>
                   @foreach(['Abandonado','Destruido','En construcción','En pie','En ruinas','Enterrado','Habitado','Secreto','Olvidado'] as $est)
                   <option value="{{ $est }}" {{ old('estatus') == $est ? 'selected' : '' }}>{{ $est }}</option>
                   @endforeach
                 </select>
+                @error('estatus') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-4 mb-3">
                 <label for="nivel_deterioro" class="form-label font-weight-bold">Nivel de deterioro</label>
-                <select class="form-control select2bs4" name="nivel_deterioro" id="nivel_deterioro">
+                <select class="form-control select2bs4 @error('nivel_deterioro') is-invalid @enderror" name="nivel_deterioro" id="nivel_deterioro">
                   @foreach(['Ninguno', 'Bajo', 'Medio', 'Alto', 'Irreversible'] as $det)
                   <option value="{{ $det }}" {{ old('nivel_deterioro') == $det ? 'selected' : '' }}>{{ $det }}</option>
                   @endforeach
                 </select>
+                @error('nivel_deterioro') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-4 mb-3">
                 <label for="dificultad_acceso" class="form-label font-weight-bold">Dificultad de acceso</label>
-                <select class="form-control select2bs4" name="dificultad_acceso" id="dificultad_acceso">
+                <select class="form-control select2bs4 @error('dificultad_acceso') is-invalid @enderror" name="dificultad_acceso" id="dificultad_acceso">
                   @foreach(['Libre', 'Fácil', 'Moderada', 'Difícil', 'Extrema'] as $dif)
                   <option value="{{ $dif }}" {{ old('dificultad_acceso') == $dif ? 'selected' : '' }}>{{ $dif }}</option>
                   @endforeach
                 </select>
+                @error('dificultad_acceso') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
             </div>
           </div>
 
           {{-- Columna de control y ubicación --}}
           <div class="col-md-4 border-left">
-            <div class="mb-3">
+              <div class="mb-3">
               <label for="asentamiento_id" class="form-label font-weight-bold">Ubicado en:</label>
-              <select class="form-control select2bs4" name="asentamiento_id" id="asentamiento_id">
+              <select class="form-control select2bs4 @error('asentamiento_id') is-invalid @enderror" name="asentamiento_id" id="asentamiento_id">
                 <option value="" selected>Desconocido / Exterior</option>
                 @foreach($asentamientos as $id => $nombre)
                 <option value="{{$id}}" {{ old('asentamiento_id') == $id ? 'selected' : '' }}>{{$nombre}}</option>
                 @endforeach
               </select>
+              @error('asentamiento_id') <small class="text-danger d-block">{{ $message }}</small> @enderror
             </div>
             <div class="mb-3 text-center">
               <label class="form-label font-weight-bold d-block">Configuración</label>
               <div class="d-flex flex-wrap justify-content-center gap-2">
                 <div class="custom-control custom-checkbox mr-3">
-                  <input class="custom-control-input" type="checkbox" id="acceso_publico" name="acceso_publico" value="1" {{ old('acceso_publico') ? 'checked' : '' }}>
+                  <input class="custom-control-input @error('acceso_publico') is-invalid @enderror" type="checkbox" id="acceso_publico" name="acceso_publico" value="1" {{ old('acceso_publico') ? 'checked' : '' }}>
                   <label for="acceso_publico" class="custom-control-label">Acceso público</label>
                 </div>
                 <div class="custom-control custom-checkbox mr-3">
-                  <input class="custom-control-input" type="checkbox" id="acceso_temporal" name="acceso_temporal" value="1" {{ old('acceso_temporal') ? 'checked' : '' }}>
+                  <input class="custom-control-input @error('acceso_temporal') is-invalid @enderror" type="checkbox" id="acceso_temporal" name="acceso_temporal" value="1" {{ old('acceso_temporal') ? 'checked' : '' }}>
                   <label for="acceso_temporal" class="custom-control-label">Acceso temporal</label>
                 </div>
                 <div class="custom-control custom-checkbox mr-3">
-                  <input class="custom-control-input" type="checkbox" id="tecnologia_perdida" name="tecnologia_perdida" value="1" {{ old('tecnologia_perdida') ? 'checked' : '' }}>
+                  <input class="custom-control-input @error('tecnologia_perdida') is-invalid @enderror" type="checkbox" id="tecnologia_perdida" name="tecnologia_perdida" value="1" {{ old('tecnologia_perdida') ? 'checked' : '' }}>
                   <label for="tecnologia_perdida" class="custom-control-label">Tecnología perdida</label>
                 </div>
               </div>
+              @error('acceso_publico') <small class="text-danger d-block">{{ $message }}</small> @enderror
+              @error('acceso_temporal') <small class="text-danger d-block">{{ $message }}</small> @enderror
+              @error('tecnologia_perdida') <small class="text-danger d-block">{{ $message }}</small> @enderror
             </div>
           </div>
         </div>
@@ -166,9 +174,10 @@
             <div class="row mb-3">
               <div class="col-md-4">
                 <div class="custom-control custom-switch mt-2">
-                  <input type="checkbox" class="custom-control-input" id="tiene_magia_inherente" name="tiene_magia_inherente" value="1" {{ old('tiene_magia_inherente') ? 'checked' : '' }}>
+                  <input type="checkbox" class="custom-control-input @error('tiene_magia_inherente') is-invalid @enderror" id="tiene_magia_inherente" name="tiene_magia_inherente" value="1" {{ old('tiene_magia_inherente') ? 'checked' : '' }}>
                   <label class="custom-control-label" for="tiene_magia_inherente">¿Construcción mágica?</label>
                 </div>
+                @error('tiene_magia_inherente') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-8">
                 <x-text-input name="tipo_magia" label="Tipo de magia / Escuela" placeholder="Ej: Abjuración, Divina, Ancestral..." :value="old('tipo_magia')" />

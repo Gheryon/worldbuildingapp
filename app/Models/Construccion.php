@@ -141,16 +141,16 @@ class Construccion extends Model
       //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
       if (!empty($data['anno_construccion'])) {
         $construccion->fecha_construccion_id = Fecha::sync(null, [
-          'dia'  => $data['dia_construccion'] ?? 0,
-          'mes'  => $data['mes_construccion'] ?? 0,
+          'dia'  => $data['dia_construccion'] ?? null,
+          'mes'  => $data['mes_construccion'] ?? null,
           'anno' => $data['anno_construccion'] ?? null
         ]);
       }
 
       if (!empty($data['anno_destruccion'])) {
         $construccion->fecha_destruccion_id = Fecha::sync(null, [
-          'dia'  => $data['dia_destruccion'] ?? 0,
-          'mes'  => $data['mes_destruccion'] ?? 0,
+          'dia'  => $data['dia_destruccion'] ?? null,
+          'mes'  => $data['mes_destruccion'] ?? null,
           'anno' => $data['anno_destruccion'] ?? null,
         ]);
       }
@@ -184,18 +184,22 @@ class Construccion extends Model
       $this->processRichTextImages($data, self::$richTextFields, 'construcciones');
 
       //Actualizado de fechas
-      //Procesar Fechas, si existe fundacion_id o disolucion_id se actualiza, si no se crea. Si no hay año no se guarda fecha
-      $this->fecha_construccion_id = Fecha::sync($this->fecha_construccion_id, [
-        'dia'  => $data['dia_construccion'] ?? 0,
-        'mes'  => $data['mes_construccion'] ?? 0,
-        'anno' => $data['anno_construccion'] ?? null,
-      ]);
+      //Procesar Fechas, si existe construccion_id o destruccion_id se actualiza, si no se crea. Si no hay año no se guarda fecha
+      if (!empty($request['anno_construccion'])) {
+        $this->fecha_construccion_id = Fecha::sync($this->fecha_construccion_id, [
+          'dia'  => $data['dia_construccion'] ?? null,
+          'mes'  => $data['mes_construccion'] ?? null,
+          'anno' => $data['anno_construccion'] ?? null,
+        ]);
+      }
 
-      $this->fecha_destruccion_id = Fecha::sync($this->fecha_destruccion_id, [
-        'dia'  => $data['dia_destruccion'] ?? 0,
-        'mes'  => $data['mes_destruccion'] ?? 0,
-        'anno' => $data['anno_destruccion'] ?? null,
-      ]);
+      if (!empty($request['anno_destruccion'])) {
+        $this->fecha_destruccion_id = Fecha::sync($this->fecha_destruccion_id, [
+          'dia'  => $data['dia_destruccion'] ?? null,
+          'mes'  => $data['mes_destruccion'] ?? null,
+          'anno' => $data['anno_destruccion'] ?? null,
+        ]);
+      }
 
       return $this->save();
     });
