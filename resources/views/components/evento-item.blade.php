@@ -55,10 +55,10 @@ in_array($evento->tipo, ['nace_personaje', 'muere_personaje', 'personajes', 'nac
 => route('personajes.show', $evento->id),
 
 in_array($evento->tipo, ['ini_conflicto', 'fin_conflicto', 'conflicto', 'conflictos'])
-=> route('conflicto.show', $evento->id),
+=> route('conflictos.show', $evento->id),
 
 in_array($evento->tipo, ['ini_asentamiento', 'fin_asentamiento', 'asentamiento', 'asentamientos'])
-=> route('asentamiento.show', $evento->id),
+=> route('asentamientos.show', $evento->id),
 
 in_array($evento->tipo, ['ini_organizacion', 'fin_organizacion', 'organizacion', 'organizaciones'])
 => route('organizaciones.show', $evento->id),
