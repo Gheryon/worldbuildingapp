@@ -1,6 +1,7 @@
 @props(['name', 'label', 'orden' => 'asc'])
 
 <li class="nav-item ml-2">
+  <label for="order" class="sr-only">Ordenar</label>
   <select id="order" class="form-control ml-2" name="order">
     <option disabled value="ASC">Orden</option>
     <option value="asc" {{ $orden == 'asc' ? 'selected' : '' }}>Ascendente</option>
