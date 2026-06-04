@@ -9,6 +9,7 @@
   <a href="{{route('construcciones.create')}}" class="btn btn-dark">Nueva construcción</a>
 </li>
 <li class="nav-item ml-2">
+  <label for="filter_tipo" class="sr-only">Filtrar tipo</label>
   <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
     <option selected disabled value="0">Filtrar tipo</option>
     <option value="0">Todos</option>
@@ -17,20 +18,15 @@
     @endforeach
   </select>
 </li>
-<li class="nav-item ml-2">
-  <select id="order" class="form-control ml-2" name="order">
-    <option selected disabled value="ASC">Orden</option>
-    <option value="asc">Ascendente</option>
-    <option value="desc">Descendente</option>
-  </select>
-</li>
+<x-order-input name="orden" label="Orden" :orden="$orden" />
 @endsection
 
 @section('navbar-search')
 <li class="nav-item">
-  <form class="form-inline ml-2" action="{{route('construcciones.index')}}" method="GET">
+  <form class="form-inline ml-2" action="{{route('construcciones.index')}}" method="GET" role="search">
     <div class="input-group">
-      <input type="search" name="search" class="form-control" placeholder="Nombre a buscar">
+      <label for="search" class="sr-only">Buscar construcciones</label>
+      <input id="search" type="search" name="search" class="form-control" placeholder="Nombre a buscar" aria-label="Buscar construcciones">
       <div class="input-group-append">
         <button type="submit" class="btn btn-default">
           <i class="fa fa-search"></i>
@@ -64,7 +60,7 @@
         <div class="row text-right">
           <a href="{{route('construcciones.show',$construccion->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
           <a href="{{route('construcciones.edit',$construccion->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-          <button data-id="{{$construccion->id}}" data-nombre="{{$construccion->nombre}}" data-url="{{ route('construcciones.destroy', $construccion->id) }}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-construccion"><i class="fas fa-trash mr-1"></i></button>
+          <button data-id="{{$construccion->id}}" data-nombre="{{$construccion->nombre}}" data-url="{{ route('construcciones.destroy', $construccion->id) }}" type="button" title="Borrar" aria-label="Borrar {{$construccion->nombre}}" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-construccion"><i class="fas fa-trash mr-1"></i></button>
         </div>
       </div>
     </div>
@@ -110,7 +106,7 @@
       if (search) params.append('search', search); //Mantiene la búsqueda al filtrar
 
       // Generamos la URL base desde Laravel
-      const baseUrl = "{{ route('lugares.index') }}";
+      const baseUrl = "{{ route('construcciones.index') }}";
       const urlFinal = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
       //console.log(orden, tipo, urlFinal);
       document.location.href = urlFinal;

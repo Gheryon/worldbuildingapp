@@ -11,17 +11,18 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
-  {{-- Encabezado --}}
-  <div class="row mb-4">
-    <div class="col-12 text-center">
-      <h1 class="display-4 text-primary-custom font-weight-bold">
-        <i class="nav-icon fa-solid fa-building mr-2"></i>Nueva construcción
-      </h1>
+<main class="content" role="main">
+  <div class="container-fluid">
+    {{-- Encabezado --}}
+    <div class="row mb-4">
+      <div class="col-12 text-center">
+        <h1 class="display-4 text-primary-custom font-weight-bold">
+          <i class="nav-icon fa-solid fa-building mr-2"></i>Nueva construcción
+        </h1>
+      </div>
     </div>
-  </div>
 
-  <form id="form-create-construccion" data-prevent-loss="true" class="needs-validation" action="{{route('construcciones.store')}}" method="post" enctype="multipart/form-data">
+    <form id="form-create-construccion" data-prevent-loss="true" class="needs-validation" action="{{route('construcciones.store')}}" method="post" enctype="multipart/form-data">
     @csrf
 
     {{-- Botón de Acción Superior --}}
@@ -36,7 +37,7 @@
     {{-- Bloque de Datos Primarios --}}
     <div class="card card-outline card-dark shadow-sm">
       <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-hammer mr-1"></i> Información técnica y estado</h3>
+        <h2 class="card-title"><i class="fas fa-hammer mr-1"></i> Información técnica y estado</h2>
       </div>
       <div class="card-body bg-light">
         <div class="row">
@@ -196,8 +197,9 @@
         </div>
       </div>
     </div>
-  </form>
-</div>
+    </form>
+  </div>
+</main>
 @endsection
 
 @section('specific-scripts')

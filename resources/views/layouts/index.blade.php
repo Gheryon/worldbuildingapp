@@ -5,6 +5,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="description" content="@yield('meta_description', 'Worldbuilding App - Herramienta para crear y gestionar mundos ficticios')">
+  <link rel="canonical" href="@yield('canonical_url', url()->current())">
+  <meta name="robots" content="@yield('robots_meta', 'index, follow')">
   @yield('title')
 
   <!-- Google Font: Source Sans Pro -->

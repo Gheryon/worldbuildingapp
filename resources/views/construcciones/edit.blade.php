@@ -19,7 +19,7 @@
 <hr>
 
 <!-- Main content -->
-<section class="content">
+<main class="content" role="main">
 <form id="form-create-construccion" data-prevent-loss="true" class="needs-validation" action="{{route('construcciones.update', $construccion->id)}}" method="post" enctype="multipart/form-data">
     @csrf
     @method('PUT')
@@ -35,7 +35,7 @@
     {{-- Bloque de Datos Primarios --}}
     <div class="card card-outline card-dark shadow-sm">
       <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-hammer mr-1"></i> Información técnica y estado</h3>
+        <h2 class="card-title"><i class="fas fa-hammer mr-1"></i> Información técnica y estado</h2>
       </div>
       <div class="card-body bg-light">
         <div class="row">
@@ -197,7 +197,7 @@
     </div>
   </form>
 
-</section>
+</main>
 <!-- /.content -->
 @endsection
 

@@ -1,5 +1,13 @@
 @extends('layouts.index')
 
+@section('meta_description')
+{{ \Illuminate\Support\Str::limit(strip_tags($construccion->descripcion_breve ?? $construccion->historia ?? $construccion->aspecto ?? 'Descripción de construcción en Worldbuilding App'), 150) }}
+@endsection
+
+@section('canonical_url')
+{{ route('construcciones.show', $construccion->id) }}
+@endsection
+
 @section('title')
 <title id="title">{{$construccion->nombre}}</title>
 @endsection
