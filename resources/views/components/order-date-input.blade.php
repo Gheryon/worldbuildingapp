@@ -1,6 +1,7 @@
 @props(['fecha' => null])
 
 <li class="nav-item ml-2">
+  <label for="filtro_fecha" class="sr-only">Ordenar por Fecha</label>
   <select id="filtro_fecha" class="form-control ml-2" name="fecha">
     <option value="" selected disabled>Ordenar por Fecha</option>
     {{-- Opción para limpiar el filtro de fecha y volver al alfabético --}}
