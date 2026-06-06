@@ -51,6 +51,8 @@ Route::resource('especies', App\Http\Controllers\EspecieController::class)->para
 /*******imagenes routes********/
 Route::get('/galeria/index', [App\Http\Controllers\ImagenController::class, 'index'])->name('galeria.index');
 Route::post('/galeria/store', [App\Http\Controllers\ImagenController::class, 'store'])->name('galeria.store');
+Route::put('/galeria/{id}', [App\Http\Controllers\ImagenController::class, 'update'])->name('galeria.update');
+Route::delete('/galeria/{id}', [App\Http\Controllers\ImagenController::class, 'destroy'])->name('galeria.destroy');
 Route::get('/galeria/limpiar_imagenes', [App\Http\Controllers\ImagenController::class, 'limpiar_imagenes'])->name('galeria.limpiar_imagenes');
 
 /*******lugares routes********/

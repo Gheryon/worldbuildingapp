@@ -9,7 +9,7 @@
   <link rel="canonical" href="@yield('canonical_url', url()->current())">
   <meta name="robots" content="@yield('robots_meta', 'index, follow')">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self';">
   @php
     $ldData = [
       '@context' => 'https://schema.org',
@@ -31,9 +31,14 @@
   @yield('title')
 
   <!-- Google Font: Source Sans Pro -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <!--<link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=swap" integrity="sha384-LwTn3VUjhfCQ7fNTgs5njQpcKigDry8Anvg+3XojQS1MpAX9Yw9gtyMF5SGibvN2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=swap" integrity="sha384-LwTn3VUjhfCQ7fNTgs5njQpcKigDry8Anvg+3XojQS1MpAX9Yw9gtyMF5SGibvN2" crossorigin="anonymous">-->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Metamorphous&display=swap" rel="stylesheet">
+
   <!-- Font Awesome Icons -->
   <link rel="preload" href="{{asset('plugins/fontawesome-free/css/all.min.css')}}" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="{{asset('plugins/fontawesome-free/css/all.min.css')}}"></noscript>
@@ -89,20 +94,20 @@
   <!-- REQUIRED SCRIPTS -->
 
   <!-- jQuery -->
-  <script src="{{asset('plugins/jquery/jquery.min.js')}}" defer></script>
+  <script src="{{asset('plugins/jquery/jquery.min.js')}}"></script>
   <!-- Bootstrap 4 -->
-  <script src="{{asset('plugins/bootstrap/js/bootstrap.bundle.min.js')}}" defer></script>
+  <script src="{{asset('plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
   <!-- AdminLTE App -->
-  <script src="{{asset('dist/js/adminlte.min.js')}}" defer></script>
+  <script src="{{asset('dist/js/adminlte.min.js')}}"></script>
   <!-- Summernote -->
-  <script src="{{asset('dist/js/summernote-bs4.min.js')}}" defer></script>
+  <script src="{{asset('dist/js/summernote-bs4.min.js')}}"></script>
   <!-- toastr -->
-  <script src="{{asset('dist/js/toastr.min.js')}}" defer></script>
+  <script src="{{asset('dist/js/toastr.min.js')}}"></script>
   <!-- select2 -->
-  <script src="{{asset('dist/js/select2.min.js')}}" defer></script>
+  <script src="{{asset('dist/js/select2.min.js')}}"></script>
 
-  <script src="{{asset('dist/js/notifications.js')}}" defer></script>
-  <script defer>
+  <script src="{{asset('dist/js/notifications.js')}}"></script>
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
       const sessionData = {
         success: @json(session('success')),

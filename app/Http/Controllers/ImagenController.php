@@ -2,10 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Imagen;
 use App\Models\articulo;
-use App\Models\imagen;
+use App\Models\Construccion;
+use App\Models\Personaje;
+use App\Models\Lugar;
+use App\Models\Organizacion;
+use App\Models\Especie;
+use App\Models\Religion;
+use App\Models\Conflicto;
+use App\Models\Asentamiento;
+use App\Models\Evento;
+use App\Http\Requests\ImagenRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ImagenController extends Controller
 {
@@ -14,130 +25,113 @@ class ImagenController extends Controller
    */
   public function index()
   {
-    $imagenes = imagen::all();
+    $imagenes = Imagen::all();
+
+    //cambia el nombre de la imagen por el del dueño de la imagen a las que provienen de summernote
+    foreach ($imagenes as $imagen) {
+      $imagen->owner_name = $imagen->table_owner === 'galeria'
+        ? null
+        : $this->getOwnerName($imagen->table_owner, $imagen->owner);
+    }
+
     return view('galeria.index', compact('imagenes'));
   }
 
   /**
-   * Show the form for creating a new resource.
+   * Obtiene el nombre del dueño de una imagen de summernote.
    */
-  public function create()
+  private function getOwnerName(string $tableOwner, int $ownerId): string
   {
-    //
+    $model = match ($tableOwner) {
+      'articulos'       => new articulo(),
+      'construcciones'  => new Construccion(),
+      'personajes'      => new Personaje(),
+      'lugares'         => new Lugar(),
+      'organizaciones'  => new Organizacion(),
+      'especies'        => new Especie(),
+      'religiones'      => new Religion(),
+      'conflictos'      => new Conflicto(),
+      'asentamientos'   => new Asentamiento(),
+      'eventos'         => new Evento(),
+      default           => null,
+    };
+
+    if (!$model) return 'Desconocido';
+
+    $record = $model->newQuery()->find($ownerId);
+    return $record ? $record->nombre : 'Desconocido';
   }
 
   /**
    * Store a newly created resource in storage.
    */
-  public function store(Request $request)
+  public function store(ImagenRequest $request)
   {
-    $request->validate([
-      'nombre' => 'required|max:255',
-      'imagen' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-    ]);
-
     $imageFile = $request->file('imagen');
-    $filename = time() . '.' . $imageFile->getClientOriginalExtension();
+    $cleanName = preg_replace('/\s+$/', '', $request->nombre);
+    $filename = $cleanName . '_' . time() . '.' . $imageFile->getClientOriginalExtension();
 
-    // Save the image file to public storage
     $path = $imageFile->storeAs('imagenes', $filename, 'public');
 
-    // Optionally, you can use Intervention Image to manipulate the image
-    // $image = ImageFacade::make($imageFile)->resize(800, null, function ($constraint) {
-    //     $constraint->aspectRatio();
-    // })->save(public_path('storage/images/' . $filename));
-
-    // Create a new image record using Eloquent
-    imagen::create([
+    Imagen::create([
       'nombre' => basename($path),
-      //'filename' => $filename
       'path' => $path,
-      'owner' => $request->owner,
-      'table_owner' => $request->table_owner,
+      'owner' => 0,
+      'table_owner' => 'galeria',
     ]);
 
-    /*
-    $imagen=new imagen();
-    $imagen->nombre=$request->nombre;
-
-    $imagen->save();*/
-
-    // Redirect back to the same page with a success message
-    //return back()->with('success', 'Image uploaded successfully!');
     return redirect()->route('galeria.index');
   }
 
   /**
-   * Store a new resource from summernote in storage.
+   * Update the specified resource in storage.
    */
-  public function store_for_summernote($content, string $table_owner, int $id_owner)
+  public function update(ImagenRequest $request, $id)
   {
-    $dom = new \DomDocument();
-    $searchPage = mb_convert_encoding($content, 'HTML-ENTITIES', "UTF-8"); //necesario para mantener las tildes en el texto
-    $dom->loadHtml($searchPage, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-    $imageFile = $dom->getElementsByTagName('img');
+    $imagen = Imagen::findOrFail($id);
 
-    foreach ($imageFile as $item => $image) {
-      $data = $image->getAttribute('src');
-      list($type, $data) = explode(';', $data);
-      list(, $data)      = explode(',', $data);
-      $imgeData = base64_decode($data);
-      $image_name = time() . rand(0, 1234567890) . $item . '.png';
-      $path = public_path() . "/storage/imagenes/" . $image_name;
-      file_put_contents($path, $imgeData);
-
-      $image->removeAttribute('src');
-      $image->setAttribute('src', asset("/storage/imagenes/" . $image_name));
-
-      $imagen = new imagen();
-      $imagen->owner = $id_owner;
-      $imagen->table_owner = $table_owner;
-      $imagen->nombre = $image_name;
-      $imagen->path = asset("/storage/imagenes/" . $image_name);
-      $imagen->save();
+    if ($imagen->table_owner !== 'galeria') {
+      return redirect()->route('galeria.index')->with('error', 'No se puede renombrar esta imagen.');
     }
 
-    $content = $dom->saveHTML();
-    return $content;
+    $oldPath = 'imagenes/' . $imagen->nombre;
+    $cleanName = preg_replace('/\s+$/', '', $request->nombre);
+    $extension = pathinfo($imagen->nombre, PATHINFO_EXTENSION);
+    $newFilename = $cleanName . '_' . time() . '.' . $extension;
+    $newPath = 'imagenes/' . $newFilename;
+
+    if (Storage::disk('public')->exists($oldPath)) {
+      Storage::disk('public')->move($oldPath, $newPath);
+    }
+
+    $imagen->update([
+      'nombre' => $newFilename,
+      'path' => $newPath,
+    ]);
+
+    return redirect()->route('galeria.index');
   }
 
   /**
-   * Update a resource from summernote in storage.
+   * Remove the specified resource from storage.
    */
-  public function update_for_summernote($content, string $table_owner, int $id_owner = 0)
+  public function destroy($id)
   {
-    $dom = new \DomDocument();
-    libxml_use_internal_errors(true);
-    $searchPage = mb_convert_encoding($content, 'HTML-ENTITIES', "UTF-8"); //necesario para mantener las tildes en el texto
-    $dom->loadHtml($searchPage, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | libxml_use_internal_errors(true));
-    $imageFile = $dom->getElementsByTagName('img');
+    $imagen = Imagen::findOrFail($id);
 
-    //no se borran las imagenes antiguas en caso de existir, esto se hace desde otra función
-    foreach ($imageFile as $item => $image) {
-      $data = $image->getAttribute('src');
-      if (strpos($data, ';') === false) {
-        continue;
-      }
-      list($type, $data) = explode(';', $data);
-      list(, $data)      = explode(',', $data);
-      $imgeData = base64_decode($data);
-      $image_name = time() . rand(0, 1234567890) . $item . '.png';
-      $path = public_path() . "/storage/imagenes/" . $image_name;
-      file_put_contents($path, $imgeData);
-
-      $image->removeAttribute('src');
-      $image->setAttribute('src', asset("/storage/imagenes/" . $image_name));
-
-      $imagen = new imagen();
-      $imagen->owner = $id_owner;
-      $imagen->table_owner = $table_owner;
-      $imagen->nombre = $image_name;
-      $imagen->path = asset("/storage/imagenes/" . $image_name);
-      $imagen->save();
+    if ($imagen->table_owner !== 'galeria') {
+      return redirect()->route('galeria.index')->with('error', 'No se puede eliminar esta imagen.');
     }
 
-    $content = $dom->saveHTML();
-    return $content;
+    $path = 'imagenes/' . $imagen->nombre;
+
+    if (Storage::disk('public')->exists($path)) {
+      Storage::disk('public')->delete($path);
+    }
+
+    $imagen->delete();
+
+    return redirect()->route('galeria.index');
   }
 
   /**
@@ -180,37 +174,5 @@ class ImagenController extends Controller
       //}
       //imagen::destroy($imagen->id);
     }
-  }
-
-  /**
-   * Display the specified resource.
-   */
-  public function show(imagen $imagen)
-  {
-    //
-  }
-
-  /**
-   * Show the form for editing the specified resource.
-   */
-  public function edit(imagen $imagen)
-  {
-    //
-  }
-
-  /**
-   * Update the specified resource in storage.
-   */
-  public function update(Request $request, imagen $imagen)
-  {
-    //
-  }
-
-  /**
-   * Remove the specified resource from storage.
-   */
-  public function destroy(imagen $imagen)
-  {
-    //
   }
 }
