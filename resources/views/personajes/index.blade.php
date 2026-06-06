@@ -9,7 +9,8 @@
   <a href="{{route('personajes.create')}}" class="btn btn-dark">Nuevo personaje</a>
 </li>
 <li class="nav-item ml-2">
-  <select id="filter_especie" class="form-control ml-2" name="filter_especie">
+  <label for="filter_especie" class="sr-only">Filtrar especie</label>
+  <select id="filter_especie" class="form-control ml-2" name="filter_especie" aria-label="Filtrar por especie">
     <option selected disabled value="0">Filtrar especie</option>
     <option value="0" {{ $especie_id == 0 ? 'selected' : '' }}>Todas</option>
     @foreach($especies as $id => $nombre)
@@ -29,9 +30,10 @@
 
 @section('navbar-search')
 <li class="nav-item">
-  <form class="form-inline ml-2" action="{{route('personajes.index')}}" method="GET">
+  <form class="form-inline ml-2" action="{{route('personajes.index')}}" method="GET" role="search" aria-label="Buscar personajes">
     <div class="input-group">
-      <input type="search" name="search" class="form-control" placeholder="Nombre a buscar" value="{{ request('search') }}">
+      <label for="search" class="sr-only">Buscar personaje</label>
+      <input type="search" id="search" name="search" class="form-control" placeholder="Nombre a buscar" value="{{ request('search') }}" aria-label="Buscar personaje por nombre">
       <input type="hidden" name="especie" value="{{ request('especie', 0) }}">
       <input type="hidden" name="orden" value="{{ request('orden', 'asc') }}">
       <div class="input-group-append">
@@ -53,9 +55,9 @@
     <div class="card card-dark card-outline h-100">
       <div class="card-body box-profile">
         <div class="text-center">
-          <img class="profile-user-img img-fluid img-circle" src="{{ asset("storage/retratos/" . ($personaje->retrato ?? 'default.png')) }}" alt="Retrato de {{ $personaje->nombre }}">
+          <img class="profile-user-img img-fluid img-circle" src="{{ asset("storage/retratos/" . ($personaje->retrato ?? 'default.png')) }}" alt="Retrato de {{ $personaje->nombre }}" loading="lazy">
         </div>
-        <h3 class="profile-username text-center text-truncate">{{ $personaje->nombre }}</h3>
+        <h2 class="profile-username text-center text-truncate">{{ $personaje->nombre }}</h2>
         <ul class="list-group list-group-unbordered mb-3">
           <li class="list-group-item">
             <b><i class="fa-solid fa-dna mr-1"></i> Especie</b>
@@ -86,7 +88,7 @@
   @empty
   <div class="col-12 text-center mt-5">
     <div class="callout callout-info">
-      <h5>No se encontraron personajes</h5>
+      <h2>No se encontraron personajes</h2>
       <p>Intenta ajustar los filtros o crea uno nuevo.</p>
       <a href="{{route('personajes.create')}}" class="btn btn-dark text-light">Crear nuevo personaje</a>
     </div>

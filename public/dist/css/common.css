@@ -46,6 +46,46 @@ h2, h3, .text-secondary-custom {
     border: 1px solid rgba(0,0,0,0.1);
 }
 
+/* Skip to content link */
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    background: var(--primary-color);
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    z-index: 9999;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 0 0 4px 0;
+    transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+    top: 0;
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+}
+
+/* Focus styles visibles para todos los interactivos */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(144, 11, 11, 0.25);
+}
+
+/* Focus para paginación (override del existente) */
+.pagination .page-link:focus {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
 a {
     color: var(--primary-color);
     text-decoration: none;
@@ -94,6 +134,15 @@ a:hover {
     padding-left: 15px;
     height: 38px;
 }
+/* Touch targets mejorados para botones de acción */
+.card-footer .btn-group .btn {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /*================Pagination====================*/
 /* Cambia el color del texto y fondo de los items de paginación */
 .pagination .page-link {
