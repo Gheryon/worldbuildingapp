@@ -10,7 +10,8 @@
 </li>
 
 <li class="nav-item ml-2">
-  <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
+  <label for="filter_tipo" class="sr-only">Filtrar tipo</label>
+  <select id="filter_tipo" class="form-control ml-2" name="filter_tipo" aria-label="Filtrar por tipo de organización">
     <option selected disabled value="0">Filtrar tipo</option>
     <option value="0" {{ $tipo_id == 0 ? 'selected' : '' }}>Todos</option>
     @foreach($tipos_organizacion as $tipo)
@@ -30,9 +31,10 @@
 
 @section('navbar-search')
 <li class="nav-item">
-  <form class="form-inline ml-2" action="{{route('organizaciones.index')}}" method="GET">
+  <form class="form-inline ml-2" action="{{route('organizaciones.index')}}" method="GET" role="search" aria-label="Buscar organizaciones">
     <div class="input-group">
-      <input type="search" name="search" class="form-control" placeholder="Nombre a buscar">
+      <label for="search" class="sr-only">Buscar organización</label>
+      <input type="search" id="search" name="search" class="form-control" placeholder="Nombre a buscar" aria-label="Buscar organización por nombre">
       <div class="input-group-append">
         <button type="submit" class="btn btn-default">
           <i class="fa fa-search"></i>
@@ -54,7 +56,7 @@
       <div class="card-body box-profile">
         <div class="text-center">
           <h2 class="lead"><b>{{$organizacion->nombre}}</b></h2>
-          <img class="img-fluid" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" alt="Escudo de {{ $organizacion->nombre }}">
+          <img class="img-fluid" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" alt="Escudo de {{ $organizacion->nombre }}" loading="lazy">
         </div>
         <ul class="list-group list-group-unbordered mb-3">
           <li class="list-group-item">
@@ -75,7 +77,7 @@
   @empty
   <div class="col-12 text-center mt-5">
     <div class="callout callout-info">
-      <h5>No se encontraron organizaciones</h5>
+      <h2>No se encontraron organizaciones</h2>
       <p>Intenta ajustar los filtros o crea una nueva.</p>
       <a href="{{route('organizaciones.create')}}" class="btn btn-dark text-light">Crear nueva organización</a>
     </div>

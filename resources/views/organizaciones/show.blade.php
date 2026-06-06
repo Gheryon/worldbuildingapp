@@ -96,7 +96,8 @@
               <img alt="Escudo de {{ $organizacion->nombre }}"
                 class="img-fluid rounded shadow-sm"
                 src="{{ asset('storage/escudos/' . $organizacion->escudo) }}"
-                style="max-height: 350px; width: 100%; object-fit: cover;">
+                style="max-height: 350px; width: 100%; object-fit: cover;"
+                loading="lazy">
             </div>
             <ul class="list-group list-group-flush">
 
@@ -124,7 +125,7 @@
                 <small class="d-block text-muted text-uppercase font-weight-bold">Líder</small>
                 <span><i class="fas fa-chess-king mr-1"></i>
                   <a href="{{route('personajes.show', $organizacion->lider->id)}}">
-                <img class="retrato-mini" src="{{ asset("storage/retratos/" . ($organizacion->lider->retrato ?? 'default.png')) }}" alt="Retrato de {{ $organizacion->lider->nombre }}">
+                <img class="retrato-mini" src="{{ asset("storage/retratos/" . ($organizacion->lider->retrato ?? 'default.png')) }}" alt="Retrato de {{ $organizacion->lider->nombre }}" loading="lazy">
                  {{ $organizacion->lider->nombre }}
               </a>
                 </span>
@@ -136,7 +137,7 @@
                 <small class="d-block text-muted text-uppercase font-weight-bold">Controlado por</small>
                 <span>
                   <a href="{{route('organizaciones.show', $organizacion->organizacion_padre->id )}}">
-                    <img class="retrato-mini" src="{{ asset("storage/escudos/" . ($organizacion->organizacion_padre->escudo ?? 'default.png')) }}" alt="Escudo de {{ $organizacion->organizacion_padre->nombre }}">
+                    <img class="retrato-mini" src="{{ asset("storage/escudos/" . ($organizacion->organizacion_padre->escudo ?? 'default.png')) }}" alt="Escudo de {{ $organizacion->organizacion_padre->nombre }}" loading="lazy">
                     {{$organizacion->organizacion_padre->nombre}}
                   </a>
                 </span>
@@ -163,7 +164,7 @@
                 @foreach($organizacion->religiones as $religion)
                 <p class="ml-1 mr-2 mb-0">
                   <a href="{{route('religiones.show', $religion->id)}}">
-                    <img class="retrato-mini" src="{{ asset("storage/escudos/" . ($religion->escudo ?? 'default.png')) }}" alt="Escudo de {{ $religion->nombre }}">
+                    <img class="retrato-mini" src="{{ asset("storage/escudos/" . ($religion->escudo ?? 'default.png')) }}" alt="Escudo de {{ $religion->nombre }}" loading="lazy">
                     {{$religion->nombre}}
                   </a>
                 </p>
@@ -177,7 +178,7 @@
                 @foreach($organizacion->subordinates as $subordinate)
                 <p class="ml-1 mr-2 mb-0">
                   <a href="{{route('organizaciones.show', [$subordinate->id] )}}">
-                    <img class="retrato-mini" src="{{ asset("storage/escudos/" . ($subordinate->escudo ?? 'default.png')) }}" alt="Escudo de {{ $subordinate->nombre }}">
+                    <img class="retrato-mini" src="{{ asset("storage/escudos/" . ($subordinate->escudo ?? 'default.png')) }}" alt="Escudo de {{ $subordinate->nombre }}" loading="lazy">
                     {{$subordinate->nombre}}
                   </a>
                 </p>
