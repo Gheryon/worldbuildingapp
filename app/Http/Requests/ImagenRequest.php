@@ -23,6 +23,7 @@ class ImagenRequest extends FormRequest
   {
     $rules = [
       'nombre' => 'required|string|max:255',
+      'categoria_id' => 'nullable|exists:categorias,id',
     ];
 
     if ($this->isMethod('post')) {

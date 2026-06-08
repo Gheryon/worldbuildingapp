@@ -24,6 +24,24 @@ return preg_replace('/_\d+$/', '', $name);
 </div>
 <hr>
 
+<!-- Filtro por categoría -->
+<div class="row mb-3">
+  <div class="col-md-4">
+    <form method="GET" action="{{ route('galeria.index') }}" class="form-inline">
+      <label for="categoria_id" class="mr-2">Filtrar por categoría:</label>
+      <select name="categoria_id" id="categoria_id" class="form-control form-control-sm" onchange="this.form.submit()">
+        <option value="">Todas</option>
+        @foreach($categorias as $cat)
+        <option value="{{ $cat->id }}" @selected($categoriaActiva==$cat->id)>{{ $cat->nombre }}</option>
+        @endforeach
+      </select>
+      @if($categoriaActiva)
+      <a href="{{ route('galeria.index') }}" class="btn btn-sm btn-secondary ml-2">Limpiar filtro</a>
+      @endif
+    </form>
+  </div>
+</div>
+
 <!-- Modal subir imagen -->
 <div class="modal fade" id="subir-imagen" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
@@ -39,7 +57,7 @@ return preg_replace('/_\d+$/', '', $name);
           <form action="{{route('galeria.store')}}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="row">
-              <div class="col-8">
+              <div class="col-6">
                 <div class="form-group">
                   <label for="nombre">Nombre de la imagen:</label>
                   <input type="text" class="form-control" id="nombre" name="nombre" required>
@@ -48,9 +66,18 @@ return preg_replace('/_\d+$/', '', $name);
                   <label for="imagen">Seleccionar imagen:</label>
                   <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*" required>
                 </div>
+                <div class="form-group">
+                  <label for="categoria_id_store">Categoría:</label>
+                  <select class="form-control" id="categoria_id_store" name="categoria_id">
+                    <option value="">Sin categoría</option>
+                    @foreach($categorias as $cat)
+                    <option value="{{ $cat->id }}">{{ $cat->nombre }}</option>
+                    @endforeach
+                  </select>
+                </div>
               </div>
-              <div class="col-4">
-                <img id="imagen-preview" src="{{asset('storage/retratos/default.png')}}" class="img-fluid" style="width: 200px; height: 200px; object-fit: cover;">
+              <div class="col-6">
+                <img id="imagen-preview" src="{{asset('storage/retratos/default.png')}}" class="img-fluid" style="object-fit: cover;">
               </div>
             </div>
         </div>
@@ -66,7 +93,7 @@ return preg_replace('/_\d+$/', '', $name);
 
 <!-- Modal renombrar -->
 <div class="modal fade" id="renombrar-imagen" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="card card-dark">
         <div class="card-header">
@@ -79,9 +106,25 @@ return preg_replace('/_\d+$/', '', $name);
           <form id="form-renombrar" method="POST">
             @csrf
             @method('PUT')
-            <div class="form-group">
-              <label for="nuevo-nombre">Nuevo nombre:</label>
-              <input type="text" class="form-control" id="nuevo-nombre" name="nombre" required>
+            <div class="row">
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="nuevo-nombre">Nuevo nombre:</label>
+                  <input type="text" class="form-control" id="nuevo-nombre" name="nombre" required>
+                </div>
+                <div class="form-group">
+                  <label for="categoria_id_update">Categoría:</label>
+                  <select class="form-control" id="categoria_id_update" name="categoria_id">
+                    <option value="">Sin categoría</option>
+                    @foreach($categorias as $cat)
+                    <option value="{{ $cat->id }}">{{ $cat->nombre }}</option>
+                    @endforeach
+                  </select>
+                </div>
+              </div>
+              <div class="col-6">
+                <img id="imagen-preview-edit" src="{{asset('storage/retratos/default.png')}}" class="img-fluid" style="object-fit: contain;">
+              </div>
             </div>
         </div>
         <div class="card-footer">
@@ -97,44 +140,54 @@ return preg_replace('/_\d+$/', '', $name);
 <!-- Main content -->
 <section class="content">
   <div class="container-fluid">
-    <div class="row">
+    <div class="masonry-gallery">
       @foreach($imagenes as $image)
-      <div class="col-md-3">
-        <div class="thumbnail" style="position:relative;">
-          <!-- Thumbnail Image -->
-          <img src="{{ asset('storage/imagenes/' . $image->nombre) }}" alt="{{ display_name($image) }}" style="width:100%; cursor:pointer;" data-toggle="modal" data-target="#imageModal{{ $image->id }}">
+      <div class="masonry-item">
+        <!-- Thumbnail Image -->
+        <img src="{{ asset('storage/imagenes/' . $image->nombre) }}"
+          alt="{{ display_name($image) }}"
+          style="cursor:pointer;"
+          class="img-thumbnail-trigger"
+          data-toggle="modal"
+          data-target="#imageModal"
+          data-src="{{ asset('storage/imagenes/' . $image->nombre) }}"
+          data-title="{{ display_name($image) }}">
 
-          <!-- Botones de acción solo para imágenes de galería -->
-          @if($image->table_owner === 'galeria')
-          <div style="position:absolute; top:5px; right:5px;">
-            <button class="btn btn-sm btn-warning btn-renombrar" data-id="{{ $image->id }}" data-nombre="{{ display_name($image) }}" title="Renombrar">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="borrar btn btn-sm btn-danger btn-borrar" data-id="{{ $image->id }}" data-nombre="{{ display_name($image) }}" data-url="{{ route('galeria.destroy', $image->id) }}" title="Eliminar" data-toggle="modal" data-target="#eliminar-imagen">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-          @endif
+        <!-- Badge de categoría -->
+        @if($image->categoria)
+        <span class="badge badge-info" style="position:absolute; bottom:5px; left:5px;">{{ $image->categoria->nombre }}</span>
+        @endif
 
-          <!-- Modal imagen completa -->
-          <div class="modal fade" id="imageModal{{ $image->id }}" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">{{ display_name($image) }}</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <img src="{{ asset('storage/imagenes/' . $image->nombre) }}" alt="{{ $image->nombre }}" style="width:100%;">
-                </div>
-              </div>
-            </div>
-          </div>
+        <!-- Botones de acción solo para imágenes de galería -->
+        @if($image->table_owner === 'galeria')
+        <div style="position:absolute; top:5px; right:5px;">
+          <button class="btn btn-sm btn-warning btn-renombrar" data-id="{{ $image->id }}" data-nombre="{{ display_name($image) }}" data-categoria="{{ $image->categoria_id }}" data-imagen="{{ asset('storage/imagenes/' . $image->nombre) }}" title="Renombrar">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="borrar btn btn-sm btn-danger btn-borrar" data-id="{{ $image->id }}" data-nombre="{{ display_name($image) }}" data-url="{{ route('galeria.destroy', $image->id) }}" title="Eliminar" data-toggle="modal" data-target="#eliminar-imagen">
+            <i class="fas fa-trash"></i>
+          </button>
         </div>
+        @endif
       </div>
       @endforeach
+    </div>
+  </div>
+
+  <!-- Unico Modal imagen completa -->
+  <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="imageModalTitle"></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <img src="" id="imageModalSource" alt="Imagen ampliada" style="width:100%;">
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -148,16 +201,29 @@ return preg_replace('/_\d+$/', '', $name);
 <script src="{{asset('dist/js/common.js')}}"></script>
 <script>
   $(function() {
-    // Renombrar imagen
+    // Manejar apertura de modal para ver imagen
+    $('.img-thumbnail-trigger').on('click', function() {
+      var src = $(this).data('src');
+      var title = $(this).data('title');
+
+      $('#imageModalTitle').text(title);
+      $('#imageModalSource').attr('src', src);
+    });
+
+    // Manejar el modal de renombrar imagen
     $(document).on('click', '.btn-renombrar', function() {
       var id = $(this).data('id');
       var nombre = $(this).data('nombre');
+      var categoria = $(this).data('categoria');
+      var imagen = $(this).data('imagen');
       $('#nuevo-nombre').val(nombre);
+      $('#imagen-preview-edit').attr('src', imagen);
+      $('#categoria_id_update').val(categoria || '');
       $('#form-renombrar').attr('action', '{{ url("galeria") }}/' + id);
       $('#renombrar-imagen').modal('show');
     });
 
-    //Previsualizar la imagen subida en el modal
+    //Previsualizar la imagen subida en el modal de subir imagen
     $('#imagen').change(function() {
       const file = this.files[0];
       console.log(file);
