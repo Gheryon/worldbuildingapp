@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Nombres;
-use App\Models\lineas_temporales;
 use App\Models\Fecha;
 use Illuminate\Http\Request;
 use Exception;
@@ -18,6 +17,7 @@ class ConfigurationController extends Controller
     'construccion'   => \App\Models\TipoConstruccion::class,
     'lugar'          => \App\Models\TipoLugar::class,
     'organizacion'   => \App\Models\TipoOrganizacion::class,
+    'categorias'     => \App\Models\Categoria::class,
   ];
 
   /**
@@ -37,6 +37,7 @@ class ConfigurationController extends Controller
       'tipos_construccion'    => \App\Models\TipoConstruccion::class,
       'tipos_lugar'           => \App\Models\TipoLugar::class,
       'tipos_organizaciones'  => \App\Models\TipoOrganizacion::class,
+      'categorias'            => \App\Models\Categoria::class,
     ];
 
     foreach ($catalogos as $key => $modelClass) {
@@ -79,17 +80,33 @@ class ConfigurationController extends Controller
     try {
       $modelClass = $this->modelMap[$type];
 
-      // 3. Crear el registro usando Mass Assignment (requiere $fillable en el modelo)
+      //Crear el registro usando Mass Assignment (requiere $fillable en el modelo)
       $nuevo = $modelClass::create([
         'nombre' => $request->input($inputName)
       ]);
 
       return redirect()->route('config.index')
-        ->with('message', "{$nuevo->nombre} añadido correctamente a {$type}.");
-    } catch (\Illuminate\Database\QueryException $excepcion) {
+        ->with('success', "{$nuevo->nombre} añadido correctamente a {$type}.");
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error(
+        "Error de base de datos al guardar.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
       return redirect()->route('config.index')->with('error', 'Error de base de datos al guardar.');
-    } catch (\Exception $excepcion) {
-      return redirect()->route('config.index')->with('error', $excepcion->getMessage());
+    } catch (\Exception $e) {
+      Log::critical(
+        "Error inesperado al guardar.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->route('config.index')->with('error', 'Error inesperado al guardar.');
     }
   }
 
@@ -120,11 +137,37 @@ class ConfigurationController extends Controller
       $registro->save();
 
       return redirect()->route('config.index')
-        ->with('message', "{$registro->nombre} actualizado correctamente.");
+        ->with('success', "{$registro->nombre} actualizado correctamente.");
     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+      Log::error(
+        "Error al actualizar, el registro no existe.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
       return redirect()->route('config.index')->with('error', 'El registro no existe.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error(
+        "Error de base de datos al actualizar.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->route('config.index')->with('error', 'Error de base de datos al actualizar.');
     } catch (\Exception $e) {
-      return redirect()->route('config.index')->with('error', 'Error al actualizar: ' . $e->getMessage());
+      Log::critical(
+        "Error inesperado al actualizar.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->route('config.index')->with('error', 'Error inesperado al actualizar.');
     }
   }
 
@@ -138,7 +181,7 @@ class ConfigurationController extends Controller
       'tipo'      => 'required|string',
     ]);
 
-    //Comprobar si el tipo es válido en nuestro mapa
+    //Comprobar si el tipo es válido
     if (!isset($this->modelMap[$request->tipo])) {
       return redirect()->route('config.index')->with('error', 'Tipo de entidad no válido.');
     }
@@ -151,11 +194,37 @@ class ConfigurationController extends Controller
       $registro->delete();
 
       return redirect()->route('config.index')
-        ->with('message', "El registro '{$nombreGuardado}' ha sido eliminado correctamente.");
+        ->with('success', "El registro '{$nombreGuardado}' ha sido eliminado correctamente.");
     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-      return redirect()->route('config.index')->with('error', 'El registro ya no existe.');
-    } catch (\Exception $e) {
-      return redirect()->route('config.index')->with('error', 'Error al eliminar: ' . $e->getMessage());
+      Log::error(
+        "Error al borrar, el registro no existe.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->route('config.index')->with('error', 'El registro no existe.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error(
+        "Error de base de datos al borrar.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->route('config.index')->with('error', 'Error de base de datos al borrar.');
+    }catch (\Exception $e) {
+      Log::critical(
+        "Error inesperado al eliminar.",
+        [
+          'entrada_input' => $request,
+          'error' => $e->getMessage(),
+          'exception' => $e,
+        ]
+      );
+      return redirect()->route('config.index')->with('error', 'Error inesperado al eliminar.');
     }
   }
 
@@ -174,7 +243,7 @@ class ConfigurationController extends Controller
       $exito = Nombres::update_nombre_mundo($nuevoNombre);
 
       return redirect()->route('config.index')
-        ->with('message', 'Nombre del mundo actualizado con éxito.');
+        ->with('success', 'Nombre del mundo actualizado con éxito.');
     } catch (\Exception $e) {
       Log::error("Error al actualizar nombre mundo: " . $e->getMessage());
       return redirect()->route('config.index')->with('error', 'No se pudo actualizar el nombre.');
@@ -194,7 +263,7 @@ class ConfigurationController extends Controller
 
     $exito = Fecha::update_fecha_mundo($request->input('dia', 0), $request->input('mes', 0), $request->input('anno', 0));
     if ($exito) {
-      return redirect()->route('config.index')->with('message', 'Fecha del mundo actualizada correctamente.');
+      return redirect()->route('config.index')->with('success', 'Fecha del mundo actualizada correctamente.');
     } else {
       return redirect()->route('config.index')->with('error', 'No se pudo actualizar la fecha del mundo.');
     }

@@ -124,6 +124,7 @@
   <div class="row">
     <x-config-table :items="$tipos_lugar" title="Tipos de lugares" :route="'config.store_tipo_lugar'" :name="'lugar'" :placeholder="'Ej: Bosque, desierto...'" />
     <x-config-table :items="$tipos_organizaciones" title="Tipos de organizaciones" :route="'config.store_tipo_organizacion'" :name="'organizacion'" :placeholder="'Ej: Imperio, ejército...'" />
+    <x-config-table :items="$categorias" title="Categorías de imágenes" :route="'config.store_generic'" :name="'categorias'" :placeholder="'Ej: Ambientación, animales...'" />
   </div>
 
 </div>
