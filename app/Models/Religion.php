@@ -9,11 +9,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Services\ImageService;
 use App\Enums\TipoTeismo;
-use App\Traits\HandlesRichTextImages;
 
 class Religion extends Model
 {
-  use HasFactory, HandlesRichTextImages;
+  use HasFactory;
 
   protected $table = 'religiones';
   protected $primaryKey = 'id';
