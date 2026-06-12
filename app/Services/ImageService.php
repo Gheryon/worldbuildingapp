@@ -3,11 +3,34 @@
 namespace App\Services;
 
 use App\Models\Imagen;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
 
 class ImageService
 {
+
+  /**
+   * Procesa múltiples campos de texto enriquecido para un modelo Eloquent.
+   */
+  public function processModelRichText(Model $model, array $data, array $camposConfig)
+  {
+    // Obtener el nombre e id de la tabla del modelo Eloquent
+    $tableOwner = $model->getTable();
+    $idOwner = $model->id;
+
+    foreach ($camposConfig as $columna => $inputKey) {
+      if (!empty($data[$inputKey])) {
+        // Procesar el HTML y actualizar el atributo del modelo
+        $model->$columna = $this->processSummernoteImages(
+          $data[$inputKey],
+          $tableOwner,
+          $idOwner
+        );
+      }
+    }
+
+  }
+
   /**
    * Procesa el HTML, guarda imágenes base64 en disco y crea registros en la BD.
    */
@@ -16,7 +39,7 @@ class ImageService
     if (empty($content)) return $content;
 
     $dom = new \DomDocument();
-     //Mantener UTF-8 y evitar errores de HTML5
+    //Mantener UTF-8 y evitar errores de HTML5
     $htmlForDom = '<?xml encoding="utf-8" ?>' . $content;
     @$dom->loadHtml($htmlForDom, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 

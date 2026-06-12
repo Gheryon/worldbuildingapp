@@ -5,12 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use App\Traits\HandlesRichTextImages;
 use Exception;
 
 class Especie extends Model
 {
-  use HasFactory, HandlesRichTextImages;
+  use HasFactory;
 
   protected $table = 'especies';
   protected $primaryKey = 'id';
@@ -92,8 +91,9 @@ class Especie extends Model
       // Crear registro
       $especie = self::create($request);
 
-      // Procesado de campos de RichText (Summernote)
-      $especie->processRichTextImages($request, self::$richTextFields, 'especies');
+      // Procesado de campos de RichText (Summernote) mediante el servicio ImageService
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($especie, $request, self::$richTextFields);
 
       $especie->save();
 
@@ -112,8 +112,9 @@ class Especie extends Model
     return DB::transaction(function () use ($request) {
       $this->fill($request);
 
-      // Procesado de campos de RichText (Summernote)
-      $this->processRichTextImages($request, self::$richTextFields, 'especies');
+      // Procesado de campos de RichText (Summernote) mediante el servicio ImageService
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($this, $request, self::$richTextFields);
 
       $this->save();
 

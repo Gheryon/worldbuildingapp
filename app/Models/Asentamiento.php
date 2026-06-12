@@ -6,11 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use App\Traits\HandlesRichTextImages;
 
 class Asentamiento extends Model
 {
-  use HasFactory, HandlesRichTextImages;
+  use HasFactory;
 
   protected $table = 'asentamientos';
   protected $primaryKey = 'id';
@@ -156,7 +155,8 @@ class Asentamiento extends Model
       $asentamiento = self::create($request);
 
       // Procesado de campos de RichText (Summernote)
-      $asentamiento->processRichTextImages($request, self::$richTextFields, 'asentamientos');
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($asentamiento, $request, self::$richTextFields);
 
       //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
       if (!empty($request['anno_fundacion'])) {
@@ -195,7 +195,8 @@ class Asentamiento extends Model
       $this->fill($request);
 
       // Procesado de campos de RichText (Summernote)
-      $this->processRichTextImages($request, self::$richTextFields, 'asentamientos');
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($this, $request, self::$richTextFields);
 
       //Actualizado de fechas, si existe *_id se actualiza, si no se crea. Si no hay año no se guarda fecha
       if (!empty($request['anno_fundacion'])) {

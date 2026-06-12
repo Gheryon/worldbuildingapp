@@ -5,12 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\HandlesRichTextImages;
 use Illuminate\Support\Facades\DB;
 
 class Evento extends Model
 {
-  use HasFactory, HandlesRichTextImages;
+  use HasFactory;
 
   protected $table = 'eventos';
   protected $primaryKey = 'id';
@@ -85,7 +84,14 @@ class Evento extends Model
       $evento = self::create($request);
 
       // Procesado de campos de Summernote
-      $evento->processRichTextImages($request, self::$richTextFields, 'eventos');
+      //$evento->processRichTextImages($request, self::$richTextFields, 'eventos');
+      // Procesado de campos de Summernote
+      $imageService = new ImageService();
+      $evento->descripcion = $imageService->processSummernoteImages(
+        $request->descripcion,
+        "eventos",
+        $evento->id
+      );
 
       $evento->tipo = $request['form_tipo'] ?? 'general';
       $evento->categoria = $request['form_categoria'] ?? 'local';
@@ -120,6 +126,14 @@ class Evento extends Model
       //Procesar imágenes de Summernote
       $this->processRichTextImages($data, self::$richTextFields, 'eventos');
 
+      // Procesado de campos de Summernote
+      $imageService = new ImageService();
+      $this->descripcion = $imageService->processSummernoteImages(
+        $request->descripcion,
+        "eventos",
+        $this->id
+      );
+      
       $this->tipo = $data['form_tipo'] ?? 'general';
       $this->categoria = $data['form_categoria'] ?? 'local';
 

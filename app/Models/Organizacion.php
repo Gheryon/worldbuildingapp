@@ -7,11 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Services\ImageService;
-use App\Traits\HandlesRichTextImages;
 
 class Organizacion extends Model
 {
-  use HasFactory, HandlesRichTextImages;
+  use HasFactory;
 
   protected $table = 'organizaciones';
   protected $primaryKey = 'id';
@@ -171,8 +170,9 @@ class Organizacion extends Model
 
       $organizacion = self::create($request);
 
-      // Procesado de campos Summernote
-      $organizacion->processRichTextImages($request, self::$richTextFields, 'organizaciones');
+      // Procesado de campos de RichText (Summernote) mediante el servicio ImageService
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($organizacion, $request, self::$richTextFields);
 
       //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
       if (!empty($request['anno_fundacion'])) {
@@ -227,7 +227,8 @@ class Organizacion extends Model
       $this->fill($request);
 
       // Procesado campos RichText (Summernote)
-      $this->processRichTextImages($request, self::$richTextFields, 'organizaciones');
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($this, $request, self::$richTextFields);
 
       //Actualizado de fechas
       //Procesar Fechas, si existe fundacion_id o disolucion_id se actualiza, si no se crea. Si no hay año no se guarda fecha

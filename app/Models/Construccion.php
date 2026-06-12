@@ -6,11 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use App\Traits\HandlesRichTextImages;
 
 class Construccion extends Model
 {
-  use HasFactory, HandlesRichTextImages;
+  use HasFactory;
 
   protected $table = 'construcciones';
   protected $primaryKey = 'id';
@@ -136,7 +135,8 @@ class Construccion extends Model
       $construccion->tiene_magia_inherente = isset($data['tiene_magia_inherente']);
 
       // Procesado campos RichText (Summernote)
-      $construccion->processRichTextImages($data, self::$richTextFields, 'construcciones');
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($construccion, $data, self::$richTextFields);
 
       //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
       if (!empty($data['anno_construccion'])) {
@@ -174,14 +174,15 @@ class Construccion extends Model
       //Campos básicos
       $this->fill($data);
 
-      //Manejo de Checkboxes, en un array, si el checkbox no se marcó, la clave no existe.
+      //Manejo de Checkboxes, en un array, si el checkbox no se marcó, la clave no existe, por eso se hace a parte.
       $this->acceso_publico        = isset($data['acceso_publico']);
       $this->acceso_temporal       = isset($data['acceso_temporal']);
       $this->tecnologia_perdida    = isset($data['tecnologia_perdida']);
       $this->tiene_magia_inherente = isset($data['tiene_magia_inherente']);
 
       // Procesado campos RichText (Summernote)
-      $this->processRichTextImages($data, self::$richTextFields, 'construcciones');
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($this, $data, self::$richTextFields);
 
       //Actualizado de fechas
       //Procesar Fechas, si existe construccion_id o destruccion_id se actualiza, si no se crea. Si no hay año no se guarda fecha

@@ -7,11 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use App\Traits\HandlesRichTextImages;
 
 class Conflicto extends Model
 {
-  use HasFactory, HandlesRichTextImages;
+  use HasFactory;
 
   protected $table = 'conflictos';
   protected $primaryKey = 'id';
@@ -182,7 +181,8 @@ class Conflicto extends Model
       $conflicto->es_conflicto_magico = isset($datos['es_conflicto_magico']);
 
       // Procesado campos RichText (Summernote)
-      $conflicto->processRichTextImages($datos, self::$richTextFields, 'conflictos');
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($conflicto, $datos, self::$richTextFields);
 
       //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
       if (!empty($datos['anno_fecha_inicio'])) {
@@ -263,7 +263,8 @@ class Conflicto extends Model
       $this->es_conflicto_magico = isset($datos['es_conflicto_magico']);
 
       // Procesado campos RichText (Summernote)
-      $this->processRichTextImages($datos, self::$richTextFields, 'conflictos');
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($this, $datos, self::$richTextFields);
 
       //Actualizado de fechas
       //Procesar Fechas, si existe *_id se actualiza, si no se crea. Si no hay año no se guarda fecha

@@ -127,7 +127,8 @@ class Religion extends Model
       $religion = self::create($request);
 
       // Procesado de campos Summernote
-      $religion->processRichTextImages($request, self::$richTextFields, 'religiones');
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($religion, $request, self::$richTextFields);
 
       //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
       if (!empty($request['anno_fundacion'])) {
@@ -176,7 +177,8 @@ class Religion extends Model
       }
 
       // Procesado de campos Summernote
-      $this->processRichTextImages($request, self::$richTextFields, 'religiones');
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($this, $request, self::$richTextFields);
 
       //Actualizado de fechas
       //Procesar Fechas, si existe fundacion_id o disolucion_id se actualiza, si no se crea. Si no hay año no se guarda fecha

@@ -133,10 +133,11 @@ class Lugar extends Model
     return DB::transaction(function () use ($request) {
       $lugar = self::create($request);
 
-      // Procesado de campos de Summernote
-      $lugar->processRichTextImages($request, self::$richTextFields, 'lugares');
+      // Procesado de campos de RichText (Summernote) mediante el servicio ImageService
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($lugar, $request, self::$richTextFields);
 
-      // Guardamos los cambios finales (rutas de imágenes y fechas)
+      // Guardar los cambios finales (rutas de imágenes y fechas)
       $lugar->save();
 
       return $lugar;
@@ -156,7 +157,8 @@ class Lugar extends Model
       $this->fill($request);
 
       // Procesado campos RichText (Summernote)
-      $this->processRichTextImages($request, self::$richTextFields, 'lugares');
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($this, $request, self::$richTextFields);
 
       return $this->save();
     });

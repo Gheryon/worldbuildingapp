@@ -164,7 +164,8 @@ class Personaje extends Model
       $personaje = self::create($request);
 
       // Procesado de campos de Summernote
-      $personaje->processRichTextImages($request, self::$richTextFields, 'personajes');
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($personaje, $request, self::$richTextFields);
 
       //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
       if (!empty($request['anno_nacimiento'])) {
@@ -208,7 +209,8 @@ class Personaje extends Model
       $this->fill($request);
 
       // Procesado de campos de Summernote
-      $this->processRichTextImages($request, self::$richTextFields, 'personajes');
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($this, $request, self::$richTextFields);
 
       //Actualizado de fechas
       //Procesar Fechas, si existe nacimiento_id o fallecimiento_id se actualiza, si no se crea. Si no hay año no se guarda fecha
