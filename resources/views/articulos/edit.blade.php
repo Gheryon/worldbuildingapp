@@ -6,7 +6,7 @@
 
 @section('content')
 <div class="container-fluid mt-4">
-  <form id="form-edit" action="{{route('articulos.update', $articulo->id)}}" method="post">
+  <form id="form-edit-articulo" data-prevent-loss="true" action="{{route('articulos.update', $articulo->id)}}" method="post">
     @csrf
     @method('PUT')
 
@@ -61,28 +61,8 @@
   </form>
 </div>
 
-
 @endsection
 
 @section('specific-scripts')
 <script src="{{asset('dist/js/common.js')}}"></script>
-<script>
-  $(document).ready(function() {
-    // Prevención de pérdida de datos
-    let formChanged = false;
-    $('#form-create').on('change', 'input, select, textarea', function() {
-      formChanged = true;
-    });
-
-    $(window).on('beforeunload', function() {
-      if (formChanged) {
-        return "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?";
-      }
-    });
-
-    $('#form-create').on('submit', function() {
-      $(window).off('beforeunload'); // Desactivar alerta al enviar el formulario
-    });
-  });
-</script>
 @endsection

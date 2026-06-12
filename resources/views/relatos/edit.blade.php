@@ -12,7 +12,7 @@
 
 @section('content')
 <div class="container-fluid mt-4">
-  <form id="form-edit" action="{{route('relatos.update', $relato->id )}}" method="post">
+  <form id="form-edit-relato" data-prevent-loss="true" action="{{route('relatos.update', $relato->id )}}" method="post">
     @csrf
     @method('PUT')
 
@@ -75,7 +75,6 @@
 
 @section('specific-scripts')
 <script src="{{asset('dist/js/common.js')}}"></script>
-
 <script>
   $(document).ready(function() {
     $('#personajes').select2({
@@ -84,22 +83,6 @@
       allowClear: true,
       width: '100%',
       containerCssClass: ':all:'
-    });
-
-    // Prevención de pérdida de datos
-    let formChanged = false;
-    $('#form-edit').on('change', 'input, select, textarea', function() {
-      formChanged = true;
-    });
-
-    $(window).on('beforeunload', function() {
-      if (formChanged) {
-        return "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?";
-      }
-    });
-
-    $('#form-edit').on('submit', function() {
-      $(window).off('beforeunload'); // Desactivar alerta al enviar el formulario
     });
   });
 </script>

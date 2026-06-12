@@ -12,7 +12,7 @@
 
 @section('content')
 <div class="container-fluid mt-4">
-  <form id="form-create" action="{{route('relatos.store')}}" method="post">
+  <form id="form-create-relato" data-prevent-loss="true" action="{{route('relatos.store')}}" method="post">
     @csrf
 
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -69,7 +69,6 @@
 @endsection
 
 @section('specific-scripts')
-<!--<script src="../js/summernote-bs4.min.js"></script>-->
 <script src="{{asset('dist/js/common.js')}}"></script>
 
 <script>
@@ -80,22 +79,6 @@
       allowClear: true,
       width: '100%',
       containerCssClass: ':all:'
-    });
-
-    // Prevención de pérdida de datos
-    let formChanged = false;
-    $('#form-create').on('change', 'input, select, textarea', function() {
-      formChanged = true;
-    });
-
-    $(window).on('beforeunload', function() {
-      if (formChanged) {
-        return "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?";
-      }
-    });
-
-    $('#form-create').on('submit', function() {
-      $(window).off('beforeunload'); // Desactivar alerta al enviar el formulario
     });
   });
 </script>
