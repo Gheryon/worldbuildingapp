@@ -104,7 +104,7 @@
       if (search) params.append('search', search); //Mantiene la búsqueda al filtrar
 
       // Generamos la URL base desde Laravel
-      const baseUrl = "{{ route('articulos.index') }}";
+      const baseUrl = "{{ route('relatos.index') }}";
       const urlFinal = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
       //console.log(orden, tipo, urlFinal);
       document.location.href = urlFinal;
