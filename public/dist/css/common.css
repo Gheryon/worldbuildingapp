@@ -15,6 +15,15 @@ body {
     min-height: 100vh;
 }
 
+/* Para enlaces en vistas de relatos y conflictos */
+.retrato-mini {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 8px;
+    }
+
 /* Tipografía */
 h1, .text-primary-custom {
     color: var(--primary-color) !important;
