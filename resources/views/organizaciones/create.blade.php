@@ -46,8 +46,8 @@
             </div>
             <div class="row">
               <div class="col-md-3">
-                <label for="select_tipo" class="form-label">Tipo de organización</label>
-                <select class="form-select form-control @error('select_tipo') is-invalid @enderror" name="select_tipo" id="select_tipo" @if($tipo_organizacion->count()>0)required @endif>
+                <label for="tipo_organizacion_id" class="form-label">Tipo de organización</label>
+                <select class="form-select form-control @error('tipo_organizacion_id') is-invalid @enderror" name="tipo_organizacion_id" id="tipo_organizacion_id" @if($tipo_organizacion->count()>0)required @endif>
                   <option selected disabled value="">Elegir</option>
                   @if($tipo_organizacion->count()>0)
                   @foreach($tipo_organizacion as $tipo)
@@ -55,31 +55,31 @@
                   @endforeach
                   @endif
                 </select>
-                @error('select_tipo')
+                @error('tipo_organizacion_id')
                 <small style="color: red">{{$message}}</small>
                 @enderror
               </div>
               <div class="col-md">
-                <label for="select_lider" class="form-label">Soberano</label>
-                <select class="form-select form-control @error('select_lider') is-invalid @enderror" name="select_lider" id="select_lider">
+                <label for="lider_id" class="form-label">Soberano</label>
+                <select class="form-select form-control @error('lider_id') is-invalid @enderror" name="lider_id" id="lider_id">
                   <option selected disabled value="">Elegir</option>
                   @foreach($personajes as $id => $nombre)
                   <option value="{{$id}}">{{$nombre}}</option>
                   @endforeach
                 </select>
-                @error('select_lider')
+                @error('lider_id')
                 <small style="color: red">{{$message}}</small>
                 @enderror
               </div>
               <div class="col-md">
-                <label for="select_organizacion_padre" class="form-label">Controlado por</label>
-                <select class="form-select form-control @error('select_organizacion_padre') is-invalid @enderror" name="select_organizacion_padre" id="select_organizacion_padre">
+                <label for="organizacion_padre_id" class="form-label">Controlado por</label>
+                <select class="form-select form-control @error('organizacion_padre_id') is-invalid @enderror" name="organizacion_padre_id" id="organizacion_padre_id">
                   <option selected disabled value="">Elegir</option>
                   @foreach($paises as $id => $nombre)
                   <option value="{{$id}}">{{$nombre}}</option>
                   @endforeach
                 </select>
-                @error('select_organizacion_padre')
+                @error('organizacion_padre_id')
                 <small style="color: red">{{$message}}</small>
                 @enderror
               </div>
