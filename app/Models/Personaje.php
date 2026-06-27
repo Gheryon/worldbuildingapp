@@ -2,18 +2,22 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasReferenceImages;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class Personaje extends Model
 {
   use HasFactory;
+  use HasReferenceImages;
 
   protected $table = 'personajes';
+
   protected $primaryKey = 'id';
+
   public $timestamps = true;
 
   protected $fillable = [
@@ -41,7 +45,7 @@ class Personaje extends Model
     'nacimiento_id',
     'fallecimiento_id',
     'sexo',
-    'otros'
+    'otros',
   ];
 
   protected $casts = [
@@ -65,7 +69,7 @@ class Personaje extends Model
     'religion' => 'religion',
     'familia' => 'familia',
     'politica' => 'politica',
-    'otros' => 'otros'
+    'otros' => 'otros',
   ];
 
   /**
@@ -114,7 +118,7 @@ class Personaje extends Model
       ->when($filtros['search'] ?? null, function ($q, $search) {
         $q->where('personajes.nombre', 'LIKE', "%{$search}%");
       })
-      ->when(!empty($filtros['especie']), function ($q) use ($filtros) {
+      ->when(! empty($filtros['especie']), function ($q) use ($filtros) {
         $q->where('personajes.especie_id', $filtros['especie']);
       })
       ->orderBy('personajes.nombre', $filtros['orden'] ?? 'asc');
@@ -122,19 +126,15 @@ class Personaje extends Model
 
   /**
    * Obtiene la edad del personaje si está vivo o murió
-   * 
-   * @param Fecha $nacimiento
-   * @param Fecha $fin
-   * @return string
    */
-  public function getEdadAttribute(Fecha $nacimiento, Fecha $fin): String
+  public function getEdadAttribute(Fecha $nacimiento, Fecha $fin): string
   {
-    //el mundo no se rige por nuestro calendario, así que se convierte todo a días para hacer la resta
+    // el mundo no se rige por nuestro calendario, así que se convierte todo a días para hacer la resta
     $dias_nacimiento = $nacimiento->anno * 365 + $nacimiento->mes * 30 + $nacimiento->dia;
     $dias_fallecimiento = $fin->anno * 365 + $fin->mes * 30 + $fin->dia;
 
     $edad = ($dias_fallecimiento - $dias_nacimiento) / 365;
-    $edad = (int)$edad . " años.";
+    $edad = (int) $edad . ' años.';
 
     return $edad;
   }
@@ -142,7 +142,6 @@ class Personaje extends Model
   /**
    * Almacena un nuevo personaje en la base de datos.
    *
-   * @param array $request
    * @return \App\Models\personaje
    */
   public static function store_personaje(array $request)
@@ -153,7 +152,7 @@ class Personaje extends Model
         $path = $request['retrato']->store('retratos', 'public');
         $request['retrato'] = basename($path);
       } else {
-        $request['retrato'] = "default.png";
+        $request['retrato'] = 'default.png';
       }
 
       if (isset($request['select_especie'])) {
@@ -166,24 +165,26 @@ class Personaje extends Model
       $imageService = app(\App\Services\ImageService::class);
       $imageService->processModelRichText($personaje, $request, self::$richTextFields);
 
-      //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
-      if (!empty($request['anno_nacimiento'])) {
+      // Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
+      if (! empty($request['anno_nacimiento'])) {
         $personaje->nacimiento_id = Fecha::sync(null, [
-          'dia'  => $request['dia_nacimiento'] ?? null,
-          'mes'  => $request['mes_nacimiento'] ?? null,
-          'anno' => $request['anno_nacimiento'] ?? null
+          'dia' => $request['dia_nacimiento'] ?? null,
+          'mes' => $request['mes_nacimiento'] ?? null,
+          'anno' => $request['anno_nacimiento'] ?? null,
         ]);
       }
 
-      if (!empty($request['anno_fallecimiento'])) {
+      if (! empty($request['anno_fallecimiento'])) {
         $personaje->fallecimiento_id = Fecha::sync(null, [
-          'dia'  => $request['dia_fallecimiento'] ?? null,
-          'mes'  => $request['mes_fallecimiento'] ?? null,
-          'anno' => $request['anno_fallecimiento'] ?? null
+          'dia' => $request['dia_fallecimiento'] ?? null,
+          'mes' => $request['mes_fallecimiento'] ?? null,
+          'anno' => $request['anno_fallecimiento'] ?? null,
         ]);
       }
 
       $personaje->save();
+
+      $personaje->subirImagenesReferencia($request['imagenes_referencia'] ?? []);
 
       return $personaje;
     });
@@ -192,7 +193,6 @@ class Personaje extends Model
   /**
    * Actualiza un personaje existente en la base de datos.
    *
-   * @param array $request
    * @return \App\Models\personaje
    */
   public function update_personaje(array $request)
@@ -211,23 +211,25 @@ class Personaje extends Model
       $imageService = app(\App\Services\ImageService::class);
       $imageService->processModelRichText($this, $request, self::$richTextFields);
 
-      //Actualizado de fechas
-      //Procesar Fechas, si existe nacimiento_id o fallecimiento_id se actualiza, si no se crea. Si no hay año no se guarda fecha
-      if (!empty($request['anno_nacimiento'])) {
+      // Actualizado de fechas
+      // Procesar Fechas, si existe nacimiento_id o fallecimiento_id se actualiza, si no se crea. Si no hay año no se guarda fecha
+      if (! empty($request['anno_nacimiento'])) {
         $this->nacimiento_id = Fecha::sync($this->nacimiento_id, [
-          'dia'  => $request['dia_nacimiento'] ?? null,
-          'mes'  => $request['mes_nacimiento'] ?? null,
-          'anno' => $request['anno_nacimiento'] ?? null
+          'dia' => $request['dia_nacimiento'] ?? null,
+          'mes' => $request['mes_nacimiento'] ?? null,
+          'anno' => $request['anno_nacimiento'] ?? null,
         ]);
       }
 
-      if (!empty($request['anno_fallecimiento'])) {
+      if (! empty($request['anno_fallecimiento'])) {
         $this->fallecimiento_id = Fecha::sync($this->fallecimiento_id, [
-          'dia'  => $request['dia_fallecimiento'] ?? null,
-          'mes'  => $request['mes_fallecimiento'] ?? null,
-          'anno' => $request['anno_fallecimiento'] ?? null
+          'dia' => $request['dia_fallecimiento'] ?? null,
+          'mes' => $request['mes_fallecimiento'] ?? null,
+          'anno' => $request['anno_fallecimiento'] ?? null,
         ]);
       }
+
+      $this->subirImagenesReferencia($request['imagenes_referencia'] ?? []);
 
       return $this->save();
     });
@@ -237,6 +239,7 @@ class Personaje extends Model
    * Elimina el personaje y sus recursos relacionados (imágenes y fechas).
    *
    * @return bool|null
+   *
    * @throws \Exception
    */
   protected static function booted()
@@ -258,13 +261,7 @@ class Personaje extends Model
       // Desvincular Organizaciones
       $personaje->organizacionesGobernadas()->update(['lider_id' => null]);
 
-      // Llamamos al servicio para limpiar el disco y la DB
-      //$imageService = new \App\Services\ImageService();
-      //$imageService->deleteImagesByOwner('personajes', $personaje->id);
-      //Versión alternativa con service container, para evitar inyección directa y facilitar testing/mocking
-      app(\App\Services\ImageService::class)->deleteImagesByOwner('personajes', $personaje->id);
-
-      //Borrado de fechas
+      // Borrado de fechas
       if ($personaje->nacimiento_id) {
         \App\Models\Fecha::destroy($personaje->nacimiento_id);
       }

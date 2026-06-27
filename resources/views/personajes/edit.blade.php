@@ -172,6 +172,8 @@
       </div>
     </div>{{-- Fin panel de pestañas --}}
 
+    <x-reference-images-manager :imagenes="$personaje->imagenes" entityType="personajes" :entityId="$personaje->id" />
+
   </form>
 
 </section>

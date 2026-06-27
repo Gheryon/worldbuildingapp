@@ -20,7 +20,7 @@
 
 <!-- Main content -->
 <section class="content">
-    <form id="form-create-personaje" class="position-relative needs-validation" action="{{route('personajes.store')}}" method="post" enctype="multipart/form-data">
+  <form id="form-create-personaje" class="position-relative needs-validation" action="{{route('personajes.store')}}" method="post" enctype="multipart/form-data">
     @csrf
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
@@ -84,7 +84,7 @@
                 @enderror
               </div>
               <div class="col-md">
-                <x-text-input name="lugar_nacimiento" label="Lugar de nacimiento" placeholder="Ej: Córdoba, Minas Tirith." disabled/>
+                <x-text-input name="lugar_nacimiento" label="Lugar de nacimiento" placeholder="Ej: Córdoba, Minas Tirith." disabled />
               </div>
               <div class="col-md">
                 <x-text-input name="profesion" label="Profesión" placeholder="Ej: Alquimista, guerrero, etc." />
@@ -92,10 +92,10 @@
             </div>
             <div class="row mt-2">
               <div class="col-md-4">
-                <x-date-input-group name="nacimiento" label="Fecha de nacimiento"/>
+                <x-date-input-group name="nacimiento" label="Fecha de nacimiento" />
               </div>
               <div class="col-md-4">
-                <x-date-input-group name="fallecimiento" label="Fecha de fallecimiento"/>
+                <x-date-input-group name="fallecimiento" label="Fecha de fallecimiento" />
               </div>
               <div class="col-md">
                 <label for="causa_fallecimiento" class="form-label mt-2">Causa de fallecimiento</label>
@@ -173,6 +173,8 @@
         </div>
       </div>
     </div>{{-- Fin panel de pestañas --}}
+
+    <x-reference-images-manager />
 
   </form>
 

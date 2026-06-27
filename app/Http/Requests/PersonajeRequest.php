@@ -35,6 +35,10 @@ class PersonajeRequest extends FormRequest
       // Imagen de retrato
       'retrato' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
 
+      // Imágenes de referencia
+      'imagenes_referencia' => 'nullable|array',
+      'imagenes_referencia.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+
       // Fechas y fallecimiento
       'dia_nacimiento'      => 'nullable|integer|min:1|max:30',
       'mes_nacimiento'      => 'nullable|integer|min:1|max:13',

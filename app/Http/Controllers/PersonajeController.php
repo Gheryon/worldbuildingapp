@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PersonajeRequest;
 use App\Models\Especie;
 use App\Models\Fecha;
 use App\Models\Personaje;
-use Exception;
 use Illuminate\Http\Request;
-use App\Http\Requests\PersonajeRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -18,14 +17,14 @@ class PersonajeController extends Controller
    *
    * Los parámetros de la URL se validan estrictamente para asegurar la integridad de la consulta.
    *
-   * @param Request $request Objeto de solicitud inyectado para acceder a los parámetros.
+   * @param  Request  $request  Objeto de solicitud inyectado para acceder a los parámetros.
    * @return View La vista con la lista de personajes y los filtros disponibles.
    */
   public function index(Request $request)
   {
     $datosValidados = $request->validate([
       'orden' => 'sometimes|string|in:asc,desc', // 'sometimes' permite que no esté presente.
-      'especie'  => 'sometimes|integer|nullable',
+      'especie' => 'sometimes|integer|nullable',
       'search' => 'sometimes|nullable|string|max:100',
     ], [
       'orden.in' => 'El orden debe ser ascendente (asc) o descendente (desc).',
@@ -38,9 +37,9 @@ class PersonajeController extends Controller
     $terminoBusqueda = $datosValidados['search'] ?? null;
 
     $personajes = Personaje::filtrar([
-      'orden'  => $orden,
-      'especie'   => $especie_id,
-      'search' => $terminoBusqueda
+      'orden' => $orden,
+      'especie' => $especie_id,
+      'search' => $terminoBusqueda,
     ]) // IMPORTANTE: Incluir siempre las FK (especie_id) para que el 'with' funcione.
       ->select('id', 'nombre', 'retrato', 'especie_id', 'sexo')
       ->paginate(18)
@@ -58,7 +57,7 @@ class PersonajeController extends Controller
    */
   public function create()
   {
-    //obtener todas las especies
+    // obtener todas las especies
     $especies = Especie::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
     return view('personajes.create', compact('especies'));
@@ -79,25 +78,27 @@ class PersonajeController extends Controller
         ->with('success', 'Personaje ' . $personaje->nombre . ' añadido correctamente.');
     } catch (\Illuminate\Database\QueryException $e) {
       Log::error(
-        "Error de base de datos al añadir personaje.",
+        'Error de base de datos al añadir personaje.',
         [
           'entrada_input' => $request,
           'error' => $e->getMessage(),
           'exception' => $e,
         ]
       );
+
       return redirect()->back()
         ->withInput()
         ->with('error', 'No se pudo crear el personaje debido a un error en la base de datos.');
     } catch (\Exception $e) {
       Log::critical(
-        "Error inesperado al añadir personaje.",
+        'Error inesperado al añadir personaje.',
         [
           'entrada_input' => $request,
           'error' => $e->getMessage(),
           'exception' => $e,
         ]
       );
+
       return redirect()->back()
         ->withInput()
         ->with('error', 'No se pudo crear el personaje: ' . $e->getMessage());
@@ -110,21 +111,22 @@ class PersonajeController extends Controller
   public function show($id)
   {
     // Cargamos el personaje con sus relaciones para evitar el problema N+1
-    $personaje = Personaje::with(['especie'])
+    $personaje = Personaje::with(['especie', 'imagenes'])
       ->findOrFail($id);
 
-    //obtener fechas en formato string
+    // obtener fechas en formato string
     $nacimiento = Fecha::get_fecha_string($personaje->nacimiento_id);
     $fallecimiento = Fecha::get_fecha_string($personaje->fallecimiento_id);
 
     // Cálculo de la edad, por defecto "Desconocida"
-    $edad = "Desconocida";
+    $edad = 'Desconocida';
     if ($personaje->nacimiento_id) {
-      //Si no se ha fallecido, se obtiene la fecha actual del mundo
-      if ($personaje->fallecimiento_id)
+      // Si no se ha fallecido, se obtiene la fecha actual del mundo
+      if ($personaje->fallecimiento_id) {
         $fechaFin = Fecha::find($personaje->fallecimiento_id);
-      else
+      } else {
         $fechaFin = Fecha::get_fecha_mundo();
+      }
       $edad = $personaje->getEdadAttribute(Fecha::find($personaje->nacimiento_id), $fechaFin);
     }
 
@@ -133,7 +135,8 @@ class PersonajeController extends Controller
       'especie' => $personaje->especie->nombre ?? 'Desconocida',
       'nacimiento' => $nacimiento,
       'fallecimiento' => $fallecimiento,
-      'edad' => $edad
+      'edad' => $edad,
+      'imagenesReferencia' => $personaje->imagenes,
     ]);
   }
 
@@ -143,10 +146,10 @@ class PersonajeController extends Controller
   public function edit($id)
   {
     try {
-      //obtener personaje
-      $personaje = Personaje::with(['fecha_nacimiento', 'fecha_fallecimiento'])->findOrFail($id);
+      // obtener personaje
+      $personaje = Personaje::with(['fecha_nacimiento', 'fecha_fallecimiento', 'imagenes'])->findOrFail($id);
 
-      //obtener todas las especies
+      // obtener todas las especies
       $especies = Especie::orderBy('nombre', 'asc')->pluck('nombre', 'id');
 
       return view('personajes.edit', compact('personaje', 'especies'));
@@ -171,6 +174,7 @@ class PersonajeController extends Controller
         ->with('success', 'Personaje ' . $personaje->nombre . ' actualizado con éxito.');
     } catch (\Exception $e) {
       Log::error("Error actualizando personaje ID {$personaje->id}: " . $e->getMessage());
+
       return redirect()->back()
         ->withInput()
         ->with('error', 'Error al actualizar: ' . $e->getMessage());

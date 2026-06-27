@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Imagen;
-use App\Models\Categoria;
-use Illuminate\Http\Request;
 use App\Http\Requests\ImagenRequest;
+use App\Models\Categoria;
+use App\Models\Imagen;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ImagenController extends Controller
 {
@@ -35,29 +37,32 @@ class ImagenController extends Controller
   {
     try {
       Imagen::subirImagen($request);
+
       return redirect()->route('galeria.index')
         ->with('success', 'Imagen subida correctamente.');
     } catch (\Illuminate\Database\QueryException $e) {
       Log::error(
-        "Error de base de datos al subir imagen.",
+        'Error de base de datos al subir imagen.',
         [
           'entrada_input' => $request,
           'error' => $e->getMessage(),
           'exception' => $e,
         ]
       );
+
       return redirect()->back()
         ->withInput()
         ->with('error', 'No se pudo subir la imagen debido a un error en la base de datos.');
     } catch (\Exception $e) {
       Log::critical(
-        "Error inesperado al subir imagen.",
+        'Error inesperado al subir imagen.',
         [
           'entrada_input' => $request,
           'error' => $e->getMessage(),
           'exception' => $e,
         ]
       );
+
       return redirect()->back()
         ->withInput()
         ->with('error', 'No se pudo subir la imagen: Error inesperado');
@@ -71,28 +76,31 @@ class ImagenController extends Controller
   {
     try {
       $imagen->renombrarImagen($request->nombre, $request->categoria_id);
+
       return redirect()->route('galeria.index')->with('success', 'Imagen renombrada correctamente.');
     } catch (\Illuminate\Database\QueryException $e) {
       Log::error(
-        "Error de base de datos al renombrar imagen.",
+        'Error de base de datos al renombrar imagen.',
         [
           'entrada_input' => $request->all(),
           'error' => $e->getMessage(),
           'exception' => $e,
         ]
       );
+
       return redirect()->back()
         ->withInput()
         ->with('error', 'No se pudo renombrar la imagen debido a un error en la base de datos.');
     } catch (\Exception $e) {
       Log::critical(
-        "Error inesperado al renombrar imagen.",
+        'Error inesperado al renombrar imagen.',
         [
           'entrada_input' => $request->all(),
           'error' => $e->getMessage(),
           'exception' => $e,
         ]
       );
+
       return redirect()->back()
         ->withInput()
         ->with('error', 'No se pudo renombrar la imagen: Error inesperado');
@@ -106,28 +114,66 @@ class ImagenController extends Controller
   {
     try {
       $imagen->eliminarImagen();
+
       return redirect()->route('galeria.index')
         ->with('success', 'Imagen eliminada correctamente.');
     } catch (\Illuminate\Database\QueryException $e) {
       Log::error(
-        "Error de base de datos al eliminar imagen.",
+        'Error de base de datos al eliminar imagen.',
         [
           'error' => $e->getMessage(),
           'exception' => $e,
         ]
       );
+
       return redirect()->back()
         ->with('error', 'No se pudo eliminar la imagen debido a un error en la base de datos.');
     } catch (\Exception $e) {
       Log::critical(
-        "Error inesperado al eliminar imagen.",
+        'Error inesperado al eliminar imagen.',
         [
           'error' => $e->getMessage(),
           'exception' => $e,
         ]
       );
+
       return redirect()->back()
         ->with('error', 'No se pudo eliminar la imagen: Error inesperado');
+    }
+  }
+
+  /**
+   * Elimina una imagen de referencia asociada a una entidad.
+   */
+  public function destroyReference($entityType, $entityId, Imagen $imagen)
+  {
+    if ($imagen->table_owner !== $entityType || (int) $imagen->owner !== (int) $entityId) {
+      abort(404);
+    }
+
+    try {
+      DB::transaction(function () use ($imagen) {
+        if (Storage::disk('public')->exists($imagen->path)) {
+          Storage::disk('public')->delete($imagen->path);
+        }
+        $imagen->delete();
+      });
+
+      return back()->with('success', 'Imagen eliminada.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      Log::error('Error de base de datos al eliminar imagen de referencia.', [
+        'imagen_id' => $imagen->id,
+        'error' => $e->getMessage(),
+      ]);
+
+      return back()->with('error', 'No se pudo eliminar la imagen.');
+    } catch (\Exception $e) {
+      Log::critical('Error inesperado al eliminar imagen de referencia.', [
+        'imagen_id' => $imagen->id,
+        'error' => $e->getMessage(),
+      ]);
+
+      return back()->with('error', 'Error inesperado al eliminar la imagen.');
     }
   }
 }

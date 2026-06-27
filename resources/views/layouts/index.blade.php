@@ -59,6 +59,8 @@
 
   <link rel="preload" href="{{asset('dist/css/styles.css')}}" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="{{asset('dist/css/styles.css')}}"></noscript>
+
+  @yield('specific-cases')
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed" id="_body_">
