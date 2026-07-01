@@ -194,6 +194,9 @@
         </div>
       </div>
     </div>{{-- Fin panel de pestañas --}}
+
+    <x-reference-images-manager />
+    
   </form>
 
 </section>

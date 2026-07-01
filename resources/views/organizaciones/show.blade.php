@@ -80,6 +80,7 @@
           @endif
           @endforeach
         </div>
+        <x-reference-images-gallery :imagenes="$organizacion->imagenes" :entityId="$organizacion->id" />
       </div>
 
       {{-- Columna Lateral: Ficha Técnica --}}

@@ -123,6 +123,7 @@ class OrganizacionController extends Controller
         'tipo',
         'lider',
         'organizacion_padre',
+        'imagenes',
         'subordinates' => function ($query) {
           $query->orderBy('nombre', 'asc');
         }
