@@ -47,7 +47,7 @@ class ConflictoRequest extends FormRequest
       'bando_vencedor'                    => 'sometimes|string|in:atacante,defensor,ninguno',
       'hechizos_decisivos'                => 'nullable|string',
       'armas_magicas_empleadas'           => 'nullable|string',
-      'seres_sobrenaturales_participants' => 'nullable|string',
+      'seres_sobrenaturales_participantes' => 'nullable|string',
       'fenomenos_naturales'               => 'nullable|string',
 
       // --- Pestaña: resultados ---
