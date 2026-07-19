@@ -137,14 +137,21 @@ class Organizacion extends Model
   public function scopeFiltrar($query, $filtros)
   {
     return $query->leftJoin('tipo_organizacion', 'organizaciones.tipo_organizacion_id', '=', 'tipo_organizacion.id')
+      ->leftJoin('organizaciones as padres', 'organizaciones.organizacion_padre_id', '=', 'padres.id')
+      ->leftJoin('personajes as lideres', 'organizaciones.lider_id', '=', 'lideres.id')
       ->select(
         'organizaciones.id',
         'organizaciones.nombre',
         'organizaciones.escudo',
+        'organizaciones.estatus',
+        'organizaciones.descripcion_breve',
+        'organizaciones.lider_id',
+        'organizaciones.organizacion_padre_id',
         'organizaciones.tipo_organizacion_id',
-        DB::raw('COALESCE(tipo_organizacion.nombre, "Tipo de organización desconocido") as tipo')
+        DB::raw('COALESCE(tipo_organizacion.nombre, "Tipo de organización desconocido") as tipo'),
+        'padres.nombre as nombre_padre',
+        'lideres.nombre as nombre_lider'
       )
-      ->where('organizaciones.id', '!=', 0)
       ->when($filtros['search'] ?? null, function ($q, $search) {
         $q->where('organizaciones.nombre', 'LIKE', "%{$search}%");
       })

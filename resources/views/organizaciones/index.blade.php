@@ -46,34 +46,9 @@
 @endsection
 
 @section('content')
-  <h1 class="text-center mb-4">Instituciones</h1>
-<hr>
-
 <div class="row">
   @forelse($organizaciones as $organizacion)
-  <div class="col-sm-12 col-md-6 col-lg-3 col-xl-2">
-    <div class="card card-dark card-outline">
-      <div class="card-body box-profile">
-        <div class="text-center">
-          <h2 class="lead"><b>{{$organizacion->nombre}}</b></h2>
-          <img class="img-fluid" src="{{asset("storage/escudos/{$organizacion->escudo}")}}" alt="Escudo de {{ $organizacion->nombre }}" loading="lazy">
-        </div>
-        <ul class="list-group list-group-unbordered mb-3">
-          <li class="list-group-item">
-            <b>Tipo:</b> {{$organizacion->tipo}}
-          </li>
-        </ul>
-      </div>
-      <!-- /.card-body -->
-      <div class="card-footer">
-        <div class="row text-right">
-          <a href="{{route('organizaciones.show',$organizacion->id)}}" role="button" title="Ver" class="btn btn-info btn-sm col-4"><b><i class="fas fa-id-card mr-1"></i></b></a>
-          <a href="{{route('organizaciones.edit',$organizacion->id)}}" role="button" title="Editar" class="btn btn-success btn-sm col-4"><b><i class="fas fa-pencil-alt mr-1"></i></b></a>
-          <button data-id="{{$organizacion->id}}" data-nombre="{{$organizacion->nombre}}" data-url="{{route('organizaciones.destroy',$organizacion->id)}}" type="button" title="Borrar" class="borrar btn btn-danger btn-sm col-4" data-toggle="modal" data-target="#eliminar-organizacion"><i class="fas fa-trash mr-1"></i></button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <x-organizacion-card :organizacion="$organizacion" />
   @empty
   <div class="col-12 text-center mt-5">
     <div class="callout callout-info">
