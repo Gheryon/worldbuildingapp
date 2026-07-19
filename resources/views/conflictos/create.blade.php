@@ -241,6 +241,8 @@
         </div>
       </div>
     </div>
+
+    <x-reference-images-manager />
   </form>
 </div>
 @endsection

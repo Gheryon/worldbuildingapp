@@ -133,6 +133,7 @@ class ConflictoController extends Controller
         'personajes',
         'organizaciones',
         'conflictoPadre',
+        'imagenes',
       ]);
 
       // Obtención de las fechas formateadas para la vista

@@ -48,6 +48,9 @@
           ['titulo' => 'Consecuencias geopolíticas', 'campo' => $conflicto->consecuencias, 'icono' => 'fa-monument'],
           ['titulo' => 'Fenómenos naturales', 'campo' => $conflicto->fenomenos_naturales, 'icono' => 'fa-cloud-showers-heavy'],
           ['titulo' => 'Elementos mágicos y sobrenaturales', 'campo' => $conflicto->hechizos_decisivos, 'icono' => 'fa-hat-wizard'],
+          ['titulo' => 'Maquinaria de guerra', 'campo' => $conflicto->maquinaria_warlike, 'icono' => 'fa-cogs'],
+          ['titulo' => 'Criaturas de combate', 'campo' => $conflicto->criaturas_combate, 'icono' => 'fa-dragon'],
+          ['titulo' => 'Seres sobrenaturales', 'campo' => $conflicto->seres_sobrenaturales_participantes, 'icono' => 'fa-spaghetti-monster-flying'],
           ['titulo' => 'Otros detalles', 'campo' => $conflicto->otros, 'icono' => 'fa-plus-circle'],
           ];
           @endphp
@@ -65,6 +68,7 @@
           @endif
           @endforeach
         </div>
+        <x-reference-images-gallery :imagenes="$conflicto->imagenes" :entityId="$conflicto->id" />
       </div>
 
       {{-- Columna Derecha: Ficha Técnica (Estilo Wikipedia) --}}
@@ -160,17 +164,21 @@
 
               @if($conflicto->unidades_especiales)
               <li class="list-group-item">
-                <small class="d-block text-muted text-uppercase font-weight-bold">Unidades Destacadas</small>
+                <small class="d-block text-muted text-uppercase font-weight-bold">Unidades destacadas</small>
                 <div class="article-body-mini">{!! clean($conflicto->unidades_especiales) !!}</div>
               </li>
               @endif
 
+              @if($conflicto->armas_magicas_empleadas)
+              <li class="list-group-item">
+                <small class="d-block text-muted text-uppercase font-weight-bold">Artefactos o armas mágicas</small>
+                <div class="article-body-mini">{!! clean($conflicto->armas_magicas_empleadas) !!}</div>
+              </li>
+              @endif
+
               @if($conflicto->es_conflicto_magico)
-              <li class="list-group-item bg-magic-soft">
-                <small class="d-block text-primary-custom text-uppercase font-weight-bold"><i class="fas fa-magic"></i> Factor Mágico</small>
-                <div class="mt-1 small">
-                  <strong>Artefactos o armas:</strong> {!! clean($conflicto->armas_magicas_empleadas) !!}
-                </div>
+              <li class="list-group-item bg-magic-soft text-primary-custom text-center font-weight-bold py-1 text-uppercase">
+                Conflicto mágico
               </li>
               @endif
             </ul>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasReferenceImages;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class Conflicto extends Model
 {
-  use HasFactory;
+  use HasFactory, HasReferenceImages;
 
   protected $table = 'conflictos';
   protected $primaryKey = 'id';
@@ -187,16 +188,16 @@ class Conflicto extends Model
       //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
       if (!empty($datos['anno_fecha_inicio'])) {
         $conflicto->fecha_inicio_id = Fecha::sync(null, [
-          'dia'  => $datos['dia_fecha_inicio'] ?? 0,
-          'mes'  => $datos['mes_fecha_inicio'] ?? 0,
+          'dia'  => $datos['dia_fecha_inicio'] ?? null,
+          'mes'  => $datos['mes_fecha_inicio'] ?? null,
           'anno' => $datos['anno_fecha_inicio'] ?? null
         ]);
       }
 
       if (!empty($datos['anno_fecha_fin'])) {
         $conflicto->fecha_fin_id = Fecha::sync(null, [
-          'dia'  => $datos['dia_fecha_fin'] ?? 0,
-          'mes'  => $datos['mes_fecha_fin'] ?? 0,
+          'dia'  => $datos['dia_fecha_fin'] ?? null,
+          'mes'  => $datos['mes_fecha_fin'] ?? null,
           'anno' => $datos['anno_fecha_fin'] ?? null,
         ]);
       }
@@ -243,6 +244,8 @@ class Conflicto extends Model
 
       $conflicto->save();
 
+      $conflicto->subirImagenesReferencia($datos['imagenes_referencia'] ?? []);
+
       return $conflicto;
     });
   }
@@ -270,16 +273,16 @@ class Conflicto extends Model
       //Procesar Fechas, si existe *_id se actualiza, si no se crea. Si no hay año no se guarda fecha
       if (!empty($datos['anno_fecha_inicio'])) {
         $this->fecha_inicio_id = Fecha::sync($this->fecha_inicio_id, [
-          'dia'  => $datos['dia_fecha_inicio'] ?? 0,
-          'mes'  => $datos['mes_fecha_inicio'] ?? 0,
+          'dia'  => $datos['dia_fecha_inicio'] ?? null,
+          'mes'  => $datos['mes_fecha_inicio'] ?? null,
           'anno' => $datos['anno_fecha_inicio'] ?? null
         ]);
       }
 
       if (!empty($datos['anno_fecha_fin'])) {
         $this->fecha_fin_id = Fecha::sync($this->fecha_fin_id, [
-          'dia'  => $datos['dia_fecha_fin'] ?? 0,
-          'mes'  => $datos['mes_fecha_fin'] ?? 0,
+          'dia'  => $datos['dia_fecha_fin'] ?? null,
+          'mes'  => $datos['mes_fecha_fin'] ?? null,
           'anno' => $datos['anno_fecha_fin'] ?? null,
         ]);
       }
@@ -319,6 +322,9 @@ class Conflicto extends Model
           $this->organizaciones()->attach($id, ['lado' => 'defensor', 'es_vencedor' => ($bandoGanador === 'defensor')]);
         }
       }
+
+      //Sincronizar imágenes de referencia si las hubiera
+      $this->subirImagenesReferencia($datos['imagenes_referencia'] ?? []);
 
       return $this->save();
     });

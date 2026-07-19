@@ -37,6 +37,7 @@ class ImagenController extends Controller
   {
     try {
       Imagen::subirImagen($request);
+      Log::info('Imagen subida correctamente.');
 
       return redirect()->route('galeria.index')
         ->with('success', 'Imagen subida correctamente.');
@@ -76,6 +77,7 @@ class ImagenController extends Controller
   {
     try {
       $imagen->renombrarImagen($request->nombre, $request->categoria_id);
+      Log::info('Imagen renombrada correctamente.', ['imagen_id' => $imagen->id]);
 
       return redirect()->route('galeria.index')->with('success', 'Imagen renombrada correctamente.');
     } catch (\Illuminate\Database\QueryException $e) {
@@ -114,6 +116,7 @@ class ImagenController extends Controller
   {
     try {
       $imagen->eliminarImagen();
+      Log::info('Imagen eliminada correctamente.', ['imagen_id' => $imagen->id]);
 
       return redirect()->route('galeria.index')
         ->with('success', 'Imagen eliminada correctamente.');
@@ -158,22 +161,23 @@ class ImagenController extends Controller
         }
         $imagen->delete();
       });
+      Log::info('Imagen de referencia eliminada correctamente.', ['imagen_id' => $imagen->id, 'entityType' => $entityType, 'entityId' => $entityId]);
 
-      return back()->with('success', 'Imagen eliminada.');
+      return response()->json(['success' => true, 'message' => 'Imagen eliminada.']);
     } catch (\Illuminate\Database\QueryException $e) {
       Log::error('Error de base de datos al eliminar imagen de referencia.', [
         'imagen_id' => $imagen->id,
         'error' => $e->getMessage(),
       ]);
 
-      return back()->with('error', 'No se pudo eliminar la imagen.');
+      return response()->json(['success' => false, 'message' => 'No se pudo eliminar la imagen.'], 500);
     } catch (\Exception $e) {
       Log::critical('Error inesperado al eliminar imagen de referencia.', [
         'imagen_id' => $imagen->id,
         'error' => $e->getMessage(),
       ]);
 
-      return back()->with('error', 'Error inesperado al eliminar la imagen.');
+      return response()->json(['success' => false, 'message' => 'Error inesperado al eliminar la imagen.'], 500);
     }
   }
 }
