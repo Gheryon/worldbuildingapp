@@ -68,7 +68,7 @@
               @error('nuevo_nombre_mundo')
               <small style="color: red">{{$message}}</small>
               @enderror
-              <button type="submit" class="btn btn-outline-primary">Guardar</button>
+              <button type="submit" class="btn btn-dark">Guardar</button>
             </div>
           </form>
         </div>
@@ -104,7 +104,7 @@
               @error('anno')
               <small style="color: red">{{$message}}</small>
               @enderror
-              <button type="submit" class="btn btn-outline-primary">Guardar</button>
+              <button type="submit" class="btn btn-dark">Guardar</button>
             </div>
           </form>
         </div>
