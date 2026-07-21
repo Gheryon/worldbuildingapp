@@ -41,7 +41,7 @@
         @enderror
       </div>
       <div class="col-3 align-bottom">
-        <button type="submit" class="btn btn-primary">Añadir</button>
+        <button type="submit" class="btn btn-dark">Añadir</button>
       </div>
     </form>
   </div>
