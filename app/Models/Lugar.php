@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasReferenceImages;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use App\Services\ImageService;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Lugar extends Model
 {
-  use HasFactory;
+  use HasFactory, HasReferenceImages;
 
   protected $table = 'lugares';
   protected $primaryKey = 'id';
@@ -139,6 +139,7 @@ class Lugar extends Model
 
       // Guardar los cambios finales (rutas de imágenes y fechas)
       $lugar->save();
+      $lugar->subirImagenesReferencia($request['imagenes_referencia'] ?? []);
 
       return $lugar;
     });
@@ -159,6 +160,9 @@ class Lugar extends Model
       // Procesado campos RichText (Summernote)
       $imageService = app(\App\Services\ImageService::class);
       $imageService->processModelRichText($this, $request, self::$richTextFields);
+
+      //Sincronizar imágenes de referencia si las hubiera
+      $this->subirImagenesReferencia($request['imagenes_referencia'] ?? []);
 
       return $this->save();
     });

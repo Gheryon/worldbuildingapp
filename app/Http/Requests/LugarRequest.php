@@ -27,7 +27,7 @@ class LugarRequest extends FormRequest
       'otros_nombres'     => 'nullable|string|max:255',
       'select_tipo'       => 'required|exists:tipo_lugar,id',
       'nivel_peligro'     => 'nullable|string|in:Ninguno,Bajo,Moderado,Alto,Mortal,Desconocido',
-      'tipo_peligro'      => 'required|string|in:Mágico,Fauna,Clima,Geológico,Político,Sobrenatural,Ninguno',
+      'tipo_peligro'      => 'nullable|string|in:Mágico,Fauna,Clima,Geológico,Político,Sobrenatural,Ninguno',
       'dificultad_acceso' => 'nullable|string|in:Muy fácil,Fácil,Moderada,Difícil,Extrema',
       'estacionalidad'    => 'nullable|string|max:255',
       'es_secreto'        => 'nullable|boolean',
@@ -43,6 +43,10 @@ class LugarRequest extends FormRequest
       'historia'          => 'nullable|string', // Campo Summernote
       'rumores'           => 'nullable|string',
       'otros'             => 'nullable|string',
+
+      //Imágenes de referencia
+      'imagenes_referencia'   => 'nullable|array',
+      'imagenes_referencia.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
     ];
   }
 

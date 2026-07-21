@@ -65,8 +65,11 @@
             @endif
           @endforeach
         </div>
+
+        <x-reference-images-gallery :imagenes="$lugar->imagenes" :entityId="$lugar->id" />
       </div>
 
+      {{-- Columna Lateral: Ficha Técnica --}}
       <div class="col-lg-4">
         <div class="card shadow-sm border-0 sticky-top sidebar-infobox" style="top: 2rem;">
           <div class="card-header bg-dark-custom text-white font-weight-bold py-3">
