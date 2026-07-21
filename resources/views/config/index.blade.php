@@ -56,85 +56,81 @@
   </div>-->
   <!--<a href="{{route('galeria.limpiar_imagenes')}}" class="btn btn-dark">Limpiar imágenes</a>-->
 
-  <div class="row">
-    <div class="col-4">
-      <form id="form-edit-nombre_mundo" class="form-inline" action="{{route('config.update_nombre_mundo')}}" method="POST">
-        @csrf
-        <div class="form-group mb-2">
-          <label for="nombre_mundo" class="sr-only">Nombre del mundo</label>
-          <input type="text" readonly class="form-control-plaintext" id="nombre_mundo" value="Nombre del mundo">
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <div class="row align-items-end">
+        <div class="col-md-3 mb-3 mb-md-0">
+          <form id="form-edit-nombre_mundo" action="{{route('config.update_nombre_mundo')}}" method="POST">
+            @csrf
+            <label for="nuevo_nombre_mundo" class="form-label font-weight-bold">Nombre del mundo</label>
+            <div class="input-group">
+              <input type="text" value="{{$Nombre_mundo}}" name="nuevo_nombre_mundo" class="form-control" id="nuevo_nombre_mundo">
+              @error('nuevo_nombre_mundo')
+              <small style="color: red">{{$message}}</small>
+              @enderror
+              <button type="submit" class="btn btn-outline-primary">Guardar</button>
+            </div>
+          </form>
         </div>
-        <div class="form-group mx-sm-3 mb-2">
-          <label for="nuevo_nombre_mundo" class="sr-only">Nombre del mundo</label>
-          <input type="text" value="{{$Nombre_mundo}}" name="nuevo_nombre_mundo" class="form-control" id="nuevo_nombre_mundo" placeholder="Ej: Córdoba">
-          @error('nuevo_nombre_mundo')
-          <small style="color: red">{{$message}}</small>
-          @enderror
-          <button type="submit" class="btn btn-primary">Cambiar</button>
+        <div class="col-md-4">
+          <form id="form-edit-fecha_mundo" action="{{route('config.update_fecha_mundo')}}" method="POST">
+            @csrf
+            <label class="form-label font-weight-bold">Fecha actual en el mundo</label>
+            <div class="input-group">
+              <input type="text" id="dia" name="dia" class="form-control" style="max-width: 80px;" placeholder="Día" value="{{$fecha->dia}}">
+              @error('dia')
+              <small style="color: red">{{$message}}</small>
+              @enderror
+              <select class="form-select form-control" id="mes" name="mes">
+                <option selected disabled value="">Mes</option>
+                <option value="0" @selected($fecha->mes == 0)>Semana de año nuevo</option>
+                <option value="1" @selected($fecha->mes == 1)>Enero</option>
+                <option value="2" @selected($fecha->mes == 2)>Febrero</option>
+                <option value="3" @selected($fecha->mes == 3)>Marzo</option>
+                <option value="4" @selected($fecha->mes == 4)>Abril</option>
+                <option value="5" @selected($fecha->mes == 5)>Mayo</option>
+                <option value="6" @selected($fecha->mes == 6)>Junio</option>
+                <option value="7" @selected($fecha->mes == 7)>Julio</option>
+                <option value="8" @selected($fecha->mes == 8)>Agosto</option>
+                <option value="9" @selected($fecha->mes == 9)>Septiembre</option>
+                <option value="10" @selected($fecha->mes == 10)>Octubre</option>
+                <option value="11" @selected($fecha->mes == 11)>Noviembre</option>
+                <option value="12" @selected($fecha->mes == 12)>Diciembre</option>
+              </select>
+              @error('mes')
+              <small style="color: red">{{$message}}</small>
+              @enderror
+              <input type="text" id="anno" name="anno" class="form-control" style="max-width: 100px;" placeholder="Año" value="{{$fecha->anno}}">
+              @error('anno')
+              <small style="color: red">{{$message}}</small>
+              @enderror
+              <button type="submit" class="btn btn-outline-primary">Guardar</button>
+            </div>
+          </form>
         </div>
-        <input type="hidden" name="id" id="id" value="Nombre_mundo">
-      </form>
-
+      </div>
     </div>
-    <div class="col-8">
-      <form id="form-edit-fecha_mundo" class="form-inline" action="{{route('config.update_fecha_mundo')}}" method="POST">
-        @csrf
-        <div class="form-group mb-2">
-          <label for="fecha_actual" class="sr-only">Fecha actual en el mundo</label>
-          <input type="text" readonly class="form-control-plaintext" id="fecha_actual" value="Fecha actual en el mundo">
-        </div>
-        <div class="form-group mx-sm-3 mb-2">
-          <input type="text" id="dia" name="dia" class="form-control col-2" placeholder="Día" value="{{$fecha->dia}}">
-          @error('dia')
-          <small style="color: red">{{$message}}</small>
-          @enderror
-          <select class="form-control col-4" id="mes" name="mes">
-            <option selected disabled value="">Mes</option>
-            <option value="0" @selected($fecha->mes == 0)>Semana de año nuevo</option>
-            <option value="1" @selected($fecha->mes == 1)>Enero</option>
-            <option value="2" @selected($fecha->mes == 2)>Febrero</option>
-            <option value="3" @selected($fecha->mes == 3)>Marzo</option>
-            <option value="4" @selected($fecha->mes == 4)>Abril</option>
-            <option value="5" @selected($fecha->mes == 5)>Mayo</option>
-            <option value="6" @selected($fecha->mes == 6)>Junio</option>
-            <option value="7" @selected($fecha->mes == 7)>Julio</option>
-            <option value="8" @selected($fecha->mes == 8)>Agosto</option>
-            <option value="9" @selected($fecha->mes == 9)>Septiembre</option>
-            <option value="10" @selected($fecha->mes == 10)>Octubre</option>
-            <option value="11" @selected($fecha->mes == 11)>Noviembre</option>
-            <option value="12" @selected($fecha->mes == 12)>Diciembre</option>
-          </select>
-          @error('mes')
-          <small style="color: red">{{$message}}</small>
-          @enderror
-          <input type="text" id="anno" name="anno" class="form-control col-2" placeholder="Año" value="{{$fecha->anno}}">
-          @error('anno')
-          <small style="color: red">{{$message}}</small>
-          @enderror
-          <button type="submit" class="btn btn-primary">Cambiar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-  <div class="row">
-    <x-config-table :items="$tipos_asentamiento" title="Tipos de asentamientos" :route="'config.store_tipo_asentamiento'" :name="'asentamiento'" :placeholder="'Ej: Pueblo, ciudad...'" />
-    <x-config-table :items="$tipos_conflicto" title="Tipos de conflictos" :route="'config.store_tipo_conflicto'" :name="'conflicto'" :placeholder="'Ej: Batalla, intriga...'" />
-    <x-config-table :items="$tipos_construccion" title="Tipos de construcciones" :route="'config.store_tipo_construccion'" :name="'construccion'" :placeholder="'Ej: Casa, castillo...'" />
-  </div>
-  <div class="row">
-    <x-config-table :items="$tipos_lugar" title="Tipos de lugares" :route="'config.store_tipo_lugar'" :name="'lugar'" :placeholder="'Ej: Bosque, desierto...'" />
-    <x-config-table :items="$tipos_organizaciones" title="Tipos de organizaciones" :route="'config.store_tipo_organizacion'" :name="'organizacion'" :placeholder="'Ej: Imperio, ejército...'" />
-    <x-config-table :items="$categorias" title="Categorías de imágenes" :route="'config.store_generic'" :name="'categorias'" :placeholder="'Ej: Ambientación, animales...'" />
   </div>
 
 </div>
+<div class="row">
+  <x-config-table :items="$tipos_asentamiento" title="Tipos de asentamientos" :route="'config.store_tipo_asentamiento'" :name="'asentamiento'" :placeholder="'Ej: Pueblo, ciudad...'" />
+  <x-config-table :items="$tipos_conflicto" title="Tipos de conflictos" :route="'config.store_tipo_conflicto'" :name="'conflicto'" :placeholder="'Ej: Batalla, intriga...'" />
+  <x-config-table :items="$tipos_construccion" title="Tipos de construcciones" :route="'config.store_tipo_construccion'" :name="'construccion'" :placeholder="'Ej: Casa, castillo...'" />
+</div>
+<div class="row">
+  <x-config-table :items="$tipos_lugar" title="Tipos de lugares" :route="'config.store_tipo_lugar'" :name="'lugar'" :placeholder="'Ej: Bosque, desierto...'" />
+  <x-config-table :items="$tipos_organizaciones" title="Tipos de organizaciones" :route="'config.store_tipo_organizacion'" :name="'organizacion'" :placeholder="'Ej: Imperio, ejército...'" />
+  <x-config-table :items="$categorias" title="Categorías de imágenes" :route="'config.store_generic'" :name="'categorias'" :placeholder="'Ej: Ambientación, animales...'" />
+</div>
+
+</div>
 <!-- /.col -->
-<x-modal-delete 
-    id="confirmar_eliminacion" 
-    :route="route('config.destroy')" 
-    title="Confirmar eliminación" 
-    message="¿Estás seguro de que deseas eliminar este registro de configuración?" 
-/>
+<x-modal-delete
+  id="confirmar_eliminacion"
+  :route="route('config.destroy')"
+  title="Confirmar eliminación"
+  message="¿Estás seguro de que deseas eliminar este registro de configuración?" />
 @endsection
 
 @section('specific-scripts')
