@@ -58,6 +58,8 @@
           @endif
           @endforeach
         </div>
+
+        <x-reference-images-gallery :imagenes="$asentamiento->imagenes" :entityId="$asentamiento->id" />
       </div>
 
       <div class="col-lg-4">

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasReferenceImages;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class Asentamiento extends Model
 {
-  use HasFactory;
+  use HasFactory, HasReferenceImages;
 
   protected $table = 'asentamientos';
   protected $primaryKey = 'id';
@@ -146,7 +147,7 @@ class Asentamiento extends Model
   /**
    * Almacena un nuevo asentamiento en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $request
    * @return \App\Models\Asentamiento
    */
   public static function store_asentamiento(array $request)
@@ -177,6 +178,7 @@ class Asentamiento extends Model
 
       // Guardamos los cambios finales (rutas de imágenes y fechas)
       $asentamiento->save();
+      $asentamiento->subirImagenesReferencia($request['imagenes_referencia'] ?? []);
 
       return $asentamiento;
     });
@@ -214,6 +216,9 @@ class Asentamiento extends Model
           'anno' => $request['anno_disolucion'] ?? null
         ]);
       }
+      //Sincronizar imágenes de referencia si las hubiera
+      $this->subirImagenesReferencia($request['imagenes_referencia'] ?? []);
+      
       return $this->save();
     });
   }

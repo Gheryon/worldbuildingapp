@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <form id="form-edit-asentamiento" class="needs-validation" action="{{route('asentamientos.update', $asentamiento->id )}}" method="post" enctype="multipart/form-data">
+  <form id="form-edit-asentamiento" data-prevent-loss="true" class="needs-validation" action="{{route('asentamientos.update', $asentamiento->id )}}" method="post" enctype="multipart/form-data">
     @csrf
     @method('PUT')
 
@@ -174,30 +174,13 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>{{-- Fin panel de pestañas --}}
+
+    <x-reference-images-manager :imagenes="$asentamiento->imagenes" entityType="asentamientos" :entityId="$asentamiento->id" />
   </form>
 </div>
 @endsection
 
 @section('specific-scripts')
 <script src="{{asset('dist/js/common.js')}}"></script>
-<script>
-  $(function() {
-    // Prevención de pérdida de datos
-    let formChanged = false;
-    $('#form-edit-asentamiento').on('change', 'input, select, textarea', function() {
-      formChanged = true;
-    });
-
-    $(window).on('beforeunload', function() {
-      if (formChanged) {
-        return "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?";
-      }
-    });
-
-    $('#form-edit-asentamiento').on('submit', function() {
-      $(window).off('beforeunload'); // Desactivar alerta al enviar el formulario
-    });
-  });
-</script>
 @endsection

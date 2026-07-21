@@ -57,6 +57,10 @@ class AsentamientoRequest extends FormRequest
       'dia_disolucion' => 'nullable|integer|min:1|max:30',
       'mes_disolucion' => 'nullable|integer',
       'anno_disolucion' => 'nullable|integer',
+
+      //Imágenes de referencia
+      'imagenes_referencia'   => 'nullable|array',
+      'imagenes_referencia.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
     ];
   }
 }
