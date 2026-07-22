@@ -73,6 +73,7 @@
           @endif
           @endforeach
         </div>
+        <x-reference-images-gallery :imagenes="$construccion->imagenes" :entityId="$construccion->id" />
       </div>
       <div class="col-lg-4">
         <div class="card shadow-sm border-0 sticky-top sidebar-infobox" style="top: 2rem;">

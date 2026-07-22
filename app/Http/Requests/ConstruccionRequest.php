@@ -61,6 +61,10 @@ class ConstruccionRequest extends FormRequest
       'acceso_publico'        => 'nullable|boolean',
       'acceso_temporal'       => 'nullable|boolean',
       'tecnologia_perdida'    => 'nullable|boolean',
+
+      //Imágenes de referencia
+      'imagenes_referencia'   => 'nullable|array',
+      'imagenes_referencia.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
     ];
   }
 }

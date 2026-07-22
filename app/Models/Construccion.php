@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasReferenceImages;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class Construccion extends Model
 {
-  use HasFactory;
+  use HasFactory, HasReferenceImages;
 
   protected $table = 'construcciones';
   protected $primaryKey = 'id';
@@ -120,7 +121,7 @@ class Construccion extends Model
   /**
    * Almacena una nueva construcción en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $data
    * @return \App\Models\Construccion
    */
   public static function store_construccion(array $data)
@@ -157,6 +158,7 @@ class Construccion extends Model
 
       // Guardamos los cambios finales (rutas de imágenes y fechas)
       $construccion->save();
+      $construccion->subirImagenesReferencia($data['imagenes_referencia'] ?? []);
 
       return $construccion;
     });
@@ -165,7 +167,7 @@ class Construccion extends Model
   /**
    * Actualiza una construcción existente en la base de datos.
    *
-   * @param \Illuminate\Http\Request $request
+   * @param array $data
    * @return \App\Models\Construccion
    */
   public function update_construccion(array $data)
@@ -186,7 +188,7 @@ class Construccion extends Model
 
       //Actualizado de fechas
       //Procesar Fechas, si existe construccion_id o destruccion_id se actualiza, si no se crea. Si no hay año no se guarda fecha
-      if (!empty($request['anno_construccion'])) {
+      if (!empty($data['anno_construccion'])) {
         $this->fecha_construccion_id = Fecha::sync($this->fecha_construccion_id, [
           'dia'  => $data['dia_construccion'] ?? null,
           'mes'  => $data['mes_construccion'] ?? null,
@@ -194,13 +196,15 @@ class Construccion extends Model
         ]);
       }
 
-      if (!empty($request['anno_destruccion'])) {
+      if (!empty($data['anno_destruccion'])) {
         $this->fecha_destruccion_id = Fecha::sync($this->fecha_destruccion_id, [
           'dia'  => $data['dia_destruccion'] ?? null,
           'mes'  => $data['mes_destruccion'] ?? null,
           'anno' => $data['anno_destruccion'] ?? null,
         ]);
       }
+      //Sincronizar imágenes de referencia si las hubiera
+      $this->subirImagenesReferencia($data['imagenes_referencia'] ?? []);
 
       return $this->save();
     });

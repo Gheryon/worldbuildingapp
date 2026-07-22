@@ -224,7 +224,7 @@
           </div>
         </div>
       </div>
-    </div>{{-- Fin panel de pestañas --}}{{-- Fin panel de pestañas --}}
+    </div>{{-- Fin panel de pestañas --}}
     <x-reference-images-manager :imagenes="old('imagenes_referencia', [])" entityType="especies" :entityId="null" />
   </form>
 

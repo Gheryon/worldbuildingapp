@@ -194,7 +194,9 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>{{-- Fin panel de pestañas --}}
+
+    <x-reference-images-manager :imagenes="$construccion->imagenes" entityType="construcciones" :entityId="$construccion->id" />
   </form>
 
 </main>
