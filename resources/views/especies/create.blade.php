@@ -20,7 +20,7 @@
 
 <!-- Main content -->
 <section class="content">
-  <form id="form-create-especie" class="position-relative needs-validation" action="{{route('especies.store')}}" method="post" enctype="multipart/form-data">
+  <form id="form-create-especie" data-prevent-loss="true" class="position-relative needs-validation" action="{{route('especies.store')}}" method="post" enctype="multipart/form-data">
     @csrf
     <div class="row justify-content-md-center">
       <div class="col-md-auto form-actions">
@@ -53,7 +53,7 @@
           </div>
           <div class="col-md">
             <label for="clase_taxonomica" class="form-label mt-2">Clase taxonómica</label>
-            <select class="form-select form-control @error('clase_taxonomica') is-invalid @enderror" name="clase_taxonomica" id="clase_taxonomica" required>
+            <select class="form-select form-control @error('clase_taxonomica') is-invalid @enderror" name="clase_taxonomica" id="clase_taxonomica">
               <option selected disabled value="">Elegir</option>
               @foreach(['Anfibio', 'Arácnidos', 'Ave', 'Insectos', 'Mamífero', 'Reptil', 'Peces'] as $clase)
               <option value="{{ $clase }}"
@@ -70,7 +70,7 @@
           </div>
           <div class="col-md">
             <label for="locomocion" class="form-label mt-2">Locomoción</label>
-            <select class="form-select form-control @error('locomocion') is-invalid @enderror" name="locomocion" id="locomocion" required>
+            <select class="form-select form-control @error('locomocion') is-invalid @enderror" name="locomocion" id="locomocion">
               <option selected disabled value="">Elegir</option>
               @foreach(['Acuático', 'Caminante', 'Escalador', 'Mixto', 'Terrestre', 'Volador'] as $locomocion)
               <option value="{{ $locomocion }}"
@@ -87,7 +87,7 @@
           </div>
           <div class="col-md">
             <label for="organizacion_social" class="form-label mt-2">Organización social</label>
-            <select class="form-select form-control @error('organizacion_social') is-invalid @enderror" name="organizacion_social" id="organizacion_social" required>
+            <select class="form-select form-control @error('organizacion_social') is-invalid @enderror" name="organizacion_social" id="organizacion_social">
               <option selected disabled value="">Elegir</option>
               @foreach(['Clan familiar', 'Colonia', 'Manada', 'Rebaño', 'Solitaria'] as $organizacion)
               <option value="{{ $organizacion }}"
@@ -123,7 +123,7 @@
         <div class="row">
           <div class="col-md">
             <label for="dieta" class="form-label mt-2">Dieta</label>
-            <select class="form-select form-control @error('dieta') is-invalid @enderror" name="dieta" id="dieta" required>
+            <select class="form-select form-control @error('dieta') is-invalid @enderror" name="dieta" id="dieta">
               <option selected disabled value="">Elegir</option>
               @foreach(['Carnívoro', 'Herbívoro', 'Insectívoro', 'Omnívoro'] as $dieta)
               <option value="{{ $dieta }}"
@@ -224,7 +224,8 @@
           </div>
         </div>
       </div>
-    </div>{{-- Fin panel de pestañas --}}
+    </div>{{-- Fin panel de pestañas --}}{{-- Fin panel de pestañas --}}
+    <x-reference-images-manager :imagenes="old('imagenes_referencia', [])" entityType="especies" :entityId="null" />
   </form>
 
 </section>
@@ -232,32 +233,5 @@
 @endsection
 
 @section('specific-scripts')
-<script>
-  $(function() {
-    // Summernote
-    $('.summernote').summernote({
-      height: 300
-    })
-
-    $('.summernote-lite').summernote({
-      height: 150
-    })
-
-    // Prevención de pérdida de datos
-    let formChanged = false;
-    $('#form-create-especie').on('change', 'input, select, textarea', function() {
-      formChanged = true;
-    });
-
-    $(window).on('beforeunload', function() {
-      if (formChanged) {
-        return "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?";
-      }
-    });
-
-    $('#form-create-especie').on('submit', function() {
-      $(window).off('beforeunload'); // Desactivar alerta al enviar el formulario
-    });
-  });
-</script>
+<script src="{{asset('dist/js/common.js')}}"></script>
 @endsection

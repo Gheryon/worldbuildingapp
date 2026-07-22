@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasReferenceImages;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Exception;
 
 class Especie extends Model
 {
-  use HasFactory;
+  use HasFactory, HasReferenceImages;
 
   protected $table = 'especies';
   protected $primaryKey = 'id';
@@ -96,6 +96,7 @@ class Especie extends Model
       $imageService->processModelRichText($especie, $request, self::$richTextFields);
 
       $especie->save();
+      $especie->subirImagenesReferencia($request['imagenes_referencia'] ?? []);
 
       return $especie;
     });
@@ -117,6 +118,8 @@ class Especie extends Model
       $imageService->processModelRichText($this, $request, self::$richTextFields);
 
       $this->save();
+      //Sincronizar imágenes de referencia si las hubiera
+      $this->subirImagenesReferencia($request['imagenes_referencia'] ?? []);
 
       return $this;
     });

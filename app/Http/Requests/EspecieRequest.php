@@ -25,9 +25,9 @@ class EspecieRequest extends FormRequest
       // Campos básicos
       'nombre'              => 'required|string|max:255',
       'reino'               => 'required|in:Animalia,Fungi,Monera,Plantae,Protista',
-      'clase_taxonomica'    => 'required|in:Anfibio,Arácnidos,Ave,Insectos,Mamífero,Reptil,Peces',
-      'locomocion'          => 'required|in:Acuático,Caminante,Escalador,Mixto,Terrestre,Volador',
-      'organizacion_social' => 'required|in:Clan familiar,Colonia,Manada,Rebaño,Solitaria',
+      'clase_taxonomica'    => 'nullable|in:Anfibio,Arácnidos,Ave,Insectos,Mamífero,Reptil,Peces',
+      'locomocion'          => 'nullable|in:Acuático,Caminante,Escalador,Mixto,Terrestre,Volador',
+      'organizacion_social' => 'nullable|in:Clan familiar,Colonia,Manada,Rebaño,Solitaria',
 
       // Características físicas
       'edad'        => 'nullable|string|max:100',
@@ -37,7 +37,7 @@ class EspecieRequest extends FormRequest
       'longitud'    => 'nullable|string|max:50',
 
       // Clasificación adicional
-      'dieta'   => 'required|in:Carnívoro,Herbívoro,Insectívoro,Omnívoro',
+      'dieta'   => 'nullable|in:Carnívoro,Herbívoro,Insectívoro,Omnívoro',
       'rareza'  => 'required|in:Común,Legendario,Mítológico,Raro',
       'estatus' => 'required|in:Viva,En peligro,Extinta',
 
@@ -51,6 +51,10 @@ class EspecieRequest extends FormRequest
       'domesticacion'     => 'nullable|string',
       'explotacion'       => 'nullable|string',
       'otros'             => 'nullable|string',
+
+      //Imágenes de referencia
+      'imagenes_referencia'   => 'nullable|array',
+      'imagenes_referencia.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
     ];
   }
 
