@@ -2,7 +2,7 @@
 
 <div class="card h-100 shadow-sm border-0 rounded-lg overflow-hidden position-relative">
   <div class="position-absolute" style="top: 10px; right: 10px; z-index: 2;">
-    <span class="badge shadow-sm px-2 py-1 {{ $especie->rareza == 'Legendaria' ? 'bg-warning text-dark' : 'bg-dark text-white' }}">
+    <span class="badge shadow-sm px-2 py-1 {{ $especie->rareza == 'Legendario' ? 'bg-warning text-dark' : ($especie->rareza == 'Raro' ? 'bg-orange text-white' : ($especie->rareza == 'Mítológico' ? 'bg-purple text-white' : 'bg-success text-white')) }}">
       {{ $especie->rareza ?? 'Común' }}
     </span>
   </div>
@@ -10,7 +10,7 @@
   <div class="card-body p-4">
     <div class="text-center mb-3">
       <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 55px; height: 55px;">
-        <i class="fas {{ $especie->locomocion == 'Acuática' ? 'fa-fish' : ($especie->locomocion == 'Aérea' ? 'fa-dove' : 'fa-paw') }} fa-2x text-primary"></i>
+        <i class="fas {{ $especie->locomocion == 'Acuática' ? 'fa-fish' : ($especie->locomocion == 'Aérea' ? 'fa-dove' : 'fa-paw') }} fa-2x text-dark"></i>
       </div>
       <h5 class="font-weight-bold mb-0">{{ $especie->nombre }}</h5>
       <p class="text-muted small text-uppercase mb-0">
