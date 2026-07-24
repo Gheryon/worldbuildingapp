@@ -47,6 +47,10 @@ class ReligionRequest extends FormRequest
       'clase_sacerdotal' => 'nullable|string',
       'historia'         => 'nullable|string',
       'otros'            => 'nullable|string',
+
+      // Imágenes de referencia
+      'imagenes_referencia' => 'nullable|array',
+      'imagenes_referencia.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
     ];
   }
 

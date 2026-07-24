@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TipoTeismo;
+use App\Models\Traits\HasReferenceImages;
 use App\Models\Traits\HasEscudo;
 use App\Services\ImageService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,228 +13,230 @@ use Illuminate\Support\Facades\DB;
 
 class Religion extends Model
 {
-    use HasEscudo;
-    use HasFactory;
+  use HasFactory, HasEscudo, HasReferenceImages;
 
-    protected $table = 'religiones';
+  protected $table = 'religiones';
 
-    protected $primaryKey = 'id';
+  protected $primaryKey = 'id';
 
-    protected $fillable = [
-        'nombre',
-        'lema',
-        'escudo',
-        'tipo_teismo',
-        'deidades',
-        'estatus_legal',
-        'clase_sacerdotal',
-        'descripcion',
-        'historia',
-        'cosmologia',
-        'doctrina',
-        'sagrado',
-        'fiestas',
-        'sobrenatural',
-        'politica',
-        'estructura',
-        'sectas',
-        'otros',
-        'fundacion_id',
-        'disolucion_id',
-    ];
+  protected $fillable = [
+    'nombre',
+    'lema',
+    'escudo',
+    'tipo_teismo',
+    'deidades',
+    'estatus_legal',
+    'clase_sacerdotal',
+    'descripcion',
+    'historia',
+    'cosmologia',
+    'doctrina',
+    'sagrado',
+    'fiestas',
+    'sobrenatural',
+    'politica',
+    'estructura',
+    'sectas',
+    'otros',
+    'fundacion_id',
+    'disolucion_id',
+  ];
 
-    protected $casts = [
-        'fundacion_id' => 'integer',
-        'disolucion_id' => 'integer',
-        'tipo_teismo' => TipoTeismo::class,
-    ];
+  protected $casts = [
+    'fundacion_id' => 'integer',
+    'disolucion_id' => 'integer',
+    'tipo_teismo' => TipoTeismo::class,
+  ];
 
-    // Mapeo: 'columna_en_db' => 'nombre_input_formulario'
-    public static $richTextFields = [
-        'clase_sacerdotal' => 'clase_sacerdotal',
-        'descripcion' => 'descripcion',
-        'historia' => 'historia',
-        'cosmologia' => 'cosmologia',
-        'doctrina' => 'doctrina',
-        'sagrado' => 'sagrado',
-        'fiestas' => 'fiestas',
-        'sobrenatural' => 'sobrenatural',
-        'politica' => 'politica',
-        'estructura' => 'estructura',
-        'sectas' => 'sectas',
-        'otros' => 'otros',
-    ];
+  // Mapeo: 'columna_en_db' => 'nombre_input_formulario'
+  public static $richTextFields = [
+    'clase_sacerdotal' => 'clase_sacerdotal',
+    'descripcion' => 'descripcion',
+    'historia' => 'historia',
+    'cosmologia' => 'cosmologia',
+    'doctrina' => 'doctrina',
+    'sagrado' => 'sagrado',
+    'fiestas' => 'fiestas',
+    'sobrenatural' => 'sobrenatural',
+    'politica' => 'politica',
+    'estructura' => 'estructura',
+    'sectas' => 'sectas',
+    'otros' => 'otros',
+  ];
 
-    /**
-     * Obtiene la información de la fecha de fundación (tabla fechas).
-     */
-    public function fecha_fundacion(): BelongsTo
-    {
-        return $this->belongsTo(Fecha::class, 'fundacion_id');
-    }
+  /**
+   * Obtiene la información de la fecha de fundación (tabla fechas).
+   */
+  public function fecha_fundacion(): BelongsTo
+  {
+    return $this->belongsTo(Fecha::class, 'fundacion_id');
+  }
 
-    /**
-     * Obtiene la información de la fecha de disolución (tabla fechas).
-     */
-    public function fecha_disolucion(): BelongsTo
-    {
-        return $this->belongsTo(Fecha::class, 'disolucion_id');
-    }
+  /**
+   * Obtiene la información de la fecha de disolución (tabla fechas).
+   */
+  public function fecha_disolucion(): BelongsTo
+  {
+    return $this->belongsTo(Fecha::class, 'disolucion_id');
+  }
 
-    /**
-     * Obtiene los valores del Enum TipoTeismo para selectores.
-     */
-    public static function getTiposTeismo(): array
-    {
-        // Usamos mapWithKeys para asignar el valor interno como clave
-        // y el resultado del método label() como valor del array.
-        return collect(TipoTeismo::cases())->mapWithKeys(function ($teismo) {
-            return [$teismo->value => $teismo->label()];
-        })->sort()->toArray();
-    }
+  /**
+   * Obtiene los valores del Enum TipoTeismo para selectores.
+   */
+  public static function getTiposTeismo(): array
+  {
+    // Usamos mapWithKeys para asignar el valor interno como clave
+    // y el resultado del método label() como valor del array.
+    return collect(TipoTeismo::cases())->mapWithKeys(function ($teismo) {
+      return [$teismo->value => $teismo->label()];
+    })->sort()->toArray();
+  }
 
-    /**
-     * Scope para filtrar y ordenar organizaciones.
-     */
-    public function scopeFiltrar($query, $filtros)
-    {
-        return $query->select(
-            'id',
-            'nombre',
-        )
-            ->when($filtros['search'] ?? null, function ($q, $search) {
-                $q->where('religiones.nombre', 'LIKE', "%{$search}%");
-            })
-            ->orderBy('religiones.nombre', $filtros['orden'] ?? 'asc');
-    }
+  /**
+   * Scope para filtrar y ordenar organizaciones.
+   */
+  public function scopeFiltrar($query, $filtros)
+  {
+    return $query->select(
+      'id',
+      'nombre',
+    )
+      ->when($filtros['search'] ?? null, function ($q, $search) {
+        $q->where('religiones.nombre', 'LIKE', "%{$search}%");
+      })
+      ->orderBy('religiones.nombre', $filtros['orden'] ?? 'asc');
+  }
 
-    /**
-     * Almacena una nueva religión en la base de datos.
-     *
-     * @return \App\Models\Religion
-     */
-    public static function store_religion(array $request)
-    {
-        return DB::transaction(function () use ($request) {
-            // Manejo del escudo
-            if (isset($request['escudo']) && $request['escudo'] instanceof \Illuminate\Http\UploadedFile) {
-                $request['escudo'] = self::storeEscudoFile($request['escudo']);
-            } else {
-                $request['escudo'] = 'default.png';
-            }
-            // Crear registro
-            $religion = self::create($request);
+  /**
+   * Almacena una nueva religión en la base de datos.
+   *
+   * @return \App\Models\Religion
+   */
+  public static function store_religion(array $request)
+  {
+    return DB::transaction(function () use ($request) {
+      // Manejo del escudo
+      if (isset($request['escudo']) && $request['escudo'] instanceof \Illuminate\Http\UploadedFile) {
+        $request['escudo'] = self::storeEscudoFile($request['escudo']);
+      } else {
+        $request['escudo'] = 'default.png';
+      }
+      // Crear registro
+      $religion = self::create($request);
 
-            // Procesado de campos Summernote
-            $imageService = app(\App\Services\ImageService::class);
-            $imageService->processModelRichText($religion, $request, self::$richTextFields);
+      // Procesado de campos Summernote
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($religion, $request, self::$richTextFields);
 
-            // Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
-            if (! empty($request['anno_fundacion'])) {
-                $religion->fundacion_id = Fecha::sync(null, [
-                    'dia' => $request['dia_fundacion'] ?? null,
-                    'mes' => $request['mes_fundacion'] ?? null,
-                    'anno' => $request['anno_fundacion'] ?? null,
-                ]);
-            }
+      // Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
+      if (! empty($request['anno_fundacion'])) {
+        $religion->fundacion_id = Fecha::sync(null, [
+          'dia' => $request['dia_fundacion'] ?? null,
+          'mes' => $request['mes_fundacion'] ?? null,
+          'anno' => $request['anno_fundacion'] ?? null,
+        ]);
+      }
 
-            if (! empty($request['anno_disolucion'])) {
-                $religion->disolucion_id = Fecha::sync(null, [
-                    'dia' => $request['dia_disolucion'] ?? null,
-                    'mes' => $request['mes_disolucion'] ?? null,
-                    'anno' => $request['anno_disolucion'] ?? null,
-                ]);
-            }
+      if (! empty($request['anno_disolucion'])) {
+        $religion->disolucion_id = Fecha::sync(null, [
+          'dia' => $request['dia_disolucion'] ?? null,
+          'mes' => $request['mes_disolucion'] ?? null,
+          'anno' => $request['anno_disolucion'] ?? null,
+        ]);
+      }
 
-            $religion->save();
+      $religion->save();
+      $religion->subirImagenesReferencia($request['imagenes_referencia'] ?? []);
 
-            return $religion;
-        });
-    }
+      return $religion;
+    });
+  }
 
-    /**
-     * Actualiza una religión existente en la base de datos.
-     *
-     * @return \App\Models\Religion
-     */
-    public function update_religion(array $request)
-    {
-        return DB::transaction(function () use ($request) {
-            // Manejo del escudo (Solo si se sube uno nuevo)
-            if (isset($request['escudo']) && $request['escudo'] instanceof \Illuminate\Http\UploadedFile) {
-                $request['escudo'] = $this->updateEscudoFile($request['escudo']);
-            }
+  /**
+   * Actualiza una religión existente en la base de datos.
+   *
+   * @return \App\Models\Religion
+   */
+  public function update_religion(array $request)
+  {
+    return DB::transaction(function () use ($request) {
+      // Manejo del escudo (Solo si se sube uno nuevo)
+      if (isset($request['escudo']) && $request['escudo'] instanceof \Illuminate\Http\UploadedFile) {
+        $request['escudo'] = $this->updateEscudoFile($request['escudo']);
+      }
 
-            // Campos básicos
-            $this->fill($request);
+      // Campos básicos
+      $this->fill($request);
 
-            // Procesado de campos Summernote
-            $imageService = app(\App\Services\ImageService::class);
-            $imageService->processModelRichText($this, $request, self::$richTextFields);
+      // Procesado de campos Summernote
+      $imageService = app(\App\Services\ImageService::class);
+      $imageService->processModelRichText($this, $request, self::$richTextFields);
 
-            // Actualizado de fechas
-            // Procesar Fechas, si existe fundacion_id o disolucion_id se actualiza, si no se crea. Si no hay año no se guarda fecha
-            if (! empty($request['anno_fundacion'])) {
-                $this->fundacion_id = Fecha::sync($this->fundacion_id, [
-                    'dia' => $request['dia_fundacion'] ?? null,
-                    'mes' => $request['mes_fundacion'] ?? null,
-                    'anno' => $request['anno_fundacion'] ?? null,
-                ]);
-            }
+      // Actualizado de fechas
+      // Procesar Fechas, si existe fundacion_id o disolucion_id se actualiza, si no se crea. Si no hay año no se guarda fecha
+      if (! empty($request['anno_fundacion'])) {
+        $this->fundacion_id = Fecha::sync($this->fundacion_id, [
+          'dia' => $request['dia_fundacion'] ?? null,
+          'mes' => $request['mes_fundacion'] ?? null,
+          'anno' => $request['anno_fundacion'] ?? null,
+        ]);
+      }
 
-            if (! empty($request['anno_disolucion'])) {
-                $this->disolucion_id = Fecha::sync($this->disolucion_id, [
-                    'dia' => $request['dia_disolucion'] ?? null,
-                    'mes' => $request['mes_disolucion'] ?? null,
-                    'anno' => $request['anno_disolucion'] ?? null,
-                ]);
-            }
+      if (! empty($request['anno_disolucion'])) {
+        $this->disolucion_id = Fecha::sync($this->disolucion_id, [
+          'dia' => $request['dia_disolucion'] ?? null,
+          'mes' => $request['mes_disolucion'] ?? null,
+          'anno' => $request['anno_disolucion'] ?? null,
+        ]);
+      }
 
-            return $this->save();
-        });
-    }
+      //Sincronizar imágenes de referencia si las hubiera
+      $this->subirImagenesReferencia($request['imagenes_referencia'] ?? []);
+      return $this->save();
+    });
+  }
 
-    protected static function booted(): void
-    {
-        static::deleting(function (Religion $religion) {
-            $imageService = new ImageService;
-            $imageService->deleteImagesByOwner('religiones', $religion->id);
+  protected static function booted(): void
+  {
+    static::deleting(function (Religion $religion) {
+      $imageService = new ImageService;
+      $imageService->deleteImagesByOwner('religiones', $religion->id);
 
-            $religion->deleteEscudoFile();
+      $religion->deleteEscudoFile();
 
-            if ($religion->fundacion_id) {
-                Fecha::destroy($religion->fundacion_id);
-            }
-            if ($religion->disolucion_id) {
-                Fecha::destroy($religion->disolucion_id);
-            }
-        });
-    }
+      if ($religion->fundacion_id) {
+        Fecha::destroy($religion->fundacion_id);
+      }
+      if ($religion->disolucion_id) {
+        Fecha::destroy($religion->disolucion_id);
+      }
+    });
+  }
 
-    /**
-     * Elimina la religión y sus recursos asociados (imágenes).
-     *
-     * * @return void
-     */
-    public function delete_religion()
-    {
-        return DB::transaction(function () {
-            // Borrar imágenes de Summernote usando el servicio
-            $imageService = new ImageService;
-            $imageService->deleteImagesByOwner('religiones', $this->id);
+  /**
+   * Elimina la religión y sus recursos asociados (imágenes).
+   *
+   * * @return void
+   */
+  public function delete_religion()
+  {
+    return DB::transaction(function () {
+      // Borrar imágenes de Summernote usando el servicio
+      $imageService = new ImageService;
+      $imageService->deleteImagesByOwner('religiones', $this->id);
 
-            $this->deleteEscudoFile();
+      $this->deleteEscudoFile();
 
-            // eliminar fechas
-            if ($this->fundacion_id) {
-                Fecha::destroy($this->fundacion_id);
-            }
-            if ($this->disolucion_id) {
-                Fecha::destroy($this->disolucion_id);
-            }
+      // eliminar fechas
+      if ($this->fundacion_id) {
+        Fecha::destroy($this->fundacion_id);
+      }
+      if ($this->disolucion_id) {
+        Fecha::destroy($this->disolucion_id);
+      }
 
-            // Eliminar la religion
-            return $this->delete();
-        });
-    }
+      // Eliminar la religion
+      return $this->delete();
+    });
+  }
 }

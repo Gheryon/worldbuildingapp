@@ -77,6 +77,7 @@
           @endif
           @endforeach
         </div>
+        <x-reference-images-gallery :imagenes="$religion->imagenes" :entityId="$religion->id" />
       </div>
 
       {{-- Columna Lateral: Ficha Técnica --}}

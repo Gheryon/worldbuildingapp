@@ -156,6 +156,7 @@
         </div>
       </div>
     </div>{{-- Fin panel de pestañas --}}
+    <x-reference-images-manager :imagenes="old('imagenes_referencia', [])" entityType="religiones" :entityId="null" />
   </form>
 
 </section>
