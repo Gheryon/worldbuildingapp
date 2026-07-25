@@ -30,6 +30,9 @@ Route::controller(App\Http\Controllers\ConfigurationController::class)->group(fu
     Route::delete('/config/destroy', 'destroy')->name('config.destroy');
 });
 
+/*******culturas routes********/
+Route::resource('culturas', App\Http\Controllers\CulturaController::class);
+
 /*******conflictos routes********/
 Route::resource('conflictos', App\Http\Controllers\ConflictoController::class);
 

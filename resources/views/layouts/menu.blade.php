@@ -11,9 +11,69 @@
     <nav class="mt-2 mb-5" aria-label="Navegación lateral">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <li class="nav-item">
+          <a href="{{route('asentamientos.index')}}" class="nav-link">
+            <i class="nav-icon fa-solid fa-house"></i>
+            <p>
+              Asentamientos
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{route('conflictos.index')}}" class="nav-link">
+            <i class="nav-icon fa-solid fa-shield-halved"></i>
+            <p>
+              Conflictos y batallas
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{route('construcciones.index')}}" class="nav-link">
+            <i class="nav-icon fa-solid fa-building"></i>
+            <p>
+              Construcciones
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{route('timelines.index')}}" class="nav-link">
+            <i class="nav-icon fas fa-columns"></i>
+            <p>
+              Cronologías
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{route('culturas.index')}}" class="nav-link">
+            <i class="nav-icon fa-solid fa-monument"></i>
+            <p>Culturas</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{route('especies.index')}}" class="nav-link">
+            <i class="nav-icon fa-solid fa-dna"></i>
+            <p>Especies</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{route('galeria.index')}}" class="nav-link">
+            <i class="nav-icon fa-solid fa-image"></i>
+            <p>
+              Galería de imágenes
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
           <a href="{{route('organizaciones.index')}}" class="nav-link">
             <i class="nav-icon fa-solid fa-building-columns"></i>
             <p>Instituciones</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{route('lugares.index')}}" class="nav-link">
+            <i class="nav-icon fa-solid fa-mountain-sun"></i>
+            <p>
+              Lugares
+            </p>
           </a>
         </li>
         <li class="nav-item">
@@ -29,64 +89,10 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="{{route('especies.index')}}" class="nav-link">
-            <i class="nav-icon fa-solid fa-dna"></i>
-            <p>Especies</p>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="{{route('asentamientos.index')}}" class="nav-link">
-            <i class="nav-icon fa-solid fa-house"></i>
-            <p>
-              Asentamientos
-            </p>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="{{route('lugares.index')}}" class="nav-link">
-            <i class="nav-icon fa-solid fa-mountain-sun"></i>
-            <p>
-              Lugares
-            </p>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="{{route('construcciones.index')}}" class="nav-link">
-            <i class="nav-icon fa-solid fa-building"></i>
-            <p>
-              Construcciones
-            </p>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="{{route('conflictos.index')}}" class="nav-link">
-            <i class="nav-icon fa-solid fa-shield-halved"></i>
-            <p>
-              Conflictos y batallas
-            </p>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="{{route('timelines.index')}}" class="nav-link">
-            <i class="nav-icon fas fa-columns"></i>
-            <p>
-              Cronologías
-            </p>
-          </a>
-        </li>
-        <li class="nav-item">
           <a href="{{route('relatos.index')}}" class="nav-link">
             <i class="nav-icon fa-solid fa-book-open"></i>
             <p>
               Relatos e historias
-            </p>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="{{route('galeria.index')}}" class="nav-link">
-            <i class="nav-icon fa-solid fa-image"></i>
-            <p>
-              Galería de imágenes
             </p>
           </a>
         </li>
