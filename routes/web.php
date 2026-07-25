@@ -31,7 +31,7 @@ Route::controller(App\Http\Controllers\ConfigurationController::class)->group(fu
 });
 
 /*******culturas routes********/
-Route::resource('culturas', App\Http\Controllers\CulturaController::class);
+Route::resource('culturas', App\Http\Controllers\CulturasController::class);
 
 /*******conflictos routes********/
 Route::resource('conflictos', App\Http\Controllers\ConflictoController::class);
