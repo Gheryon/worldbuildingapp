@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\TipoTeismo;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class ReligionRequest extends FormRequest
 {
@@ -17,7 +19,7 @@ class ReligionRequest extends FormRequest
       // Campos básicos
       'nombre'        => 'required|string|max:255',
       'lema'          => 'nullable|string|max:256',
-      'tipo_teismo'   => 'nullable|string',
+      'tipo_teismo'   => ['nullable', new Enum(TipoTeismo::class)],
       'deidades'      => 'nullable|string|max:255',
       'estatus_legal' => 'required|string',
 
