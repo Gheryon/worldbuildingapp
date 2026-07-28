@@ -2,7 +2,12 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ActitudForasteros;
+use App\Enums\ActitudMagia;
+use App\Enums\EstatusCultura;
+use App\Enums\TipoTerritorio;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class CulturaRequest extends FormRequest
 {
@@ -17,12 +22,12 @@ class CulturaRequest extends FormRequest
       //Campos básicos
       'nombre' => 'required|string|max:256',
       'gentilicio' => 'nullable|string|max:128',
-      'estatus' => 'nullable|string|max:20',
-      'tipo_territorio' => 'nullable|string|max:64',
+      'estatus' => ['nullable', new Enum(EstatusCultura::class)],
+      'tipo_territorio' => ['nullable', new Enum(TipoTerritorio::class)],
       'categoria' => 'nullable|string|max:64',
       'unidad_familiar' => 'nullable|string|max:64',
-      'actitud_magia' => 'nullable|string|max:64',
-      'actitud_forasteros' => 'nullable|string|max:64',
+      'actitud_magia' => ['nullable', new Enum(ActitudMagia::class)],
+      'actitud_forasteros' => ['nullable', new Enum(ActitudForasteros::class)],
       'madre_id' => 'nullable|exists:culturas,id',
 
       //fechas
