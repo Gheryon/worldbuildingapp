@@ -2,6 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\ActitudForasteros;
+use App\Enums\ActitudMagia;
+use App\Enums\EstatusCultura;
+use App\Enums\TipoTerritorio;
 use App\Models\Traits\HasReferenceImages;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -54,6 +58,10 @@ class Cultura extends Model
     'fundacion_id' => 'integer',
     'disolucion_id' => 'integer',
     'madre_id' => 'integer',
+    'estatus' => EstatusCultura::class,
+    'tipo_territorio' => TipoTerritorio::class,
+    'actitud_magia' => ActitudMagia::class,
+    'actitud_forasteros' => ActitudForasteros::class,
   ];
 
   public static $richTextFields = [
@@ -74,8 +82,6 @@ class Cultura extends Model
     'arte_musica' => 'arte_musica',
     'tecnologia' => 'tecnologia',
     'educacion' => 'educacion',
-    'actitud_magia' => 'actitud_magia',
-    'actitud_forasteros' => 'actitud_forasteros',
     'otros' => 'otros',
   ];
 
@@ -97,6 +103,26 @@ class Cultura extends Model
   public function culturas_hijas(): \Illuminate\Database\Eloquent\Relations\HasMany
   {
     return $this->hasMany(Cultura::class, 'madre_id', 'id');
+  }
+
+  public static function getEstatus(): array
+  {
+    return collect(EstatusCultura::cases())->mapWithKeys(fn ($case) => [$case->value => $case->label()])->toArray();
+  }
+
+  public static function getTiposTerritorio(): array
+  {
+    return collect(TipoTerritorio::cases())->mapWithKeys(fn ($case) => [$case->value => $case->label()])->toArray();
+  }
+
+  public static function getActitudesMagia(): array
+  {
+    return collect(ActitudMagia::cases())->mapWithKeys(fn ($case) => [$case->value => $case->label()])->toArray();
+  }
+
+  public static function getActitudesForasteros(): array
+  {
+    return collect(ActitudForasteros::cases())->mapWithKeys(fn ($case) => [$case->value => $case->label()])->toArray();
   }
 
   public function scopeFiltrar($query, $filtros)
