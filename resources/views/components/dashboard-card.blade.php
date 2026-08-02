@@ -3,7 +3,7 @@
 <div class="col-lg-3 col-6">
   <div class="small-box {{ $bg ?? 'bg-dark' }}">
     <div class="inner">
-      <h3>{{ $title }}</h3>
+      <h3 class="text-white">{{ $title }}</h3>
       <p>Gestionar</p>
     </div>
     <div class="icon">

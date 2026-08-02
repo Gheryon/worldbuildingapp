@@ -29,19 +29,20 @@
         {{-- Sección: El Mundo --}}
         <h5 class="mb-3 mt-4 text-muted"><i class="fas fa-globe-americas mr-2"></i>Geografía y Vida</h5>
         <div class="row">
-          <x-dashboard-card route="lugares.index" title="Lugares" icon="fa-mountain-sun" bg="bg-dark" />
           <x-dashboard-card route="asentamientos.index" title="Asentamientos" icon="fa-house" bg="bg-dark" />
-          <x-dashboard-card route="especies.index" title="Especies" icon="fa-dna" bg="bg-dark" />
           <x-dashboard-card route="construcciones.index" title="Construcciones" icon="fa-building" bg="bg-dark" />
+          <x-dashboard-card route="especies.index" title="Especies" icon="fa-dna" bg="bg-dark" />
+          <x-dashboard-card route="lugares.index" title="Lugares" icon="fa-mountain-sun" bg="bg-dark" />
         </div>
 
         {{-- Sección: Historia y Cultura --}}
         <h5 class="mb-3 mt-4 text-muted"><i class="fas fa-scroll mr-2"></i>Historia y Sociedad</h5>
         <div class="row">
-          <x-dashboard-card route="personajes.index" title="Personajes" icon="fa-people-group" bg="bg-purple" />
-          <x-dashboard-card route="organizaciones.index" title="Instituciones" icon="fa-building-columns" bg="bg-purple" />
-          <x-dashboard-card route="religiones.index" title="Religiones" icon="fa-place-of-worship" bg="bg-purple" />
           <x-dashboard-card route="conflictos.index" title="Conflictos" icon="fa-shield-halved" bg="bg-purple" />
+          <x-dashboard-card route="culturas.index" title="Culturas" icon="fa-monument" bg="bg-purple" />
+          <x-dashboard-card route="organizaciones.index" title="Instituciones" icon="fa-building-columns" bg="bg-purple" />
+          <x-dashboard-card route="personajes.index" title="Personajes" icon="fa-people-group" bg="bg-purple" />
+          <x-dashboard-card route="religiones.index" title="Religiones" icon="fa-place-of-worship" bg="bg-purple" />
           <x-dashboard-card route="timelines.index" title="Cronologías" icon="fas fa-columns" bg="bg-purple" />
         </div>
 
@@ -49,9 +50,9 @@
         <h5 class="mb-3 mt-4 text-muted"><i class="fas fa-toolbox mr-2"></i>Herramientas de Escritura</h5>
         <div class="row">
           <x-dashboard-card route="articulos.index" title="Apuntes" icon="fa-pencil" bg="bg-olive" />
-          <x-dashboard-card route="nombres.index" title="Nombres" icon="fa-signature" bg="bg-olive" />
           <x-dashboard-card route="enlaces.index" title="Enlaces" icon="fas fa-file" bg="bg-olive" />
           <x-dashboard-card route="galeria.index" title="Galería" icon="fa-image" bg="bg-olive" />
+          <x-dashboard-card route="nombres.index" title="Nombres" icon="fa-signature" bg="bg-olive" />
         </div>
 
     </div>
