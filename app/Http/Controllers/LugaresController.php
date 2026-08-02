@@ -44,7 +44,7 @@ class LugaresController extends Controller
     ])->paginate(16);
 
     // Obtener todos los tipos de lugares almacenados
-    $tipos = TipoLugar::get_tipos_lugares();
+    $tipos = TipoLugar::orderBy('nombre', 'asc')->get();
 
     return view('lugares.index', compact('lugares', 'tipos', 'orden', 'tipo_id', 'terminoBusqueda'));
   }
@@ -55,7 +55,7 @@ class LugaresController extends Controller
   public function create()
   {
     // Obtener todos los tipos de lugares almacenados
-    $tipos = TipoLugar::orderby('nombre', 'asc')->get();
+    $tipos = TipoLugar::orderBy('nombre', 'asc')->get();
 
     return view('lugares.create', ['tipos'=>$tipos]);
   }
@@ -117,7 +117,7 @@ class LugaresController extends Controller
   {
     $lugar=Lugar::findOrFail($id);
     // Obtener todos los tipos de lugares almacenados
-    $tipos = TipoLugar::orderby('nombre', 'asc')->get();
+    $tipos = TipoLugar::orderBy('nombre', 'asc')->get();
 
     return view('lugares.edit', compact('tipos', 'lugar'));
   }

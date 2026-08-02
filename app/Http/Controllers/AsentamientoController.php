@@ -47,7 +47,7 @@ class AsentamientoController extends Controller
     ])->paginate(18);
 
     // Obtener todos los tipos de asentamientos almacenados
-    $tipos_asentamientos = TipoAsentamiento::get_tipos_asentamientos();
+    $tipos_asentamientos = TipoAsentamiento::orderBy('nombre', 'asc')->get();
 
     return view('asentamientos.index', compact('asentamientos', 'tipos_asentamientos', 'orden', 'tipo_id', 'terminoBusqueda'));
   }

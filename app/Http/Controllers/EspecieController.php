@@ -74,13 +74,7 @@ class EspecieController extends Controller
    */
   public function show(Especie $especie)
   {
-    try {
-      return view('especies.show', compact('especie'));
-    } catch (\Exception $e) {
-      Log::error("Error al mostrar especie: " . $e->getMessage());
-      return redirect()->route('especies.index')
-        ->with('error', 'Especie no encontrada.');
-    }
+    return view('especies.show', compact('especie'));
   }
 
   /**
