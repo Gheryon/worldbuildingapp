@@ -8,15 +8,14 @@
 <li class="nav-item ml-2">
   <a href="{{route('conflictos.create')}}" class="btn btn-dark"><i class="fas fa-plus-circle mr-1"></i> Nuevo conflicto</a>
 </li>
-<li class="nav-item ml-2">
-  <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
-    <option disabled {{ is_null($tipo) || $tipo == 0 ? 'selected' : '' }}>Filtrar tipo</option>
-    <option value="0" {{ $tipo === '0' || $tipo === 0 ? 'selected' : '' }}>Todos</option>
-    @foreach($tipos as $item)
-    <option value="{{$item->id}}" {{ $item->id == $tipo ? 'selected' : '' }}>{{$item->nombre}}</option>
-    @endforeach
-  </select>
-</li>
+<x-filter-tipo-select
+  :tipos="$tipos"
+  :tipo-id="$tipo"
+  name="filter_tipo"
+  label="Filtrar tipo"
+  placeholder="Filtrar tipo"
+  todos-label="Todos" />
+
 <li class="nav-item ml-2">
   <select id="filter_magia" class="form-control ml-2" name="filter_magia">
     <option disabled {{ is_null($magia) || $magia == 0 ? 'selected' : '' }}>Filtrar magia</option>

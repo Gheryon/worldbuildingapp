@@ -8,16 +8,13 @@
 <li class="nav-item ml-2">
   <a href="{{route('construcciones.create')}}" class="btn btn-dark">Nueva construcción</a>
 </li>
-<li class="nav-item ml-2">
-  <label for="filter_tipo" class="sr-only">Filtrar tipo</label>
-  <select id="filter_tipo" class="form-control ml-2" name="filter_tipo">
-    <option selected disabled value="0">Filtrar tipo</option>
-    <option value="0">Todos</option>
-    @foreach($tipos as $tipo)
-    <option value="{{$tipo->id}}">{{$tipo->nombre}}</option>
-    @endforeach
-  </select>
-</li>
+<x-filter-tipo-select
+  :tipos="$tipos"
+  :tipo-id="$tipo_id"
+  name="filter_tipo"
+  label="Filtrar tipo"
+  placeholder="Filtrar tipo"
+  todos-label="Todos" />
 <x-order-input name="orden" label="Orden" :orden="$orden" />
 @endsection
 
