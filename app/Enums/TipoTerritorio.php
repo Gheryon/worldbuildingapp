@@ -16,6 +16,8 @@ enum TipoTerritorio: string
   case Nomada = 'nómada';
   case Archipielago = 'archipiélago';
   case Urbano = 'urbano';
+  case Generico = 'genérico';
+  case Mixto = 'mixto';
 
   public function label(): string
   {
@@ -32,6 +34,8 @@ enum TipoTerritorio: string
       self::Nomada => 'Nómada',
       self::Archipielago => 'Archipiélago',
       self::Urbano => 'Urbano',
+      self::Generico => 'Genérico',
+      self::Mixto => 'Mixto',
     };
   }
 }
