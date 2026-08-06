@@ -52,7 +52,7 @@ class PersonajeRequest extends FormRequest
 
       // Campos de texto largo (pestañas)
       'descripcion_corta' => 'nullable|string|max:1000',
-      'descripcion'       => 'nullable|string',
+      'descripcion_fisica'=> 'nullable|string',
       'salud'             => 'nullable|string',
       'personalidad'      => 'nullable|string',
       'deseos'            => 'nullable|string',
