@@ -32,10 +32,10 @@
       <div class="card-body">
         <div class="row">
           <div class="col-md">
-            <x-text-input name="nombre" label="Nombre" placeholder="Ej: Perro, dragón, etc." />
+            <x-text-input name="nombre" label="Nombre" placeholder="Ej: Perro, dragón, etc." icon="fa-paw" />
           </div>
           <div class="col-md">
-            <label for="reino" class="form-label mt-2">Reino</label>
+            <label for="reino" class="form-label mt-2"><i class="fas fa-globe mr-1"></i>Reino</label>
             <select class="form-select form-control @error('reino') is-invalid @enderror" name="reino" id="reino" required>
               <option selected disabled value="">Elegir</option>
               @foreach(['Animalia', 'Fungi', 'Monera', 'Plantae', 'Protista'] as $reino)
@@ -52,7 +52,7 @@
             @enderror
           </div>
           <div class="col-md">
-            <label for="clase_taxonomica" class="form-label mt-2">Clase taxonómica</label>
+            <label for="clase_taxonomica" class="form-label mt-2"><i class="fas fa-microscope mr-1"></i>Clase taxonómica</label>
             <select class="form-select form-control @error('clase_taxonomica') is-invalid @enderror" name="clase_taxonomica" id="clase_taxonomica">
               <option selected disabled value="">Elegir</option>
               @foreach(['Anfibio', 'Arácnidos', 'Ave', 'Insectos', 'Mamífero', 'Reptil', 'Peces'] as $clase)
@@ -69,7 +69,7 @@
             @enderror
           </div>
           <div class="col-md">
-            <label for="locomocion" class="form-label mt-2">Locomoción</label>
+            <label for="locomocion" class="form-label mt-2"><i class="fas fa-running mr-1"></i>Locomoción</label>
             <select class="form-select form-control @error('locomocion') is-invalid @enderror" name="locomocion" id="locomocion">
               <option selected disabled value="">Elegir</option>
               @foreach(['Acuático', 'Caminante', 'Escalador', 'Mixto', 'Terrestre', 'Volador'] as $locomocion)
@@ -86,7 +86,7 @@
             @enderror
           </div>
           <div class="col-md">
-            <label for="organizacion_social" class="form-label mt-2">Organización social</label>
+            <label for="organizacion_social" class="form-label mt-2"><i class="fas fa-users mr-1"></i>Organización social</label>
             <select class="form-select form-control @error('organizacion_social') is-invalid @enderror" name="organizacion_social" id="organizacion_social">
               <option selected disabled value="">Elegir</option>
               @foreach(['Clan familiar', 'Colonia', 'Manada', 'Rebaño', 'Solitaria'] as $organizacion)
@@ -105,24 +105,24 @@
         </div>
         <div class="row">
           <div class="col-md">
-            <x-text-input name="edad" label="Esperanza de vida media" placeholder="Ej: 10 años, 50 años, etc." />
+            <x-text-input name="edad" label="Esperanza de vida media" placeholder="Ej: 10 años, 50 años, etc." icon="fa-hourglass-start" />
           </div>
           <div class="col-md">
-            <x-text-input name="mortalidad" label="Mortalidad" placeholder="Ej: 10%, 50%, etc." />
+            <x-text-input name="mortalidad" label="Mortalidad" placeholder="Ej: 10%, 50%, etc." icon="fa-skull-crossbones" />
           </div>
           <div class="col-md">
-            <x-text-input name="peso" label="Peso" placeholder="Ej: 5kg, 300kg, etc." />
+            <x-text-input name="peso" label="Peso" placeholder="Ej: 5kg, 300kg, etc." icon="fa-weight" />
           </div>
           <div class="col-md">
-            <x-text-input name="altura" label="Altura" placeholder="Ej: 2m, 10cm, etc." />
+            <x-text-input name="altura" label="Altura" placeholder="Ej: 2m, 10cm, etc." icon="fa-arrows-alt-v" />
           </div>
           <div class="col-md">
-            <x-text-input name="longitud" label="Longitud" placeholder="Ej: 3m, 1cm, etc." />
+            <x-text-input name="longitud" label="Longitud" placeholder="Ej: 3m, 1cm, etc." icon="fa-arrows-alt-h" />
           </div>
         </div>
         <div class="row">
           <div class="col-md">
-            <label for="dieta" class="form-label mt-2">Dieta</label>
+            <label for="dieta" class="form-label mt-2"><i class="fas fa-utensils mr-1"></i>Dieta</label>
             <select class="form-select form-control @error('dieta') is-invalid @enderror" name="dieta" id="dieta">
               <option selected disabled value="">Elegir</option>
               @foreach(['Carnívoro', 'Herbívoro', 'Insectívoro', 'Omnívoro'] as $dieta)
@@ -139,7 +139,7 @@
             @enderror
           </div>
           <div class="col-md">
-            <label for="rareza" class="form-label mt-2">Rareza</label>
+            <label for="rareza" class="form-label mt-2"><i class="fas fa-star mr-1"></i>Rareza</label>
             <select class="form-select form-control @error('rareza') is-invalid @enderror" name="rareza" id="rareza" required>
               <option selected disabled value="">Elegir</option>
               @foreach(['Común', 'Legendario', 'Mítológico', 'Raro'] as $rareza)
@@ -156,7 +156,7 @@
             @enderror
           </div>
           <div class="col-md">
-            <label for="estatus" class="form-label mt-2">Estatus</label>
+            <label for="estatus" class="form-label mt-2"><i class="fas fa-flag mr-1"></i>Estatus</label>
             <select class="form-select form-control @error('estatus') is-invalid @enderror" name="estatus" id="estatus" required>
               <option selected disabled value="">Elegir</option>
               <option value="Viva">Viva</option>
@@ -195,12 +195,12 @@
           <div class="tab-pane fade show active" id="tab-fisico" role="tabpanel">
             <div class="row">
               <div class="col-md-6">
-                <x-textarea-input name="anatomia" label="Anatomía" />
-                <x-textarea-input name="alimentacion" label="Alimentación" />
+                <x-textarea-input name="anatomia" label="Anatomía" icon="fa-dna" />
+                <x-textarea-input name="alimentacion" label="Alimentación" icon="fa-utensils" />
               </div>
               <div class="col-md-6">
-                <x-textarea-input name="reproduccion" label="Reproducción y crecimiento" />
-                <x-textarea-input name="dimorfismo_sexual" label="Dimorfismo sexual" />
+                <x-textarea-input name="reproduccion" label="Reproducción y crecimiento" icon="fa-seedling" />
+                <x-textarea-input name="dimorfismo_sexual" label="Dimorfismo sexual" icon="fa-venus-mars" />
               </div>
             </div>
           </div>
@@ -209,18 +209,18 @@
           <div class="tab-pane fade" id="tab-ecologia" role="tabpanel">
             <div class="row">
               <div class="col-md-6">
-                <x-textarea-input name="distribucion" label="Distribución y hábitats" />
-                <x-textarea-input name="habilidades" label="Habilidades y sentidos especiales" />
+                <x-textarea-input name="distribucion" label="Distribución y hábitats" icon="fa-map-marked-alt" />
+                <x-textarea-input name="habilidades" label="Habilidades y sentidos especiales" icon="fa-star" />
               </div>
               <div class="col-md-6">
-                <x-textarea-input name="domesticacion" label="Domesticación" />
-                <x-textarea-input name="explotacion" label="Explotación" />
+                <x-textarea-input name="domesticacion" label="Domesticación" icon="fa-home" />
+                <x-textarea-input name="explotacion" label="Explotación" icon="fa-industry" />
               </div>
             </div>
           </div>
           {{-- PESTAÑA 3: Otros --}}
           <div class="tab-pane fade" id="tab-otros" role="tabpanel">
-            <x-textarea-input name="otros" label="Otros" />
+            <x-textarea-input name="otros" label="Otros" icon="fa-plus-circle" />
           </div>
         </div>
       </div>
