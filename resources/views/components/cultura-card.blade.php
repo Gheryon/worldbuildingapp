@@ -4,7 +4,7 @@
     <div class="card-header bg-transparent border-bottom-0 pb-0 pt-3 px-3" style="background-color: inherit;">
       <div class="d-flex justify-content-between align-items-start">
         <div>
-          <h5 class="font-weight-bold mb-0">{{ $cultura->nombre }}</h5>
+          <h5 class="font-weight-bold mb-0" style="color: #900b0b;">{{ $cultura->nombre }}</h5>
           <span class="small text-muted">{{ $cultura->gentilicio }}</span>
         </div>
         <div>

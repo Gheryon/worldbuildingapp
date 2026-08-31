@@ -1,6 +1,6 @@
 @props(['especie'])
 
-<div class="card card-index-hover h-100 shadow-sm border-0 rounded-lg overflow-hidden position-relative">
+<div class="card card-index-hover h-100 shadow-sm rounded-lg overflow-hidden position-relative"  style="border: 1px solid #d4c4a8; background-color: #fcf9f2; border-radius: 8px; transition: transform 0.2s ease, shadow 0.2s ease;">
   <div class="position-absolute" style="top: 10px; right: 10px; z-index: 2;">
     <span class="badge shadow-sm px-2 py-1 {{ $especie->rareza == 'Legendario' ? 'bg-warning text-dark' : ($especie->rareza == 'Raro' ? 'bg-orange text-white' : ($especie->rareza == 'Mítológico' ? 'bg-purple text-white' : 'bg-success text-white')) }}">
       {{ $especie->rareza ?? 'Común' }}
@@ -12,7 +12,7 @@
       <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 55px; height: 55px;">
         <i class="fas {{ $especie->locomocion == 'Acuática' ? 'fa-fish' : ($especie->locomocion == 'Aérea' ? 'fa-dove' : 'fa-paw') }} fa-2x text-dark"></i>
       </div>
-      <h5 class="font-weight-bold mb-0">{{ $especie->nombre }}</h5>
+      <h5 class="font-weight-bold mb-0" style="color: #900b0b;">{{ $especie->nombre }}</h5>
       <p class="text-muted small text-uppercase mb-0">
         {{ $especie->reino }} | {{ $especie->clase_taxonomica }}
       </p>
@@ -52,7 +52,7 @@
     </div>
   </div>
 
-  <div class="card-footer bg-white border-0 text-center pb-3">
+  <div class="card-footer bg-transparent border-0 text-center pb-3" style="background-color: inherit;">
     <hr class="mx-4 my-0 mb-3">
     <div class="btn-group border rounded-pill overflow-hidden shadow-sm">
         <a href="{{ route('especies.show', $especie->id) }}" class="btn btn-white btn-sm px-3 border-right text-muted hover-primary" title="Ver">
