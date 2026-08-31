@@ -40,7 +40,7 @@
 <div class="row">
   @forelse($religiones as $religion)
   <div class="col-6 col-sm-6 col-md-6 col-lg-6">
-    <div class="card card-dark card-outline">
+    <div class="card card-index-hover card-dark card-outline">
       <div class="card-body box-profile">
         <h3 class="profile-username text-center">{{$religion->nombre}}</h3>
       </div>

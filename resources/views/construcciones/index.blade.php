@@ -43,7 +43,7 @@
 <div class="row">
   @forelse($construcciones as $construccion)
   <div class="col-4 col-sm-6 col-md-4 col-lg-3">
-    <div class="card card-dark card-outline">
+    <div class="card card-index-hover card-dark card-outline">
       <div class="card-body box-profile">
         <h3 class="profile-username text-center">{{$construccion->nombre}}</h3>
         <ul class="list-group list-group-unbordered mb-3">

@@ -15,9 +15,10 @@ body {
     min-height: 100vh;
 }
 
-.card:hover {
+.card-index-hover:hover {
   transform: translateY(-3px);
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+  transition: all 0.2s ease-in-out;
 }
 
 /* Para enlaces en vistas de relatos y conflictos */

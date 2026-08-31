@@ -1,7 +1,7 @@
 @props(['lugar'])
 
 <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 mb-4">
-  <div class="card h-100 shadow-sm hover-shadow transition-all border-0">
+  <div class="card card-index-hover h-100 shadow-sm hover-shadow transition-all border-0">
     {{-- Badge de Tipo --}}
     <div class="position-absolute mt-2 ml-2" style="z-index: 10;">
       <span class="badge badge-dark opacity-85 px-3 py-2">

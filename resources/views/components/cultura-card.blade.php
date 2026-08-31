@@ -1,6 +1,6 @@
 @props(['cultura'])
 <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 mb-3">
-  <div class="card shadow-sm card-dark card-outline h-100" style="background-color: #f0e8d8;">
+  <div class="card card-index-hover shadow-sm card-dark card-outline h-100" style="background-color: #f0e8d8;">
     <div class="card-header bg-transparent border-bottom-0 pb-0 pt-3 px-3" style="background-color: inherit;">
       <div class="d-flex justify-content-between align-items-start">
         <div>

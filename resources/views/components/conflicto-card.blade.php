@@ -1,7 +1,7 @@
 @props(['conflicto'])
 
 <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 mb-4">
-  <div class="card h-100 border-0 shadow-lg bg-white rounded-lg overflow-hidden">
+  <div class="card card-index-hover h-100 border-0 shadow-lg bg-white rounded-lg overflow-hidden">
     <div class="card-header border-0 bg-white pt-4">
       <div class="badge {{ $conflicto->es_conflicto_magico ? 'badge-warning' : 'badge-danger' }} px-3 py-2 mb-2 shadow-sm">{{ $conflicto->tipoConflicto->nombre }}</div>
       @if($conflicto->es_conflicto_magico)

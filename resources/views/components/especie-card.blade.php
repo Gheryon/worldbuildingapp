@@ -1,6 +1,6 @@
 @props(['especie'])
 
-<div class="card h-100 shadow-sm border-0 rounded-lg overflow-hidden position-relative">
+<div class="card card-index-hover h-100 shadow-sm border-0 rounded-lg overflow-hidden position-relative">
   <div class="position-absolute" style="top: 10px; right: 10px; z-index: 2;">
     <span class="badge shadow-sm px-2 py-1 {{ $especie->rareza == 'Legendario' ? 'bg-warning text-dark' : ($especie->rareza == 'Raro' ? 'bg-orange text-white' : ($especie->rareza == 'Mítológico' ? 'bg-purple text-white' : 'bg-success text-white')) }}">
       {{ $especie->rareza ?? 'Común' }}

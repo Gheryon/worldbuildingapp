@@ -1,7 +1,9 @@
-@props(['name', 'label', 'id' => 0, 'dia' => '', 'mes' => '', 'anno' => ''])
+@props(['name', 'label', 'id' => 0, 'dia' => '', 'mes' => '', 'anno' => '', 'icon' => null])
 
 <div class="form-group mt-2">
-  <label class="form-label">{{ $label }}</label>
+  <label class="form-label">
+    @if($icon)<i class="fas {{ $icon }} mr-1"></i>@endif{{ $label }}
+  </label>
   <div class="input-group">
 
     {{-- Día --}}

@@ -50,7 +50,7 @@
 <div class="row">
   @forelse($asentamientos as $asentamiento)
   <div class="col-sm-12 col-md-6 col-lg-3 col-xl-2">
-    <div class="card card-dark card-outline">
+    <div class="card card-index-hover card-dark card-outline">
       <div class="card-body box-profile">
         <h3 class="profile-username text-center">{{$asentamiento->nombre}}</h3>
       </div>
