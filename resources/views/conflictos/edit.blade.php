@@ -43,12 +43,12 @@
           <div class="col-md-7">
             <div class="row">
               <div class="col-md-12 mb-3">
-                <x-text-input name="nombre" label="Nombre del conflicto" placeholder="Ej: Guerra de las Tres Coronas" :value="old('nombre', $conflicto->nombre)" required />
+                <x-text-input name="nombre" label="Nombre del conflicto" placeholder="Ej: Guerra de las Tres Coronas" :value="old('nombre', $conflicto->nombre)" icon="fa-swords" required />
               </div>
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label for="tipo_conflicto_id" class="form-label font-weight-bold">Tipo de conflicto</label>
+                <label for="tipo_conflicto_id" class="form-label font-weight-bold"><i class="fas fa-tags mr-1"></i>Tipo de conflicto</label>
                 <select class="form-control select2bs4 @error('tipo_conflicto_id') is-invalid @enderror" name="tipo_conflicto_id" id="tipo_conflicto_id">
                   <option selected disabled value="">Elegir tipo...</option>
                   @foreach($tipos_conflicto as $tipo)
@@ -58,7 +58,7 @@
                 @error('tipo_conflicto_id') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-6 mb-3">
-                <label for="conflicto_padre_id" class="form-label font-weight-bold">Conflicto padre</label>
+                <label for="conflicto_padre_id" class="form-label font-weight-bold"><i class="fas fa-sitemap mr-1"></i>Conflicto padre</label>
                 <select class="form-control select2bs4 @error('conflicto_padre_id') is-invalid @enderror" name="conflicto_padre_id" id="conflicto_padre_id">
                   <option value="" selected>Conflicto independiente</option>
                   @foreach($conflictos as $id => $nombre)
@@ -89,7 +89,7 @@
                 @error('ubicacion_principal_id') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-12 mb-3">
-                <x-text-input name="tipo_localizacion" label="Tipo de localización" placeholder="Ej: terrestre, aéreo, mixto, etc..." :value="old('tipo_localizacion', $conflicto->tipo_localizacion)" />
+                <x-text-input name="tipo_localizacion" label="Tipo de localización" placeholder="Ej: terrestre, aéreo, mixto, etc..." :value="old('tipo_localizacion', $conflicto->tipo_localizacion)" icon="fa-map-marked-alt" />
               </div>
             </div>
           </div>
@@ -100,10 +100,10 @@
         {{-- Cronología del conflicto --}}
         <div class="row">
           <div class="col-md-6">
-            <x-date-input-group name="fecha_inicio" label="Fecha de inicio" :id="$conflicto->fecha_inicio_id" :dia="old('dia_fecha_inicio', $conflicto->fechaInicio->dia ?? '')" :mes="old('mes_fecha_inicio', $conflicto->fechaInicio->mes ?? '')" :anno="old('anno_fecha_inicio', $conflicto->fechaInicio->anno ?? '')" />
+            <x-date-input-group name="fecha_inicio" label="Fecha de inicio" :id="$conflicto->fecha_inicio_id" :dia="old('dia_fecha_inicio', $conflicto->fechaInicio->dia ?? '')" :mes="old('mes_fecha_inicio', $conflicto->fechaInicio->mes ?? '')" :anno="old('anno_fecha_inicio', $conflicto->fechaInicio->anno ?? '')" icon="fa-calendar-plus" />
           </div>
           <div class="col-md-6">
-            <x-date-input-group name="fecha_fin" label="Fecha de conclusión" :id="$conflicto->fecha_fin_id" :dia="old('dia_fecha_fin', $conflicto->fechaFin->dia ?? '')" :mes="old('mes_fecha_fin', $conflicto->fechaFin->mes ?? '')" :anno="old('anno_fecha_fin', $conflicto->fechaFin->anno ?? '')" />
+            <x-date-input-group name="fecha_fin" label="Fecha de conclusión" :id="$conflicto->fecha_fin_id" :dia="old('dia_fecha_fin', $conflicto->fechaFin->dia ?? '')" :mes="old('mes_fecha_fin', $conflicto->fechaFin->mes ?? '')" :anno="old('anno_fecha_fin', $conflicto->fechaFin->anno ?? '')" icon="fa-calendar-times" />
           </div>
         </div>
       </div>
@@ -114,8 +114,8 @@
       <div class="card-header p-0 pt-1 border-bottom-0">
         <ul class="nav nav-tabs" id="conflictoTab" role="tablist">
           <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#tab-relato"><i class="fas fa-book-open mr-1"></i> Desarrollo e historia</a></li>
-          <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-belico"><i class="fas fa-shield-halved mr-1"></i> Elementos bélicos</a></li>
-          <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-magia"><i class="fas fa-wand-sparkles mr-1"></i> Factores mágicos</a></li>
+          <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-belico"><i class="fas fa-shield-alt mr-1"></i> Elementos bélicos</a></li>
+          <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-magia"><i class="fas fa-magic mr-1"></i> Factores mágicos</a></li>
           <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-beligerantes"><i class="fas fa-users mr-1"></i> Beligerantes</a></li>
           <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-consecuencias"><i class="fas fa-flag-checkered mr-1"></i> Resultados</a></li>
         </ul>
@@ -124,17 +124,17 @@
         <div class="tab-content">
           {{-- Pestaña relato --}}
           <div class="tab-pane fade show active" id="tab-relato">
-            <x-textarea-input name="descripcion" label="Descripción general" :value="old('descripcion', $conflicto->descripcion)" />
-            <x-textarea-input name="preludio" label="Preludio y causas" :value="old('preludio', $conflicto->preludio)" />
-            <x-textarea-input name="desarrollo" label="Desarrollo del conflicto" class="summernote" :value="old('desarrollo', $conflicto->desarrollo)" />
+            <x-textarea-input name="descripcion" label="Descripción general" :value="old('descripcion', $conflicto->descripcion)" icon="fa-align-left" />
+            <x-textarea-input name="preludio" label="Preludio y causas" :value="old('preludio', $conflicto->preludio)" icon="fa-history" />
+            <x-textarea-input name="desarrollo" label="Desarrollo del conflicto" class="summernote" :value="old('desarrollo', $conflicto->desarrollo)" icon="fa-scroll" />
           </div>
 
           {{-- Pestaña bélica --}}
           <div class="tab-pane fade" id="tab-belico">
             <div class="row">
-              <div class="col-md-6"><x-textarea-input name="unidades_especiales" label="Unidades militares especiales" :value="old('unidades_especiales', $conflicto->unidades_especiales)" /></div>
-              <div class="col-md-6"><x-textarea-input name="criaturas_combate" label="Criaturas de combate" :value="old('criaturas_combate', $conflicto->criaturas_combate)" /></div>
-              <div class="col-md-12"><x-textarea-input name="maquinaria_warlike" label="Maquinaria de guerra" :value="old('maquinaria_warlike', $conflicto->maquinaria_warlike)" /></div>
+              <div class="col-md-6"><x-textarea-input name="unidades_especiales" label="Unidades militares especiales" :value="old('unidades_especiales', $conflicto->unidades_especiales)" icon="fa-shield-alt" /></div>
+              <div class="col-md-6"><x-textarea-input name="criaturas_combate" label="Criaturas de combate" :value="old('criaturas_combate', $conflicto->criaturas_combate)" icon="fa-paw" /></div>
+              <div class="col-md-12"><x-textarea-input name="maquinaria_warlike" label="Maquinaria de guerra" :value="old('maquinaria_warlike', $conflicto->maquinaria_warlike)" icon="fa-hammer" /></div>
             </div>
           </div>
 
@@ -142,14 +142,14 @@
           <div class="tab-pane fade" id="tab-magia">
             <div class="custom-control custom-switch mb-3">
               <input type="checkbox" class="custom-control-input @error('es_conflicto_magico') is-invalid @enderror" id="es_conflicto_magico" name="es_conflicto_magico" value="1" {{ old('es_conflicto_magico', $conflicto->es_conflicto_magico) ? 'checked' : '' }}>
-              <label class="custom-control-label" for="es_conflicto_magico">¿Involucró magia significativa?</label>
+              <label class="custom-control-label" for="es_conflicto_magico"><i class="fas fa-wand-magic-sparkles mr-1"></i>¿Involucró magia significativa?</label>
             </div>
             @error('es_conflicto_magico') <small class="text-danger d-block">{{ $message }}</small> @enderror
             <div class="row">
-              <div class="col-md-6"><x-textarea-input name="hechizos_decisivos" label="Hechizos decisivos" :value="old('hechizos_decisivos', $conflicto->hechizos_decisivos)" /></div>
-              <div class="col-md-6"><x-textarea-input name="armas_magicas_empleadas" label="Artefactos y armas mágicas" :value="old('armas_magicas_empleadas', $conflicto->armas_magicas_empleadas)" /></div>
-              <div class="col-md-6"><x-textarea-input name="seres_sobrenaturales_participantes" label="Seres sobrenaturales" :value="old('seres_sobrenaturales_participantes', $conflicto->seres_sobrenaturales_participantes)" /></div>
-              <div class="col-md-6"><x-textarea-input name="fenomenos_naturales" label="Fenómenos extraños/naturales" :value="old('fenomenos_naturales', $conflicto->fenomenos_naturales)" /></div>
+              <div class="col-md-6"><x-textarea-input name="hechizos_decisivos" label="Hechizos decisivos" :value="old('hechizos_decisivos', $conflicto->hechizos_decisivos)" icon="fa-magic" /></div>
+              <div class="col-md-6"><x-textarea-input name="armas_magicas_empleadas" label="Artefactos y armas mágicas" :value="old('armas_magicas_empleadas', $conflicto->armas_magicas_empleadas)" icon="fa-magic" /></div>
+              <div class="col-md-6"><x-textarea-input name="seres_sobrenaturales_participantes" label="Seres sobrenaturales" :value="old('seres_sobrenaturales_participantes', $conflicto->seres_sobrenaturales_participantes)" icon="fa-ghost" /></div>
+              <div class="col-md-6"><x-textarea-input name="fenomenos_naturales" label="Fenómenos extraños/naturales" :value="old('fenomenos_naturales', $conflicto->fenomenos_naturales)" icon="fa-bolt" /></div>
             </div>
           </div>
 

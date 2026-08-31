@@ -32,27 +32,27 @@
     <div class="card card-outline card-dark mt-3">
       <div class="card-body">
         <div class="row">
-          <div class="col-md-9">
+           <div class="col-md-9">
             <div class="row">
               <div class="col-md">
-                <x-text-input name="nombre" label="Nombre" placeholder="Ej: Cristianismo, Judaísmo, etc." :value="$religion->nombre" required />
+                <x-text-input name="nombre" label="Nombre" placeholder="Ej: Cristianismo, Judaísmo, etc." :value="$religion->nombre" icon="fa-monument" required />
               </div>
               <div class="col-md">
-                <x-text-input name="lema" label="Lema" placeholder="Ej: Justicia para todos." :value="$religion->lema" />
+                <x-text-input name="lema" label="Lema" placeholder="Ej: Justicia para todos." :value="$religion->lema" icon="fa-feather-alt" />
               </div>
             </div>
             <div class="row">
               <div class="col-md">
-                <x-date-input-group name="fundacion" label="Fecha de fundación" :id="$religion->fundacion" :dia="$fundacion->dia ?? ''" :mes="$fundacion->mes ?? ''" :anno="$fundacion->anno ?? ''" />
+                <x-date-input-group name="fundacion" label="Fecha de fundación" :id="$religion->fundacion" :dia="$fundacion->dia ?? ''" :mes="$fundacion->mes ?? ''" :anno="$fundacion->anno ?? ''" icon="fa-calendar-plus" />
               </div>
               <div class="col-md">
-                <x-date-input-group name="disolucion" label="Fecha de disolución" :id="$religion->disolucion" :dia="$disolucion->dia ?? ''" :mes="$disolucion->mes ?? ''" :anno="$disolucion->anno ?? ''" />
+                <x-date-input-group name="disolucion" label="Fecha de disolución" :id="$religion->disolucion" :dia="$disolucion->dia ?? ''" :mes="$disolucion->mes ?? ''" :anno="$disolucion->anno ?? ''" icon="fa-calendar-times" />
               </div>
             </div>
             <div class="row">
               <div class="col-md-3">
                 <div class="form-group mt-2">
-                  <label for="tipo_teismo">Tipo de Teísmo</label>
+                  <label for="tipo_teismo"><i class="fas fa-dharmachakra mr-1"></i>Tipo de Teísmo</label>
                   <select name="tipo_teismo" id="tipo_teismo" class="form-control select2 @error('tipo_teismo') is-invalid @enderror">
                     <option value="" selected disabled>Selecciona una doctrina...</option>
                     @foreach(\App\Models\Religion::getTiposTeismo() as $value => $label)
@@ -66,11 +66,11 @@
                 </div>
               </div>
               <div class="col-md">
-                <x-text-input name="deidades" label="Deidades principales" placeholder="Ej: Zeus, Poseidón, Hades." :value="$religion->deidades" />
+                <x-text-input name="deidades" label="Deidades principales" placeholder="Ej: Zeus, Poseidón, Hades." :value="$religion->deidades" icon="fa-crown" />
               </div>
               <div class="col-md">
                 <div class="form-group mt-2">
-                  <label for="estatus_legal" class="form-label">Estatus legal</label>
+                  <label for="estatus_legal" class="form-label"><i class="fas fa-gavel mr-1"></i>Estatus legal</label>
                   <select class="form-select form-control @error('estatus_legal') is-invalid @enderror" name="estatus_legal" id="estatus_legal" required>
                     <option selected disabled value="">Elegir</option>
                     @foreach(['Activa', 'Clandestina', 'Extinta', 'Perseguida'] as $status)
@@ -86,7 +86,7 @@
             </div>
           </div>
           <div class="col">
-            <label for="escudo" class="form-label">Escudo</label>
+            <label for="escudo" class="form-label"><i class="fas fa-shield-alt mr-1"></i>Escudo</label>
             <img alt="escudo" id="escudo-preview" src="{{asset("storage/escudos/" . ($religion->escudo ?? "default.png"))}}" class="img-thumbnail" width="185" height="180">
             <input type="file" name="escudo" class="form-control form-control-sm @error('escudo') is-invalid @enderror" id="escudo">
             @error('escudo')
@@ -99,7 +99,7 @@
     {{-- Campo de descripción breve --}}
     <div class="card card-dark card-outline card-tabs mt-4">
       <div class="card-body">
-        <x-textarea-input name="descripcion" label="Descripción" rows="2" :value="$religion->descripcion" />
+        <x-textarea-input name="descripcion" label="Descripción" rows="2" :value="$religion->descripcion" icon="fa-feather-alt" />
       </div>
     </div>
 
@@ -121,39 +121,39 @@
       <div class="card-body">
         <div class="tab-content" id="personajeTabContent">
 
-          {{-- PESTAÑA 1: Geopolítica, militar, territorio y estructura --}}
+          {{-- PESTAÑA 1 --}}
           <div class="tab-pane fade show active" id="tab-fe" role="tabpanel">
             <div class="row">
               <div class="col-md-6">
-                <x-textarea-input name="cosmologia" label="Cosmología" :value="$religion->cosmologia" />
-                <x-textarea-input name="doctrina" label="Doctrina" :value="$religion->doctrina" />
-                <x-textarea-input name="sobrenatural" label="Seres, leyendas y creencias sobrenaturales" :value="$religion->sobrenatural" />
+                <x-textarea-input name="cosmologia" label="Cosmología" :value="$religion->cosmologia" icon="fa-globe" />
+                <x-textarea-input name="doctrina" label="Doctrina" :value="$religion->doctrina" icon="fa-book" />
+                <x-textarea-input name="sobrenatural" label="Seres, leyendas y creencias sobrenaturales" :value="$religion->sobrenatural" icon="fa-ghost" />
               </div>
               <div class="col-md-6">
-                <x-textarea-input name="sagrado" label="Lugares y objetos sagrados" :value="$religion->sagrado" />
-                <x-textarea-input name="fiestas" label="Fiestas y rituales importantes" :value="$religion->fiestas" />
+                <x-textarea-input name="sagrado" label="Lugares y objetos sagrados" :value="$religion->sagrado" icon="fa-monument" />
+                <x-textarea-input name="fiestas" label="Fiestas y rituales importantes" :value="$religion->fiestas" icon="fa-calendar-alt" />
               </div>
             </div>
           </div>
 
-          {{-- PESTAÑA 2: política, estructuras, sectas --}}
+          {{-- PESTAÑA 2 --}}
           <div class="tab-pane fade" id="tab-politica" role="tabpanel">
             <div class="row">
               <div class="col-md-6">
-                <x-textarea-input name="politica" label="Influencia politica" :value="$religion->politica" />
-                <x-textarea-input name="sectas" label="Sectas" :value="$religion->sectas" />
+                <x-textarea-input name="politica" label="Influencia politica" :value="$religion->politica" icon="fa-gavel" />
+                <x-textarea-input name="sectas" label="Sectas" :value="$religion->sectas" icon="fa-users" />
               </div>
               <div class="col-md-6">
-                <x-textarea-input name="estructura" label="Estructura religiosa" :value="$religion->estructura" />
-                <x-textarea-input name="clase_sacerdotal" label="Clase sacerdotal" :value="$religion->clase_sacerdotal" />
+                <x-textarea-input name="estructura" label="Estructura religiosa" :value="$religion->estructura" icon="fa-sitemap" />
+                <x-textarea-input name="clase_sacerdotal" label="Clase sacerdotal" :value="$religion->clase_sacerdotal" icon="fa-user-tie" />
               </div>
             </div>
           </div>
 
-          {{-- PESTAÑA 3: Historia y otros --}}
+          {{-- PESTAÑA 3 --}}
           <div class="tab-pane fade" id="tab-historia" role="tabpanel">
-            <x-textarea-input name="historia" label="Historia" class="summernote" rows="10" :value="$religion->historia" />
-            <x-textarea-input name="otros" label="Otros detalles adicionales" :value="$religion->otros" />
+            <x-textarea-input name="historia" label="Historia" class="summernote" rows="10" :value="$religion->historia" icon="fa-scroll" />
+            <x-textarea-input name="otros" label="Otros detalles adicionales" :value="$religion->otros" icon="fa-plus-circle" />
           </div>
         </div>
       </div>

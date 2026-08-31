@@ -35,18 +35,18 @@
           <div class="col-md-9">
             <div class="row">
               <div class="col-md">
-                <x-text-input name="nombre" label="Nombre" placeholder="Ej: La Compañía del Anillo, El Imperio Romano, etc." required />
+                <x-text-input name="nombre" label="Nombre" placeholder="Ej: La Compañía del Anillo, El Imperio Romano, etc." icon="fa-landmark" required />
               </div>
               <div class="col-md">
-                <x-text-input name="gentilicio" label="Gentilicio" placeholder="Ej: Español, Narniano, etc." />
+                <x-text-input name="gentilicio" label="Gentilicio" placeholder="Ej: Español, Narniano, etc." icon="fa-user-tag" />
               </div>
               <div class="col-md">
-                <x-text-input name="capital" label="Capital" placeholder="Ej: Minas Tirith, Córdoba, etc." />
+                <x-text-input name="capital" label="Capital" placeholder="Ej: Minas Tirith, Córdoba, etc." icon="fa-building-columns" />
               </div>
             </div>
             <div class="row">
               <div class="col-md-3">
-                <label for="tipo_organizacion_id" class="form-label">Tipo de organización</label>
+                <label for="tipo_organizacion_id" class="form-label"><i class="fas fa-tags mr-1"></i>Tipo de organización</label>
                 <select class="form-select form-control @error('tipo_organizacion_id') is-invalid @enderror" name="tipo_organizacion_id" id="tipo_organizacion_id" @if($tipo_organizacion->count()>0)required @endif>
                   <option selected disabled value="">Elegir</option>
                   @if($tipo_organizacion->count()>0)
@@ -60,7 +60,7 @@
                 @enderror
               </div>
               <div class="col-md">
-                <label for="lider_id" class="form-label">Soberano</label>
+                <label for="lider_id" class="form-label"><i class="fas fa-chess-king mr-1"></i>Soberano</label>
                 <select class="form-select form-control @error('lider_id') is-invalid @enderror" name="lider_id" id="lider_id">
                   <option selected disabled value="">Elegir</option>
                   @foreach($personajes as $id => $nombre)
@@ -72,7 +72,7 @@
                 @enderror
               </div>
               <div class="col-md">
-                <label for="organizacion_padre_id" class="form-label">Controlado por</label>
+                <label for="organizacion_padre_id" class="form-label"><i class="fas fa-sitemap mr-1"></i>Controlado por</label>
                 <select class="form-select form-control @error('organizacion_padre_id') is-invalid @enderror" name="organizacion_padre_id" id="organizacion_padre_id">
                   <option selected disabled value="">Elegir</option>
                   @foreach($paises as $id => $nombre)
@@ -86,19 +86,19 @@
             </div>
             <div class="row">
               <div class="col-md">
-                <x-date-input-group name="fundacion" label="Fecha de fundación"/>
+                <x-date-input-group name="fundacion" label="Fecha de fundación" icon="fa-calendar-plus"/>
               </div>
               <div class="col-md">
-                <x-date-input-group name="disolucion" label="Fecha de disolución"/>
+                <x-date-input-group name="disolucion" label="Fecha de disolución" icon="fa-calendar-times"/>
               </div>
             </div>
             <div class="row">
               <div class="col-md">
-                <x-text-input name="lema" label="Lema" placeholder="Ej: Justicia para todos." />
+                <x-text-input name="lema" label="Lema" placeholder="Ej: Justicia para todos." icon="fa-feather-alt" />
               </div>
               <div class="col-md-5">
                 <div class="form-group">
-                  <label for="religiones" class="form-label mt-2">Religiones presentes</label>
+                  <label for="religiones" class="form-label mt-2"><i class="fas fa-monument mr-1"></i>Religiones presentes</label>
                   <select class="select2 @error('religiones') is-invalid @enderror" multiple="multiple" name="religiones[]" id="religiones" data-placeholder="Selecciona religiones...">
                     @foreach($religiones as $id => $nombre)
                     <option value="{{$id}}" {{ (is_array(old('religiones')) && in_array($id, old('religiones'))) ? 'selected' : '' }}>{{$nombre}}</option>
@@ -112,7 +112,7 @@
             </div>
           </div>
           <div class="col">
-            <label for="escudo" class="form-label mt-2">Escudo</label>
+            <label for="escudo" class="form-label mt-2"><i class="fas fa-shield-alt mr-1"></i>Escudo</label>
             <img alt="escudo" id="escudo-preview" src="{{asset("storage/escudos/default.png")}}" class="img-thumbnail" width="185" height="180">
             <input type="file" name="escudo" class="form-control form-control-sm @error('escudo') is-invalid @enderror" id="escudo">
             @error('escudo')
@@ -126,7 +126,7 @@
     {{-- Campo de descripción breve --}}
     <div class="card card-dark card-outline card-tabs mt-4">
       <div class="card-body">
-        <x-textarea-input name="descripcion_breve" label="Descripción breve" rows="2" />
+        <x-textarea-input name="descripcion_breve" label="Descripción breve" rows="2" icon="fa-feather-alt" />
       </div>
     </div>
 
@@ -155,12 +155,12 @@
           <div class="tab-pane fade show active" id="tab-fisico" role="tabpanel">
             <div class="row">
               <div class="col-md-6">
-                <x-textarea-input name="geopolitica" label="Política exterior e interior" />
-                <x-textarea-input name="militar" label="Militar" />
+                <x-textarea-input name="geopolitica" label="Política exterior e interior" icon="fa-globe-americas" />
+                <x-textarea-input name="militar" label="Militar" icon="fa-shield-alt" />
               </div>
               <div class="col-md-6">
-                <x-textarea-input name="territorio" label="Territorio y fronteras" />
-                <x-textarea-input name="estructura" label="Estructura organizativa" />
+                <x-textarea-input name="territorio" label="Territorio y fronteras" icon="fa-map" />
+                <x-textarea-input name="estructura" label="Estructura organizativa" icon="fa-sitemap" />
               </div>
             </div>
           </div>
@@ -169,27 +169,27 @@
           <div class="tab-pane fade" id="tab-social" role="tabpanel">
             <div class="row">
               <div class="col-md-6">
-                <x-textarea-input name="educacion" label="Educación" />
-                <x-textarea-input name="religion" label="Religión" />
+                <x-textarea-input name="educacion" label="Educación" icon="fa-graduation-cap" />
+                <x-textarea-input name="religion" label="Religión" icon="fa-monument" />
               </div>
               <div class="col-md-6">
-                <x-textarea-input name="cultura" label="Aspectos culturales" />
-                <x-textarea-input name="demografia" label="Demografía" />
+                <x-textarea-input name="cultura" label="Aspectos culturales" icon="fa-theater-masks" />
+                <x-textarea-input name="demografia" label="Demografía" icon="fa-users" />
               </div>
             </div>
           </div>
 
           {{-- PESTAÑA 3: Economía y tecnologia --}}
           <div class="tab-pane fade" id="tab-economia" role="tabpanel">
-            <x-textarea-input name="tecnologia" label="Tecnología y ciencia" />
-            <x-textarea-input name="economia" label="Economía" />
-            <x-textarea-input name="recursos_naturales" label="Recursos naturales" />
+            <x-textarea-input name="tecnologia" label="Tecnología y ciencia" icon="fa-microchip" />
+            <x-textarea-input name="economia" label="Economía" icon="fa-coins" />
+            <x-textarea-input name="recursos_naturales" label="Recursos naturales" icon="fa-leaf" />
           </div>
 
           {{-- PESTAÑA 4: Historia y otros --}}
           <div class="tab-pane fade" id="tab-historia" role="tabpanel">
-            <x-textarea-input name="historia" label="Historia" class="summernote" rows="10" />
-            <x-textarea-input name="otros" label="Otros detalles adicionales" />
+            <x-textarea-input name="historia" label="Historia" class="summernote" rows="10" icon="fa-scroll" />
+            <x-textarea-input name="otros" label="Otros detalles adicionales" icon="fa-plus-circle" />
           </div>
         </div>
       </div>

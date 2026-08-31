@@ -44,15 +44,15 @@
           <div class="col-md-8">
             <div class="row">
               <div class="col-md-6 mb-3">
-                <x-text-input name="nombre" label="Nombre del lugar" placeholder="Ej: Pico del Destino" :value="old('nombre')" required />
+                <x-text-input name="nombre" label="Nombre del lugar" placeholder="Ej: Pico del Destino" :value="old('nombre')" icon="fa-map-marker-alt" required />
               </div>
               <div class="col-md-6 mb-3">
-                <x-text-input name="otros_nombres" label="Otros nombres / Alias" placeholder="Ej: La montaña de fuego" :value="old('otros_nombres')" />
+                <x-text-input name="otros_nombres" label="Otros nombres / Alias" placeholder="Ej: La montaña de fuego" :value="old('otros_nombres')" icon="fa-tag" />
               </div>
             </div>
             <div class="row">
               <div class="col-md-4 mb-3">
-                <label for="select_tipo" class="form-label font-weight-bold">Tipo de lugar</label>
+                <label for="select_tipo" class="form-label font-weight-bold"><i class="fas fa-tags mr-1"></i>Tipo de lugar</label>
                 <select class="form-control select2bs4 @error('select_tipo') is-invalid @enderror" name="select_tipo" id="select_tipo" required>
                   <option selected disabled value="">Elegir tipo...</option>
                   @foreach($tipos as $tipo)
@@ -62,7 +62,7 @@
                 @error('select_tipo') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-4 mb-3">
-                <label for="nivel_peligro" class="form-label font-weight-bold">Nivel de peligro</label>
+                <label for="nivel_peligro" class="form-label font-weight-bold"><i class="fas fa-biohazard mr-1"></i>Nivel de peligro</label>
                 <select class="form-control select2bs4 @error('nivel_peligro') is-invalid @enderror" name="nivel_peligro" id="nivel_peligro">
                   <option selected value="">Elegir nivel...</option>
                   @foreach(['Ninguno', 'Bajo', 'Moderado', 'Alto', 'Mortal', 'Desconocido'] as $nivel)
@@ -72,7 +72,7 @@
                 @error('nivel_peligro') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-4 mb-3">
-                <label for="tipo_peligro" class="form-label font-weight-bold">Naturaleza del peligro</label>
+                <label for="tipo_peligro" class="form-label font-weight-bold"><i class="fas fa-exclamation-triangle mr-1"></i>Naturaleza del peligro</label>
                 <select class="form-control select2bs4 @error('tipo_peligro') is-invalid @enderror" name="tipo_peligro" id="tipo_peligro">
                   <option selected value="">Elegir origen...</option>
                   @foreach(['Mágico', 'Fauna', 'Clima', 'Geológico', 'Político', 'Sobrenatural', 'Ninguno'] as $t_pel)
@@ -88,7 +88,7 @@
           <div class="col-md-4 border-left">
             <div class="row">
               <div class="col-12 mb-3">
-                <label for="dificultad_acceso" class="form-label font-weight-bold">Accesibilidad</label>
+                <label for="dificultad_acceso" class="form-label font-weight-bold"><i class="fas fa-hiking mr-1"></i>Accesibilidad</label>
                 <select class="form-control select2bs4 @error('dificultad_acceso') is-invalid @enderror" name="dificultad_acceso" id="dificultad_acceso">
                   <option selected value="">Elegir dificultad...</option>
                   @foreach(['Muy fácil', 'Fácil', 'Moderada', 'Difícil', 'Extrema'] as $dif)
@@ -98,13 +98,13 @@
                 @error('dificultad_acceso') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-12 mb-3">
-                <x-text-input name="estacionalidad" label="Estacionalidad" placeholder="Ej: Solo en invierno" :value="old('estacionalidad')" />
+                <x-text-input name="estacionalidad" label="Estacionalidad" placeholder="Ej: Solo en invierno" :value="old('estacionalidad')" icon="fa-calendar-alt" />
               </div>
               <div class="col-12">
                 <label class="form-label font-weight-bold">Estado</label>
                 <div class="custom-control custom-switch mt-1">
                   <input type="checkbox" class="custom-control-input @error('es_secreto') is-invalid @enderror" id="es_secreto" name="es_secreto" {{ old('es_secreto') ? 'checked' : '' }}>
-                  <label class="custom-control-label font-weight-normal" for="es_secreto">Marcar como lugar secreto</label>
+                  <label class="custom-control-label font-weight-normal" for="es_secreto"><i class="fas fa-user-secret mr-1"></i>Marcar como lugar secreto</label>
                 </div>
                 @error('es_secreto') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
@@ -128,27 +128,27 @@
       <div class="card-body bg-white">
         <div class="tab-content">
           <div class="tab-pane fade show active" id="tab-desc">
-            <x-textarea-input name="descripcion_breve" label="Descripción general" :value="old('descripcion_breve')" />
-            <x-textarea-input name="geografia" label="Geografía detallada" :value="old('geografia')" />
+            <x-textarea-input name="descripcion_breve" label="Descripción general" :value="old('descripcion_breve')" icon="fa-align-left" />
+            <x-textarea-input name="geografia" label="Geografía detallada" :value="old('geografia')" icon="fa-globe-americas" />
           </div>
           <div class="tab-pane fade" id="tab-entorno">
             <div class="row">
-              <div class="col-md-6"><x-textarea-input name="ecosistema" label="Ecosistema" :value="old('ecosistema')" /></div>
-              <div class="col-md-6"><x-textarea-input name="clima" label="Clima" :value="old('clima')" /></div>
+              <div class="col-md-6"><x-textarea-input name="ecosistema" label="Ecosistema" :value="old('ecosistema')" icon="fa-seedling" /></div>
+              <div class="col-md-6"><x-textarea-input name="clima" label="Clima" :value="old('clima')" icon="fa-cloud-sun" /></div>
             </div>
-            <x-textarea-input name="fenomeno_unico" label="Fenómeno único" :value="old('fenomeno_unico')" />
+            <x-textarea-input name="fenomeno_unico" label="Fenómeno único" :value="old('fenomeno_unico')" icon="fa-bolt" />
           </div>
           <div class="tab-pane fade" id="tab-biologia">
-            <x-textarea-input name="flora_fauna" label="Flora y Fauna" :value="old('flora_fauna')" />
+            <x-textarea-input name="flora_fauna" label="Flora y Fauna" :value="old('flora_fauna')" icon="fa-leaf" />
           </div>
           <div class="tab-pane fade" id="tab-recursos">
-            <x-textarea-input name="recursos" label="Recursos generales" :value="old('recursos')" />
+            <x-textarea-input name="recursos" label="Recursos generales" :value="old('recursos')" icon="fa-gem" />
           </div>
           <div class="tab-pane fade" id="tab-lore">
-            <x-textarea-input name="historia" label="Historia del lugar" class="summernote" rows="12" :value="old('historia')" />
+            <x-textarea-input name="historia" label="Historia del lugar" class="summernote" rows="12" :value="old('historia')" icon="fa-scroll" />
             <div class="row">
-              <div class="col-md-6"><x-textarea-input name="rumores" label="Rumores y leyendas" :value="old('rumores')" /></div>
-              <div class="col-md-6"><x-textarea-input name="otros" label="Notas adicionales" :value="old('otros')" /></div>
+              <div class="col-md-6"><x-textarea-input name="rumores" label="Rumores y leyendas" :value="old('rumores')" icon="fa-ghost" /></div>
+              <div class="col-md-6"><x-textarea-input name="otros" label="Notas adicionales" :value="old('otros')" icon="fa-plus-circle" /></div>
             </div>
           </div>
         </div>

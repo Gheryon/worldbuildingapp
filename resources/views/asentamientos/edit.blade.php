@@ -44,15 +44,15 @@
           <div class="col-md-8">
             <div class="row">
               <div class="col-md-6 mb-3">
-                <x-text-input name="nombre" label="Nombre del asentamiento" placeholder="Ej: Córdoba, Minas Tirith, etc." :value="$asentamiento->nombre" required />
+                <x-text-input name="nombre" label="Nombre del asentamiento" placeholder="Ej: Córdoba, Minas Tirith, etc." :value="$asentamiento->nombre" icon="fa-city" required />
               </div>
               <div class="col-md-6 mb-3">
-                <x-text-input name="gentilicio" label="Gentilicio" placeholder="Ej: Cordobés, etc." :value="$asentamiento->gentilicio" />
+                <x-text-input name="gentilicio" label="Gentilicio" placeholder="Ej: Cordobés, etc." :value="$asentamiento->gentilicio" icon="fa-user-tag" />
               </div>
             </div>
             <div class="row">
               <div class="col-md-4 mb-3">
-                <label for="select_tipo" class="form-label font-weight-bold">Tipo</label>
+                <label for="select_tipo" class="form-label font-weight-bold"><i class="fas fa-tags mr-1"></i>Tipo</label>
                 <select class="form-control select2bs4 @error('select_tipo') is-invalid @enderror" name="select_tipo" id="select_tipo" required>
                   <option selected disabled value="">Elegir...</option>
                   @foreach($tipos_asentamientos as $tipo)
@@ -62,7 +62,7 @@
                 @error('select_tipo') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-4 mb-3">
-                <label for="estatus" class="form-label font-weight-bold">Estatus actual</label>
+                <label for="estatus" class="form-label font-weight-bold"><i class="fas fa-flag mr-1"></i>Estatus actual</label>
                 <select class="form-control select2bs4 @error('estatus') is-invalid @enderror" name="estatus" id="estatus" required>
                   <option selected value="">Elegir...</option>
                   @foreach(['Abandonado', 'En ruinas', 'Habitado', 'Secreto', 'Olvidado'] as $est)
@@ -72,7 +72,7 @@
                 @error('estatus') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-4 mb-3">
-                <label for="poblacion" class="form-label font-weight-bold">Población estimada</label>
+                <label for="poblacion" class="form-label font-weight-bold"><i class="fas fa-users mr-1"></i>Población estimada</label>
                 <div class="input-group">
                   <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-users"></i></span></div>
                   <input type="number" name="poblacion" class="form-control @error('poblacion') is-invalid @enderror" id="poblacion" placeholder="Ej: 5000" value="{{ old('poblacion', $asentamiento->poblacion) }}">
@@ -85,7 +85,7 @@
           {{-- Bloque de Control --}}
           <div class="col-md-4 border-left">
             <div class="mb-3">
-              <label for="select_owner" class="form-label font-weight-bold">Controlado por:</label>
+              <label for="select_owner" class="form-label font-weight-bold"><i class="fas fa-landmark mr-1"></i>Controlado por:</label>
               <select class="form-control select2bs4 @error('select_owner') is-invalid @enderror" name="select_owner" id="select_owner">
                 <option value="">Independiente / Ninguno</option>
                 @foreach($paises as $id => $nombre)
@@ -95,7 +95,7 @@
               @error('select_owner') <small class="text-danger d-block">{{ $message }}</small> @enderror
             </div>
             <div class="mb-3">
-              <label for="select_gobernante" class="form-label font-weight-bold">Gobernante local</label>
+              <label for="select_gobernante" class="form-label font-weight-bold"><i class="fas fa-user-tie mr-1"></i>Gobernante local</label>
               <select class="form-control select2bs4 @error('select_gobernante') is-invalid @enderror" name="select_gobernante" id="select_gobernante">
                 <option value="">Sin gobernante especificado</option>
                 @foreach($personajes as $id => $nombre)
@@ -112,10 +112,10 @@
         {{-- Fila de Fechas --}}
         <div class="row">
           <div class="col-md-6">
-            <x-date-input-group name="fundacion" label="Fecha de fundación" :id="$asentamiento->fundacion_id" :dia="$asentamiento->fecha_fundacion->dia ?? ''" :mes="$asentamiento->fecha_fundacion->mes ?? ''" :anno="$asentamiento->fecha_fundacion->anno ?? ''" />
+            <x-date-input-group name="fundacion" label="Fecha de fundación" :id="$asentamiento->fundacion_id" :dia="$asentamiento->fecha_fundacion->dia ?? ''" :mes="$asentamiento->fecha_fundacion->mes ?? ''" :anno="$asentamiento->fecha_fundacion->anno ?? ''" icon="fa-calendar-plus" />
           </div>
           <div class="col-md-6">
-            <x-date-input-group name="disolucion" label="Fecha de disolución" :id="$asentamiento->disolucion_id" :dia="$asentamiento->fecha_disolucion->dia ?? ''" :mes="$asentamiento->fecha_disolucion->mes ?? ''" :anno="$asentamiento->fecha_disolucion->anno ?? ''" />
+            <x-date-input-group name="disolucion" label="Fecha de disolución" :id="$asentamiento->disolucion_id" :dia="$asentamiento->fecha_disolucion->dia ?? ''" :mes="$asentamiento->fecha_disolucion->mes ?? ''" :anno="$asentamiento->fecha_disolucion->anno ?? ''" icon="fa-calendar-times" />
           </div>
         </div>
       </div>
@@ -137,40 +137,41 @@
           <div class="tab-pane fade show active" id="tab-descripcion">
             <div class="row">
               <div class="col-md-12 mb-3">
-                <x-textarea-input name="descripcion" label="Descripción general" :value="$asentamiento->descripcion" />
+                <x-textarea-input name="descripcion" label="Descripción general" :value="$asentamiento->descripcion" icon="fa-align-left" />
               </div>
               <div class="col-md-6">
-                <x-textarea-input name="geografia" label="Geografía" :value="$asentamiento->geografia" />
+                <x-textarea-input name="geografia" label="Geografía" :value="$asentamiento->geografia" icon="fa-globe-americas" />
               </div>
               <div class="col-md-6">
-                <x-textarea-input name="clima" label="Clima" :value="$asentamiento->clima" />
+                <x-textarea-input name="clima" label="Clima" :value="$asentamiento->clima" icon="fa-cloud-sun" />
               </div>
               <div class="col-md-12">
-                <x-textarea-input name="ubicacion_detalles" label="Detalles especiales o secretos" :value="$asentamiento->ubicacion_detalles" />
+                <x-textarea-input name="ubicacion_detalles" label="Detalles especiales o secretos" :value="$asentamiento->ubicacion_detalles" icon="fa-key" />
               </div>
             </div>
           </div>
-          {{-- ... Repetir estructura para las demás pestañas ... --}}
           <div class="tab-pane fade" id="tab-social">
-            <x-textarea-input name="demografia" label="Composición demográfica" :value="$asentamiento->demografia" />
-            <x-textarea-input name="cultura" label="Tradiciones, costumbres y cultura" :value="$asentamiento->cultura" />
-            <x-textarea-input name="arquitectura" label="Arquitectura y monumentos" :value="$asentamiento->arquitectura" />
-            <x-textarea-input name="infraestructura" label="Servicios e infraestructura" :value="$asentamiento->infraestructura" />
+            <x-textarea-input name="demografia" label="Composición demográfica" :value="$asentamiento->demografia" icon="fa-users" />
+            <x-textarea-input name="cultura" label="Tradiciones, costumbres y cultura" :value="$asentamiento->cultura" icon="fa-theater-masks" />
+            <x-textarea-input name="arquitectura" label="Arquitectura y monumentos" :value="$asentamiento->arquitectura" icon="fa-monument" />
+            <x-textarea-input name="infraestructura" label="Servicios e infraestructura" :value="$asentamiento->infraestructura" icon="fa-tools" />
           </div>
           <div class="tab-pane fade" id="tab-politica">
-            <x-textarea-input name="gobierno" label="Sistema de gobierno" :value="$asentamiento->gobierno" />
-            <x-textarea-input name="defensas" label="Murallas y fortificaciones" :value="$asentamiento->defensas" />
-            <x-textarea-input name="ejercito" label="Guarnición y fuerzas militares" :value="$asentamiento->ejercito" />
+            <x-textarea-input name="gobierno" label="Sistema de gobierno" :value="$asentamiento->gobierno" icon="fa-gavel" />
+            <x-textarea-input name="defensas" label="Murallas y fortificaciones" :value="$asentamiento->defensas" icon="fa-shield-alt" />
+            <x-textarea-input name="ejercito" label="Guarnición y fuerzas militares" :value="$asentamiento->ejercito" icon="fa-fist-raised" />
           </div>
           <div class="tab-pane fade" id="tab-economia">
-            <x-text-input name="recurso_principal" label="Recurso principal" placeholder="Ej: Hierro, carbón, etc." :value="$asentamiento->recurso_principal" />
-            <x-text-input name="nivel_riqueza" label="Nivel de riqueza" placeholder="Ej: Bajo, medio, alto, etc." :value="$asentamiento->nivel_riqueza" />
-            <x-textarea-input name="economia" label="Economía, industria y comercio" :value="$asentamiento->economia" />
-            <x-textarea-input name="recursos" label="Recursos naturales" :value="$asentamiento->recursos" />
+            <div class="row">
+              <div class="col-md-6"><x-text-input name="recurso_principal" label="Recurso principal" placeholder="Ej: Hierro, carbón, etc." :value="$asentamiento->recurso_principal" icon="fa-gem" /></div>
+              <div class="col-md-6"><x-text-input name="nivel_riqueza" label="Nivel de riqueza" placeholder="Ej: Bajo, medio, alto, etc." :value="$asentamiento->nivel_riqueza" icon="fa-coins" /></div>
+            </div>
+            <x-textarea-input name="economia" label="Economía, industria y comercio" :value="$asentamiento->economia" icon="fa-industry" />
+            <x-textarea-input name="recursos" label="Recursos naturales" :value="$asentamiento->recursos" icon="fa-leaf" />
           </div>
           <div class="tab-pane fade" id="tab-historia">
-            <x-textarea-input name="historia" label="Historia del asentamiento" class="summernote" rows="12" :value="$asentamiento->historia" />
-            <x-textarea-input name="otros" label="Notas adicionales" :value="$asentamiento->otros" />
+            <x-textarea-input name="historia" label="Historia del asentamiento" class="summernote" rows="12" :value="$asentamiento->historia" icon="fa-scroll" />
+            <x-textarea-input name="otros" label="Notas adicionales" :value="$asentamiento->otros" icon="fa-plus-circle" />
           </div>
         </div>
       </div>

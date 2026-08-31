@@ -36,18 +36,18 @@
           <div class="col-md-9">
             <div class="row">
               <div class="col-md">
-                <x-text-input name="nombre" label="Nombre" placeholder="Ej: La Compañía del Anillo, El Imperio Romano, etc." :value="$organizacion->nombre" required />
+                <x-text-input name="nombre" label="Nombre" placeholder="Ej: La Compañía del Anillo, El Imperio Romano, etc." :value="$organizacion->nombre" icon="fa-landmark" required />
               </div>
               <div class="col-md">
-                <x-text-input name="gentilicio" label="Gentilicio" placeholder="Ej: Español, Narniano, etc." :value="$organizacion->gentilicio" />
+                <x-text-input name="gentilicio" label="Gentilicio" placeholder="Ej: Español, Narniano, etc." :value="$organizacion->gentilicio" icon="fa-user-tag" />
               </div>
               <div class="col-md">
-                <x-text-input name="capital" label="Capital" placeholder="Ej: Minas Tirith, Córdoba, etc." :value="$organizacion->capital" />
+                <x-text-input name="capital" label="Capital" placeholder="Ej: Minas Tirith, Córdoba, etc." :value="$organizacion->capital" icon="fa-building-columns" />
               </div>
             </div>
             <div class="row">
               <div class="col-md-3">
-                <label for="tipo_organizacion_id" class="form-label">Tipo de organización</label>
+                <label for="tipo_organizacion_id" class="form-label"><i class="fas fa-tags mr-1"></i>Tipo de organización</label>
                 <select class="form-select form-control @error('tipo_organizacion_id') is-invalid @enderror" name="tipo_organizacion_id" id="tipo_organizacion_id" @if($tipo_organizacion->count()>0)required @endif>
                   <option selected disabled value="">Elegir</option>
                   @if($tipo_organizacion->count()>0)
@@ -61,7 +61,7 @@
                 @enderror
               </div>
               <div class="col-md">
-                <label for="lider_id" class="form-label">Soberano</label>
+                <label for="lider_id" class="form-label"><i class="fas fa-chess-king mr-1"></i>Soberano</label>
                 <select class="form-select form-control @error('lider_id') is-invalid @enderror" name="lider_id" id="lider_id">
                   <option selected disabled value="">Elegir</option>
                   @foreach($personajes as $id => $nombre)
@@ -73,7 +73,7 @@
                 @enderror
               </div>
               <div class="col-md">
-                <label for="organizacion_padre_id" class="form-label">Controlado por</label>
+                <label for="organizacion_padre_id" class="form-label"><i class="fas fa-sitemap mr-1"></i>Controlado por</label>
                 <select class="form-select form-control @error('organizacion_padre_id') is-invalid @enderror" name="organizacion_padre_id" id="organizacion_padre_id">
                   <option selected disabled value="">Elegir</option>
                   @foreach($paises as $id => $nombre)
@@ -87,23 +87,21 @@
             </div>
             <div class="row">
               <div class="col-md">
-                <x-date-input-group name="fundacion" label="Fecha de fundación" :id="$organizacion->fundacion_id" :dia="$organizacion->fecha_fundacion->dia ?? ''" :mes="$organizacion->fecha_fundacion->mes ?? ''" :anno="$organizacion->fecha_fundacion->anno ?? ''"/>
+                <x-date-input-group name="fundacion" label="Fecha de fundación" :id="$organizacion->fundacion_id" :dia="$organizacion->fecha_fundacion->dia ?? ''" :mes="$organizacion->fecha_fundacion->mes ?? ''" :anno="$organizacion->fecha_fundacion->anno ?? ''" icon="fa-calendar-plus"/>
               </div>
               <div class="col-md">
-                <x-date-input-group name="disolucion" label="Fecha de disolución" :id="$organizacion->disolucion_id" :dia="$organizacion->fecha_disolucion->dia ?? ''" :mes="$organizacion->fecha_disolucion->mes ?? ''" :anno="$organizacion->fecha_disolucion->anno ?? ''" />
+                <x-date-input-group name="disolucion" label="Fecha de disolución" :id="$organizacion->disolucion_id" :dia="$organizacion->fecha_disolucion->dia ?? ''" :mes="$organizacion->fecha_disolucion->mes ?? ''" :anno="$organizacion->fecha_disolucion->anno ?? ''" icon="fa-calendar-times"/>
               </div>
             </div>
             <div class="row">
               <div class="col-md">
-                <x-text-input name="lema" label="Lema" placeholder="Ej: Justicia para todos." :value="$organizacion->lema" />
+                <x-text-input name="lema" label="Lema" placeholder="Ej: Justicia para todos." :value="$organizacion->lema" icon="fa-feather-alt" />
               </div>
               <div class="col-md-5">
                 <div class="form-group">
-                  <label for="religiones" class="form-label mt-2">Religiones presentes</label>
+                  <label for="religiones" class="form-label mt-2"><i class="fas fa-monument mr-1"></i>Religiones presentes</label>
                   <select class="select2 @error('religiones') is-invalid @enderror" multiple="multiple" name="religiones[]" id="religiones" data-placeholder="Selecciona religiones...">
                     @php
-                    // Determinamos los IDs seleccionados: prioridad a old() tras error de validación,
-                    // si no, usamos los IDs que ya tiene la organización en la BD.
                     $selectedIds = old('religiones', $organizacion->religiones->pluck('id')->toArray());
                     @endphp
                     @foreach($religiones as $id => $nombre)
@@ -118,7 +116,7 @@
             </div>
           </div>
           <div class="col">
-            <label for="escudo" class="form-label mt-2">Escudo</label>
+            <label for="escudo" class="form-label mt-2"><i class="fas fa-shield-alt mr-1"></i>Escudo</label>
             <img alt="escudo" id="escudo-preview" src="{{asset("storage/escudos/" . $organizacion->escudo)}}" class="img-thumbnail" width="185" height="180">
             <input type="file" name="escudo" class="form-control form-control-sm @error('escudo') is-invalid @enderror" id="escudo">
             @error('escudo')
@@ -132,7 +130,7 @@
     {{-- Campo de descripción breve --}}
     <div class="card card-dark card-outline card-tabs mt-4">
       <div class="card-body">
-        <x-textarea-input name="descripcion_breve" label="Descripción breve" rows="2" :value="$organizacion->descripcion_breve" />
+        <x-textarea-input name="descripcion_breve" label="Descripción breve" rows="2" :value="$organizacion->descripcion_breve" icon="fa-feather-alt" />
       </div>
     </div>
     {{-- Panel de pestañas --}}
@@ -160,12 +158,12 @@
           <div class="tab-pane fade show active" id="tab-fisico" role="tabpanel">
             <div class="row">
               <div class="col-md-6">
-                <x-textarea-input name="geopolitica" label="Política exterior e interior" :value="$organizacion->geopolitica" />
-                <x-textarea-input name="militar" label="Militar" :value="$organizacion->militar" />
+                <x-textarea-input name="geopolitica" label="Política exterior e interior" :value="$organizacion->geopolitica" icon="fa-globe-americas" />
+                <x-textarea-input name="militar" label="Militar" :value="$organizacion->militar" icon="fa-shield-alt" />
               </div>
               <div class="col-md-6">
-                <x-textarea-input name="territorio" label="Territorio y fronteras" :value="$organizacion->territorio" />
-                <x-textarea-input name="estructura" label="Estructura organizativa" :value="$organizacion->estructura" />
+                <x-textarea-input name="territorio" label="Territorio y fronteras" :value="$organizacion->territorio" icon="fa-map" />
+                <x-textarea-input name="estructura" label="Estructura organizativa" :value="$organizacion->estructura" icon="fa-sitemap" />
               </div>
             </div>
           </div>
@@ -174,27 +172,27 @@
           <div class="tab-pane fade" id="tab-social" role="tabpanel">
             <div class="row">
               <div class="col-md-6">
-                <x-textarea-input name="educacion" label="Educación" :value="$organizacion->educacion" />
-                <x-textarea-input name="religion" label="Religión" :value="$organizacion->religion" />
+                <x-textarea-input name="educacion" label="Educación" :value="$organizacion->educacion" icon="fa-graduation-cap" />
+                <x-textarea-input name="religion" label="Religión" :value="$organizacion->religion" icon="fa-monument" />
               </div>
               <div class="col-md-6">
-                <x-textarea-input name="cultura" label="Aspectos culturales" :value="$organizacion->cultura" />
-                <x-textarea-input name="demografia" label="Demografía" :value="$organizacion->demografia" />
+                <x-textarea-input name="cultura" label="Aspectos culturales" :value="$organizacion->cultura" icon="fa-theater-masks" />
+                <x-textarea-input name="demografia" label="Demografía" :value="$organizacion->demografia" icon="fa-users" />
               </div>
             </div>
           </div>
 
           {{-- PESTAÑA 3: Economía y tecnologia --}}
           <div class="tab-pane fade" id="tab-economia" role="tabpanel">
-            <x-textarea-input name="tecnologia" label="Tecnología y ciencia" :value="$organizacion->tecnologia" />
-            <x-textarea-input name="economia" label="Economía" :value="$organizacion->economia" />
-            <x-textarea-input name="recursos_naturales" label="Recursos naturales" :value="$organizacion->recursos_naturales" />
+            <x-textarea-input name="tecnologia" label="Tecnología y ciencia" :value="$organizacion->tecnologia" icon="fa-microchip" />
+            <x-textarea-input name="economia" label="Economía" :value="$organizacion->economia" icon="fa-coins" />
+            <x-textarea-input name="recursos_naturales" label="Recursos naturales" :value="$organizacion->recursos_naturales" icon="fa-leaf" />
           </div>
 
           {{-- PESTAÑA 4: Historia y otros --}}
           <div class="tab-pane fade" id="tab-historia" role="tabpanel">
-            <x-textarea-input name="historia" label="Historia" class="summernote" rows="10" :value="$organizacion->historia" />
-            <x-textarea-input name="otros" label="Otros detalles adicionales" :value="$organizacion->otros" />
+            <x-textarea-input name="historia" label="Historia" class="summernote" rows="10" :value="$organizacion->historia" icon="fa-scroll" />
+            <x-textarea-input name="otros" label="Otros detalles adicionales" :value="$organizacion->otros" icon="fa-plus-circle" />
           </div>
         </div>
       </div>

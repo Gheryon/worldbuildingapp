@@ -36,22 +36,22 @@
           <div class="col-md-9">
             <div class="row mt-2">
               <div class="col-md">
-                <x-text-input name="nombre" label="Nombre" :value="$personaje->nombre" required />
+                <x-text-input name="nombre" label="Nombre" :value="$personaje->nombre" icon="fa-user" required />
               </div>
               <div class="col-md">
-                <x-text-input name="nombre_familia" label="Nombre de familia" :value="$personaje->nombre_familia" placeholder="Ej: Cervantes, Fernández, etc." />
+                <x-text-input name="nombre_familia" label="Nombre de familia" :value="$personaje->nombre_familia" placeholder="Ej: Cervantes, Fernández, etc." icon="fa-users" />
               </div>
               <div class="col-md">
-                <x-text-input name="apellidos" label="apellidos" :value="$personaje->apellidos" placeholder="Ej: García López, Sánchez, etc." />
+                <x-text-input name="apellidos" label="Apellidos" :value="$personaje->apellidos" placeholder="Ej: García López, Sánchez, etc." icon="fa-signature" />
               </div>
               <div class="col-md-4">
-                <x-text-input name="apodo" label="Apodo" :value="$personaje->apodo" placeholder="Ej: El Veloz, El Sabio, etc." />
+                <x-text-input name="apodo" label="Apodo" :value="$personaje->apodo" placeholder="Ej: El Veloz, El Sabio, etc." icon="fa-user-tag" />
               </div>
             </div>
 
             <div class="row mt-2">
               <div class="col-md-2">
-                <label for="sexo">Sexo</label>
+                <label for="sexo"><i class="fas fa-venus-mars mr-1"></i>Sexo</label>
                 <select class="form-control @error('sexo') is-invalid @enderror mt-2" name="sexo" id="sexo" required>
                   <option selected disabled value="">Elegir</option>
                   <option {{ old('sexo', $personaje->sexo) == 'Hombre' ? 'selected' : '' }}>Hombre</option>
@@ -60,9 +60,8 @@
                 @error('sexo') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-3">
-                <label for="select_especie">Especie</label>
+                <label for="select_especie"><i class="fas fa-paw mr-1"></i>Especie</label>
                 @if(isset($especies) && count($especies) > 0)
-                {{-- Caso exitoso: Hay especies disponibles --}}
                 <select class="form-control @error('select_especie') is-invalid @enderror mt-2" name="select_especie" id="select_especie" required>
                   <option value="" selected disabled>Elegir una especie</option>
                   @foreach($especies as $id => $nombre)
@@ -70,15 +69,12 @@
                   @endforeach
                 </select>
                 @else
-                {{-- Error: La variable no existe o la colección está vacía --}}
                 <div class="alert alert-warning p-1 mb-0" style="font-size: 0.85rem;">
                   <i class="fas fa-exclamation-triangle mr-1"></i>
                   No se encontraron especies en el sistema.
                 </div>
                 <input type="hidden" name="select_especie" value="">
                 @endif
-
-                {{-- Error de Validación de Laravel --}}
                 @error('select_especie')
                 <span class="invalid-feedback" role="alert">
                   <strong>{{ $message }}</strong>
@@ -86,26 +82,26 @@
                 @enderror
               </div>
               <div class="col-md">
-                <x-text-input name="lugar_nacimiento" label="Lugar de nacimiento" :value="$personaje->lugar_nacimiento" placeholder="Lugar de nacimiento" disabled/>
+                <x-text-input name="lugar_nacimiento" label="Lugar de nacimiento" :value="$personaje->lugar_nacimiento" placeholder="Lugar de nacimiento" icon="fa-map-marker-alt" disabled/>
               </div>
               <div class="col-md">
-                <x-text-input name="profesion" label="Profesión" :value="$personaje->profesion" placeholder="Ej: Alquimista, guerrero, etc." />
+                <x-text-input name="profesion" label="Profesión" :value="$personaje->profesion" placeholder="Ej: Alquimista, guerrero, etc." icon="fa-briefcase" />
               </div>
             </div>
             <div class="row mt-2">
               <div class="col-md-4">
-                <x-date-input-group name="nacimiento" label="Fecha de nacimiento" :id="$personaje->nacimiento_id" :dia="$personaje->fecha_nacimiento->dia ?? ''" :mes="$personaje->fecha_nacimiento->mes ?? ''" :anno="$personaje->fecha_nacimiento->anno ?? ''" />
+                <x-date-input-group name="nacimiento" label="Fecha de nacimiento" :id="$personaje->nacimiento_id" :dia="$personaje->fecha_nacimiento->dia ?? ''" :mes="$personaje->fecha_nacimiento->mes ?? ''" :anno="$personaje->fecha_nacimiento->anno ?? ''" icon="fa-calendar-plus" />
               </div>
               <div class="col-md-4">
-                <x-date-input-group name="fallecimiento" label="Fecha de fallecimiento" :id="$personaje->fallecimiento_id" :dia="$personaje->fecha_fallecimiento->dia ?? ''" :mes="$personaje->fecha_fallecimiento->mes ?? ''" :anno="$personaje->fecha_fallecimiento->anno ?? ''" />
+                <x-date-input-group name="fallecimiento" label="Fecha de fallecimiento" :id="$personaje->fallecimiento_id" :dia="$personaje->fecha_fallecimiento->dia ?? ''" :mes="$personaje->fecha_fallecimiento->mes ?? ''" :anno="$personaje->fecha_fallecimiento->anno ?? ''" icon="fa-calendar-times" />
               </div>
               <div class="col-md">
-                <x-text-input name="causa_fallecimiento" label="Causa de fallecimiento" :value="$personaje->causa_fallecimiento" placeholder="Ej: Enfermedad, accidente, asesinato..."/>
+                <x-text-input name="causa_fallecimiento" label="Causa de fallecimiento" :value="$personaje->causa_fallecimiento" placeholder="Ej: Enfermedad, accidente, asesinato..." icon="fa-skull-crossbones"/>
               </div>
             </div>
           </div>
         <div class="col-md-3 mt-2 mb-2">
-          <label for="retrato" class="form-label">Retrato</label>
+          <label for="retrato" class="form-label"><i class="fas fa-image mr-1"></i>Retrato</label>
           <img alt="retrato" id="retrato-img" src="{{asset("storage/retratos/{$personaje->retrato}")}}" class="img-fluid" width="185" height="180">
           <input type="file" name="retrato" class="form-control @error('retrato') is-invalid @enderror" id="retrato">
           @error('retrato') <small class="text-danger d-block">{{ $message }}</small> @enderror
@@ -117,7 +113,7 @@
     {{-- Descripción breve --}}
     <div class="card card-dark card-outline mt-4">
       <div class="card-body">
-        <x-textarea-input name="descripcion_corta" label="Descripción breve" :value="$personaje->descripcion_corta" rows="2" />
+        <x-textarea-input name="descripcion_corta" label="Descripción breve" :value="$personaje->descripcion_corta" rows="2" icon="fa-feather-alt" />
       </div>
     </div>
 
@@ -143,30 +139,30 @@
           <div class="tab-pane fade show active" id="tab-fisico" role="tabpanel">
             <div class="row">
               <div class="col-md-6">
-                <x-textarea-input name="descripcion_fisica" label="Descripción física" :value="$personaje->descripcion_fisica" />
-                <x-textarea-input name="salud" label="Salud" :value="$personaje->salud" />
-                <x-textarea-input name="personalidad" label="Personalidad" :value="$personaje->personalidad" />
+                <x-textarea-input name="descripcion_fisica" label="Descripción física" :value="$personaje->descripcion_fisica" icon="fa-user" />
+                <x-textarea-input name="salud" label="Salud" :value="$personaje->salud" icon="fa-heartbeat" />
+                <x-textarea-input name="personalidad" label="Personalidad" :value="$personaje->personalidad" icon="fa-brain" />
               </div>
               <div class="col-md-6">
-                <x-textarea-input name="deseos" label="Principales deseos" :value="$personaje->deseos" />
-                <x-textarea-input name="miedos" label="Principales miedos" :value="$personaje->miedos" />
-                <x-textarea-input name="magia" label="Habilidades Mágicas" :value="$personaje->magia" />
+                <x-textarea-input name="deseos" label="Principales deseos" :value="$personaje->deseos" icon="fa-star" />
+                <x-textarea-input name="miedos" label="Principales miedos" :value="$personaje->miedos" icon="fa-ghost" />
+                <x-textarea-input name="magia" label="Habilidades Mágicas" :value="$personaje->magia" icon="fa-magic" />
               </div>
             </div>
           </div>
 
           {{-- PESTAÑA 2 --}}
           <div class="tab-pane fade" id="tab-social" role="tabpanel">
-            <x-textarea-input name="educacion" label="Educación y cultura" :value="$personaje->educacion" />
-            <x-textarea-input name="religion" label="Religión" :value="$personaje->religion" />
-            <x-textarea-input name="familia" label="Familia" :value="$personaje->familia" />
-            <x-textarea-input name="politica" label="Política y títulos" :value="$personaje->politica" />
+            <x-textarea-input name="educacion" label="Educación y cultura" :value="$personaje->educacion" icon="fa-graduation-cap" />
+            <x-textarea-input name="religion" label="Religión" :value="$personaje->religion" icon="fa-monument" />
+            <x-textarea-input name="familia" label="Familia" :value="$personaje->familia" icon="fa-users" />
+            <x-textarea-input name="politica" label="Política y títulos" :value="$personaje->politica" icon="fa-gavel" />
           </div>
 
           {{-- PESTAÑA 3 --}}
           <div class="tab-pane fade" id="tab-historia" role="tabpanel">
-            <x-textarea-input name="biografia" label="Historia" :value="$personaje->biografia" class="summernote" rows="10" />
-            <x-textarea-input name="otros" label="Otros detalles" :value="$personaje->otros" />
+            <x-textarea-input name="biografia" label="Historia" :value="$personaje->biografia" class="summernote" rows="10" icon="fa-scroll" />
+            <x-textarea-input name="otros" label="Otros detalles" :value="$personaje->otros" icon="fa-plus-circle" />
           </div>
         </div>
       </div>

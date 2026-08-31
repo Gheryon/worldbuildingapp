@@ -44,15 +44,15 @@
           <div class="col-md-8">
             <div class="row">
               <div class="col-md-6 mb-3">
-                <x-text-input name="nombre" label="Nombre del asentamiento" placeholder="Ej: Minas Tirith" :value="old('nombre')" required />
+                <x-text-input name="nombre" label="Nombre del asentamiento" placeholder="Ej: Minas Tirith" :value="old('nombre')" icon="fa-city" required />
               </div>
               <div class="col-md-6 mb-3">
-                <x-text-input name="gentilicio" label="Gentilicio" placeholder="Ej: Gondoriano" :value="old('gentilicio')" />
+                <x-text-input name="gentilicio" label="Gentilicio" placeholder="Ej: Gondoriano" :value="old('gentilicio')" icon="fa-user-tag" />
               </div>
             </div>
             <div class="row">
               <div class="col-md-4 mb-3">
-                <label for="select_tipo" class="form-label font-weight-bold">Tipo</label>
+                <label for="select_tipo" class="form-label font-weight-bold"><i class="fas fa-tags mr-1"></i>Tipo</label>
                 <select class="form-control select2bs4 @error('select_tipo') is-invalid @enderror" name="select_tipo" id="select_tipo" required>
                   <option selected disabled value="">Elegir tipo...</option>
                   @foreach($tipos_asentamientos as $tipo)
@@ -62,7 +62,7 @@
                 @error('select_tipo') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-4 mb-3">
-                <label for="estatus" class="form-label font-weight-bold">Estatus actual</label>
+                <label for="estatus" class="form-label font-weight-bold"><i class="fas fa-flag mr-1"></i>Estatus actual</label>
                 <select class="form-control select2bs4 @error('estatus') is-invalid @enderror" name="estatus" id="estatus" required>
                   <option selected value="">Elegir...</option>
                   @foreach(['Abandonado', 'En ruinas', 'Habitado', 'Secreto', 'Olvidado'] as $est)
@@ -72,7 +72,7 @@
                 @error('estatus') <small class="text-danger d-block">{{ $message }}</small> @enderror
               </div>
               <div class="col-md-4 mb-3">
-                <label for="poblacion" class="form-label font-weight-bold">Población estimada</label>
+                <label for="poblacion" class="form-label font-weight-bold"><i class="fas fa-users mr-1"></i>Población estimada</label>
                 <div class="input-group">
                   <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-users"></i></span></div>
                   <input type="number" name="poblacion" class="form-control @error('poblacion') is-invalid @enderror" id="poblacion" placeholder="Ej: 5000" value="{{ old('poblacion') }}">
@@ -85,7 +85,7 @@
           {{-- Columna de control político --}}
           <div class="col-md-4 border-left">
             <div class="mb-3">
-              <label for="select_owner" class="form-label font-weight-bold">Controlado por:</label>
+              <label for="select_owner" class="form-label font-weight-bold"><i class="fas fa-landmark mr-1"></i>Controlado por:</label>
               <select class="form-control select2bs4 @error('select_owner') is-invalid @enderror" name="select_owner" id="select_owner">
                 <option value="" selected>Independiente / Ninguno</option>
                 @foreach($paises as $id => $nombre)
@@ -95,7 +95,7 @@
               @error('select_owner') <small class="text-danger d-block">{{ $message }}</small> @enderror
             </div>
             <div class="mb-3">
-              <label for="select_gobernante" class="form-label font-weight-bold">Gobernante local:</label>
+              <label for="select_gobernante" class="form-label font-weight-bold"><i class="fas fa-user-tie mr-1"></i>Gobernante local:</label>
               <select class="form-control select2bs4 @error('select_gobernante') is-invalid @enderror" name="select_gobernante" id="select_gobernante">
                 <option value="" selected>Sin asignar</option>
                 @foreach($personajes as $id => $nombre)
@@ -112,10 +112,10 @@
         {{-- Fila de Fechas --}}
         <div class="row">
           <div class="col-md-6">
-            <x-date-input-group name="fundacion" label="Fecha de fundación" :dia="old('dia_fundacion')" :mes="old('mes_fundacion')" :anno="old('anno_fundacion')" />
+            <x-date-input-group name="fundacion" label="Fecha de fundación" :dia="old('dia_fundacion')" :mes="old('mes_fundacion')" :anno="old('anno_fundacion')" icon="fa-calendar-plus" />
           </div>
           <div class="col-md-6">
-            <x-date-input-group name="disolucion" label="Fecha de disolución" :dia="old('dia_disolucion')" :mes="old('mes_disolucion')" :anno="old('anno_disolucion')" />
+            <x-date-input-group name="disolucion" label="Fecha de disolución" :dia="old('dia_disolucion')" :mes="old('mes_disolucion')" :anno="old('anno_disolucion')" icon="fa-calendar-times" />
           </div>
         </div>
       </div>
@@ -136,34 +136,34 @@
         <div class="tab-content">
           <div class="tab-pane fade show active" id="tab-descripcion">
             <div class="row">
-              <div class="col-12 mb-3"><x-textarea-input name="descripcion" label="Descripción general" :value="old('descripcion')" /></div>
-              <div class="col-md-6"><x-textarea-input name="geografia" label="Geografía" :value="old('geografia')" /></div>
-              <div class="col-md-6"><x-textarea-input name="clima" label="Clima" :value="old('clima')" /></div>
-              <div class="col-12"><x-textarea-input name="ubicacion_detalles" label="Detalles especiales o secretos" :value="old('ubicacion_detalles')" /></div>
+              <div class="col-12 mb-3"><x-textarea-input name="descripcion" label="Descripción general" :value="old('descripcion')" icon="fa-align-left" /></div>
+              <div class="col-md-6"><x-textarea-input name="geografia" label="Geografía" :value="old('geografia')" icon="fa-globe-americas" /></div>
+              <div class="col-md-6"><x-textarea-input name="clima" label="Clima" :value="old('clima')" icon="fa-cloud-sun" /></div>
+              <div class="col-12"><x-textarea-input name="ubicacion_detalles" label="Detalles especiales o secretos" :value="old('ubicacion_detalles')" icon="fa-key" /></div>
             </div>
           </div>
           <div class="tab-pane fade" id="tab-social">
-            <x-textarea-input name="demografia" label="Composición demográfica" :value="old('demografia')" />
-            <x-textarea-input name="cultura" label="Tradiciones, costumbres y cultura" :value="old('cultura')" />
-            <x-textarea-input name="arquitectura" label="Arquitectura y monumentos" :value="old('arquitectura')" />
-            <x-textarea-input name="infraestructura" label="Servicios e infraestructura" :value="old('infraestructura')" />
+            <x-textarea-input name="demografia" label="Composición demográfica" :value="old('demografia')" icon="fa-users" />
+            <x-textarea-input name="cultura" label="Tradiciones, costumbres y cultura" :value="old('cultura')" icon="fa-theater-masks" />
+            <x-textarea-input name="arquitectura" label="Arquitectura y monumentos" :value="old('arquitectura')" icon="fa-monument" />
+            <x-textarea-input name="infraestructura" label="Servicios e infraestructura" :value="old('infraestructura')" icon="fa-tools" />
           </div>
           <div class="tab-pane fade" id="tab-politica">
-            <x-textarea-input name="gobierno" label="Sistema de gobierno" :value="old('gobierno')" />
-            <x-textarea-input name="defensas" label="Murallas y fortificaciones" :value="old('defensas')" />
-            <x-textarea-input name="ejercito" label="Guarnición y fuerzas militares" :value="old('ejercito')" />
+            <x-textarea-input name="gobierno" label="Sistema de gobierno" :value="old('gobierno')" icon="fa-gavel" />
+            <x-textarea-input name="defensas" label="Murallas y fortificaciones" :value="old('defensas')" icon="fa-shield-alt" />
+            <x-textarea-input name="ejercito" label="Guarnición y fuerzas militares" :value="old('ejercito')" icon="fa-fist-raised" />
           </div>
           <div class="tab-pane fade" id="tab-economia">
             <div class="row">
-              <div class="col-md-6"><x-text-input name="recurso_principal" label="Recurso principal" placeholder="Ej: Plata, carbón, etc." :value="old('recurso_principal')" /></div>
-              <div class="col-md-6"><x-text-input name="nivel_riqueza" label="Nivel de riqueza" placeholder="Ej: Bajo, medio, alto, opulento, etc." :value="old('nivel_riqueza')" /></div>
+              <div class="col-md-6"><x-text-input name="recurso_principal" label="Recurso principal" placeholder="Ej: Plata, carbón, etc." :value="old('recurso_principal')" icon="fa-gem" /></div>
+              <div class="col-md-6"><x-text-input name="nivel_riqueza" label="Nivel de riqueza" placeholder="Ej: Bajo, medio, alto, opulento, etc." :value="old('nivel_riqueza')" icon="fa-coins" /></div>
             </div>
-            <x-textarea-input name="economia" label="Economía, industria y comercio" :value="old('economia')" />
-            <x-textarea-input name="recursos" label="Recursos naturales" :value="old('recursos')" />
+            <x-textarea-input name="economia" label="Economía, industria y comercio" :value="old('economia')" icon="fa-industry" />
+            <x-textarea-input name="recursos" label="Recursos naturales" :value="old('recursos')" icon="fa-leaf" />
           </div>
           <div class="tab-pane fade" id="tab-historia">
-            <x-textarea-input name="historia" label="Historia del asentamiento" class="summernote" rows="12" :value="old('historia')" />
-            <x-textarea-input name="otros" label="INotas adicionales" :value="old('otros')" />
+            <x-textarea-input name="historia" label="Historia del asentamiento" class="summernote" rows="12" :value="old('historia')" icon="fa-scroll" />
+            <x-textarea-input name="otros" label="Notas adicionales" :value="old('otros')" icon="fa-plus-circle" />
           </div>
         </div>
       </div>
