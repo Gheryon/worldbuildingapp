@@ -52,7 +52,7 @@
 <div class="row">
   @forelse($personajes as $personaje)
   <div class="col-sm-12 col-md-6 col-lg-3 col-xl-2 mb-3">
-    <div class="card card-dark card-outline h-100">
+    <div class="card card-index-hover card-dark card-outline h-100">
       <div class="card-body box-profile">
         <div class="text-center">
           <img class="profile-user-img img-fluid img-circle" src="{{ asset("storage/retratos/" . ($personaje->retrato ?? 'default.png')) }}" alt="Retrato de {{ $personaje->nombre }}" loading="lazy">
