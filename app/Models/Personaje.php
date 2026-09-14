@@ -204,6 +204,10 @@ class Personaje extends Model
         $request['retrato'] = basename($path);
       }
 
+      if (isset($request['select_especie'])) {
+        $request['especie_id'] = $request['select_especie'];
+      }
+      
       // Asignación de campos básicos
       $this->fill($request);
 
