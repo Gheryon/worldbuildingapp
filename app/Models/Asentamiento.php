@@ -161,7 +161,7 @@ class Asentamiento extends Model
 
       //Procesar Fechas. Lo importante es el año, si no hay año no se guarda fecha
       if (!empty($request['anno_fundacion'])) {
-        $asentamiento->fecha_inicio_id = Fecha::sync(null, [
+        $asentamiento->fundacion_id = Fecha::sync(null, [
           'dia'  => $request['dia_fundacion'] ?? 0,
           'mes'  => $request['mes_fundacion'] ?? 0,
           'anno' => $request['anno_fundacion'] ?? null
@@ -169,7 +169,7 @@ class Asentamiento extends Model
       }
 
       if (!empty($request['anno_disolucion'])) {
-        $asentamiento->fecha_fin_id = Fecha::sync(null, [
+        $asentamiento->disolucion_id = Fecha::sync(null, [
           'dia'  => $request['dia_disolucion'] ?? 0,
           'mes'  => $request['mes_disolucion'] ?? 0,
           'anno' => $request['anno_disolucion'] ?? null
@@ -202,7 +202,7 @@ class Asentamiento extends Model
 
       //Actualizado de fechas, si existe *_id se actualiza, si no se crea. Si no hay año no se guarda fecha
       if (!empty($request['anno_fundacion'])) {
-        $this->fecha_inicio_id = Fecha::sync($this->fundacion_id, [
+        $this->fundacion_id = Fecha::sync($this->fundacion_id, [
           'dia'  => $request['dia_fundacion'] ?? 0,
           'mes'  => $request['mes_fundacion'] ?? 0,
           'anno' => $request['anno_fundacion'] ?? null
@@ -210,7 +210,7 @@ class Asentamiento extends Model
       }
 
       if (!empty($request['anno_disolucion'])) {
-        $this->fecha_fin_id = Fecha::sync($this->disolucion_id, [
+        $this->disolucion_id = Fecha::sync($this->disolucion_id, [
           'dia'  => $request['dia_disolucion'] ?? 0,
           'mes'  => $request['mes_disolucion'] ?? 0,
           'anno' => $request['anno_disolucion'] ?? null
@@ -239,12 +239,12 @@ class Asentamiento extends Model
       app(\App\Services\ImageService::class)->deleteImagesByOwner('asentamientos', $asentamiento->id);
 
       //Borrado de fechas
-      if ($asentamiento->fecha_inicio_id) {
-        \App\Models\Fecha::destroy($asentamiento->fecha_inicio_id);
+      if ($asentamiento->fundacion_id) {
+        \App\Models\Fecha::destroy($asentamiento->fundacion_id);
       }
 
-      if ($asentamiento->fecha_fin_id) {
-        \App\Models\Fecha::destroy($asentamiento->fecha_fin_id);
+      if ($asentamiento->disolucion_id) {
+        \App\Models\Fecha::destroy($asentamiento->disolucion_id);
       }
     });
   }
