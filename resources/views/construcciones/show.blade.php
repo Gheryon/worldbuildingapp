@@ -32,7 +32,7 @@
             <p class="lead text-secondary-custom font-italic">
               {{ $construccion->tipo->nombre ?? 'Edificación' }}
               @if($construccion->asentamiento)
-              en <a href="{{ route('asentamiento.show', $construccion->asentamiento_id) }}" class="font-weight-bold text-primary-custom">{{ $construccion->asentamiento->nombre }}</a>
+              en <a href="{{ route('asentamientos.show', $construccion->asentamiento_id) }}" class="font-weight-bold text-primary-custom">{{ $construccion->asentamiento->nombre }}</a>
               @endif
             </p>
           </div>
@@ -127,7 +127,7 @@
               <li class="list-group-item">
                 <small class="d-block text-muted text-uppercase font-weight-bold">Ubicación</small>
                 @if($construccion->asentamiento)
-                <span><i class="fas fa-map-marker-alt mr-1"></i> <a href="{{ route('asentamiento.show', $construccion->asentamiento_id) }}">{{ $construccion->asentamiento->nombre }}</a></span>
+                <span><i class="fas fa-map-marker-alt mr-1"></i> <a href="{{ route('asentamientos.show', $construccion->asentamiento_id) }}">{{ $construccion->asentamiento->nombre }}</a></span>
                 @else
                 <span class="text-muted"><i class="fas fa-map-marker-alt mr-1"></i> Desconocida</span>
                 @endif
