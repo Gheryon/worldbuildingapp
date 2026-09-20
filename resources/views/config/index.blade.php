@@ -51,15 +51,19 @@
 </div>
 
 <div class="col-md-12">
-  <!--<div class="row">
-    <button id="back_up" class="btn btn-primary backup_button">Copia de seguridad</button>
-  </div>-->
   <!--<a href="{{route('galeria.limpiar_imagenes')}}" class="btn btn-dark">Limpiar imágenes</a>-->
 
   <div class="card mb-4 shadow-sm">
     <div class="card-body">
-      <div class="row align-items-end">
-        <div class="col-md-3 mb-3 mb-md-0">
+      <div class="row">
+        <!-- Tarjeta 1: Mundo -->
+        <div class="col-md-6">
+          <div class="card card-outline card-dark mb-4 shadow-sm">
+            <div class="card-header py-2">
+              <h3 class="card-title font-weight-bold text-sm">Parámetros del Mundo</h3>
+            </div>
+            <div class="card-body py-2">
+        <div class="row mb-3 mb-md-0">
           <form id="form-edit-nombre_mundo" action="{{route('config.update_nombre_mundo')}}" method="POST">
             @csrf
             <label for="nuevo_nombre_mundo" class="form-label font-weight-bold">Nombre del mundo</label>
@@ -72,7 +76,7 @@
             </div>
           </form>
         </div>
-        <div class="col-md-4">
+        <div class="row">
           <form id="form-edit-fecha_mundo" action="{{route('config.update_fecha_mundo')}}" method="POST">
             @csrf
             <label class="form-label font-weight-bold">Fecha actual en el mundo</label>
@@ -107,6 +111,43 @@
               <button type="submit" class="btn btn-dark">Guardar</button>
             </div>
           </form>
+        </div>
+            </div>
+          </div>
+        </div>
+        <!-- Tarjeta 2: Backups -->
+        <div class="col-md-6">
+          <div class="card card-outline card-dark mb-4 shadow-sm">
+            <div class="card-header py-2">
+              <h3 class="card-title font-weight-bold text-sm">Copias de Seguridad</h3>
+            </div>
+            <div class="card-body py-2">
+              <!-- Botón Backup e Input Restaurar en paralelo -->
+              <div class="row mt-3 mt-md-0">
+                <label for="backup_button" class="form-label font-weight-bold">Descargar copia de seguridad (.zip)</label>
+                <div class="input-group">
+                  <a href="{{ route('config.backup') }}" id="back_up" class="btn btn-dark backup_button">
+                    <i class="fas fa-download mr-1"></i> Descargar
+                  </a>
+                </div>
+              </div>
+              <div class="row mt-3 mt-md-0">
+                <form action="{{ route('config.restore') }}" method="POST" enctype="multipart/form-data" onsubmit="return confirm('¿Estás seguro de restaurar la copia de seguridad? Esto sobrescribirá la base de datos y las imágenes actuales.');">
+                  @csrf
+                  <label for="backup_file" class="form-label font-weight-bold">Restaurar copia de seguridad (.zip)</label>
+                  <div class="input-group">
+                    <input type="file" name="backup_file" class="form-control @error('backup_file') is-invalid @enderror" accept=".zip" required id="backup_file">
+                    <button type="submit" class="btn btn-dark">
+                      <i class="fas fa-upload mr-1"></i> Restaurar
+                    </button>
+                  </div>
+                  @error('backup_file')
+                  <small style="color: red">{{ $message }}</small>
+                  @enderror
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

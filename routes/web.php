@@ -28,6 +28,8 @@ Route::controller(App\Http\Controllers\ConfigurationController::class)->group(fu
     Route::post('/config/store/{type}', 'store')->name('config.store_generic');
     Route::put('/config/update', 'update')->name('config.update');
     Route::delete('/config/destroy', 'destroy')->name('config.destroy');
+    Route::get('/config/backup', 'backup')->name('config.backup');
+    Route::post('/config/restore', 'restore')->name('config.restore');
 });
 
 /*******culturas routes********/
