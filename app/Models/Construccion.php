@@ -219,8 +219,6 @@ class Construccion extends Model
   protected static function booted()
   {
     static::deleting(function ($construccion) {
-      $construccion->asentamiento()->update(['asentamiento_id' => null]);
-
       // Llamamos al servicio para limpiar el disco y la DB
       $imageService = new \App\Services\ImageService();
       $imageService->deleteImagesByOwner('construcciones', $construccion->id);
