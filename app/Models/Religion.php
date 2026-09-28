@@ -18,6 +18,7 @@ class Religion extends Model
   protected $table = 'religiones';
 
   protected $primaryKey = 'id';
+  public $timestamps = true;
 
   protected $fillable = [
     'nombre',
