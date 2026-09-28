@@ -55,6 +55,7 @@
         </div>
 
         <x-reference-images-gallery :imagenes="$especie->imagenes" :entityId="$especie->id" />
+
       </div>
 
       <div class="col-lg-4">
@@ -84,6 +85,9 @@
           </div>
         </div>
       </div>
+    </div>
+    <div class="mt-4 pt-3 border-top text-right">
+      <h6><span class="mailbox-read-time text-muted font-weight-normal" style="font-size: 0.85rem;"><i class="far fa-calendar-alt mr-1"></i>Última edición: {{ $especie->updated_at->format('d/m/Y') }}</span></h6>
     </div>
   </div>
 </div>

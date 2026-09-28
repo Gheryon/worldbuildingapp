@@ -6,10 +6,10 @@
 
 @section('navbar-buttons')
 <li class="nav-item ml-2">
-<a href="{{route('lugares.index')}}" class="btn btn-dark">Volver</a>
+  <a href="{{route('lugares.index')}}" class="btn btn-dark">Volver</a>
 </li>
 <li class="nav-item ml-2">
-<a href="{{route('lugares.edit', $lugar->id )}}" class="btn btn-dark ml-2">Editar</a>
+  <a href="{{route('lugares.edit', $lugar->id )}}" class="btn btn-dark ml-2">Editar</a>
 </li>
 @endsection
 
@@ -19,17 +19,17 @@
     <div class="row mb-5">
       <div class="col-12 text-center text-md-left border-bottom-dark pb-3">
         <div class="d-flex align-items-center justify-content-between flex-wrap">
-            <div>
-                <h1 class="display-4 font-weight-bold mb-1 text-primary-custom">{{ $lugar->nombre }}</h1>
-                <p class="lead text-secondary-custom font-italic">
-                  {{ $lugar->tipo->nombre ?? 'Lugar Desconocido' }}
-                </p>
-            </div>
-            @if($lugar->es_secreto)
-            <span class="badge badge-warning p-2 shadow-sm">
-                <i class="fas fa-eye-slash mr-1"></i> Ubicación Secreta
-            </span>
-            @endif
+          <div>
+            <h1 class="display-4 font-weight-bold mb-1 text-primary-custom">{{ $lugar->nombre }}</h1>
+            <p class="lead text-secondary-custom font-italic">
+              {{ $lugar->tipo->nombre ?? 'Lugar Desconocido' }}
+            </p>
+          </div>
+          @if($lugar->es_secreto)
+          <span class="badge badge-warning p-2 shadow-sm">
+            <i class="fas fa-eye-slash mr-1"></i> Ubicación Secreta
+          </span>
+          @endif
         </div>
       </div>
     </div>
@@ -39,30 +39,30 @@
         <div class="pr-lg-4">
           @php
           $secciones = [
-            ['titulo' => 'Descripción', 'campo' => $lugar->descripcion_breve, 'icono' => 'fa-feather-alt'],
-            ['titulo' => 'Historia', 'campo' => $lugar->historia, 'icono' => 'fa-scroll'],
-            ['titulo' => 'Geografía', 'campo' => $lugar->geografia, 'icono' => 'fa-mountain'],
-            ['titulo' => 'Ecosistema', 'campo' => $lugar->ecosistema, 'icono' => 'fa-leaf'],
-            ['titulo' => 'Clima', 'campo' => $lugar->clima, 'icono' => 'fa-cloud-sun'],
-            ['titulo' => 'Fenómenos Únicos', 'campo' => $lugar->fenomeno_unico, 'icono' => 'fa-magic'],
-            ['titulo' => 'Flora y Fauna', 'campo' => $lugar->flora_fauna, 'icono' => 'fa-paw'],
-            ['titulo' => 'Recursos', 'campo' => $lugar->recursos, 'icono' => 'fa-gem'],
-            ['titulo' => 'Rumores y Leyendas', 'campo' => $lugar->rumores, 'icono' => 'fa-comment-dots'],
-            ['titulo' => 'Otros Detalles', 'campo' => $lugar->otros, 'icono' => 'fa-plus-circle'],
+          ['titulo' => 'Descripción', 'campo' => $lugar->descripcion_breve, 'icono' => 'fa-feather-alt'],
+          ['titulo' => 'Historia', 'campo' => $lugar->historia, 'icono' => 'fa-scroll'],
+          ['titulo' => 'Geografía', 'campo' => $lugar->geografia, 'icono' => 'fa-mountain'],
+          ['titulo' => 'Ecosistema', 'campo' => $lugar->ecosistema, 'icono' => 'fa-leaf'],
+          ['titulo' => 'Clima', 'campo' => $lugar->clima, 'icono' => 'fa-cloud-sun'],
+          ['titulo' => 'Fenómenos Únicos', 'campo' => $lugar->fenomeno_unico, 'icono' => 'fa-magic'],
+          ['titulo' => 'Flora y Fauna', 'campo' => $lugar->flora_fauna, 'icono' => 'fa-paw'],
+          ['titulo' => 'Recursos', 'campo' => $lugar->recursos, 'icono' => 'fa-gem'],
+          ['titulo' => 'Rumores y Leyendas', 'campo' => $lugar->rumores, 'icono' => 'fa-comment-dots'],
+          ['titulo' => 'Otros Detalles', 'campo' => $lugar->otros, 'icono' => 'fa-plus-circle'],
           ];
           @endphp
 
           @foreach($secciones as $seccion)
-            @if($seccion['campo'])
-            <section class="mb-4">
-              <h2 class="h3 font-weight-bold mb-3 text-secondary-custom">
-                <i class="fas {{ $seccion['icono'] }} mr-2 opacity-75"></i>{{ $seccion['titulo'] }}
-              </h2>
-              <div class="article-body text-justify">
-                {!! clean($seccion['campo']) !!}
-              </div>
-            </section>
-            @endif
+          @if($seccion['campo'])
+          <section class="mb-4">
+            <h2 class="h3 font-weight-bold mb-3 text-secondary-custom">
+              <i class="fas {{ $seccion['icono'] }} mr-2 opacity-75"></i>{{ $seccion['titulo'] }}
+            </h2>
+            <div class="article-body text-justify">
+              {!! clean($seccion['campo']) !!}
+            </div>
+          </section>
+          @endif
           @endforeach
         </div>
 
@@ -77,7 +77,7 @@
           </div>
           <div class="card-body p-0">
             <ul class="list-group list-group-flush">
-              
+
               @if($lugar->otros_nombres)
               <li class="list-group-item">
                 <small class="d-block text-muted">Otros nombres</small>
@@ -119,18 +119,24 @@
           <div class="card-footer bg-light border-0 py-3 text-center">
             <small class="text-muted d-block mb-2 text-uppercase font-weight-bold">Nivel de Peligro</small>
             @php
-              $peligro = $lugar->peligro_config; // Laravel convierte camelCase (peligroConfig) a snake_case automáticamente
-              // Generamos el HTML del icono una sola vez
-              $iconHtml = '<i class="fas fa-exclamation-triangle mx-1"></i>';
-              // Creamos el bloque de iconos repetido según la configuración
-              $icons = str_repeat($iconHtml, $peligro->icons);
+            $peligro = $lugar->peligro_config; // Laravel convierte camelCase (peligroConfig) a snake_case automáticamente
+            // Generamos el HTML del icono una sola vez
+            $iconHtml = '<i class="fas fa-exclamation-triangle mx-1"></i>';
+            // Creamos el bloque de iconos repetido según la configuración
+            $icons = str_repeat($iconHtml, $peligro->icons);
             @endphp
             <span class="badge badge-pill shadow-sm px-4 py-2 {{ $peligro->class }}" style="font-size: 0.9rem;">
               {!! $icons !!} {{ $lugar->nivel_peligro ?? 'Desconocido' }} {!! $icons !!}
             </span>
+            <div class="mt-3 text-right">
+              <h6><span class="mailbox-read-time text-muted font-weight-normal" style="font-size: 0.85rem;"><i class="far fa-calendar-alt mr-1"></i>Última edición: {{ $lugar->updated_at->format('d/m/Y') }}</span></h6>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+    <div class="mt-4 pt-3 border-top text-right">
+      <h6><span class="mailbox-read-time text-muted font-weight-normal" style="font-size: 0.85rem;"><i class="far fa-calendar-alt mr-1"></i>Última edición: {{ $lugar->updated_at->format('d/m/Y') }}</span></h6>
     </div>
   </div>
 </div>

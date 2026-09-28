@@ -97,7 +97,7 @@
               </li>
               @endif
 
-               @if(isset($asentamiento->gobernante_id))
+              @if(isset($asentamiento->gobernante_id))
               <li class="list-group-item">
                 <small class="d-block text-muted">Gobernado por:</small>
                 <a href="{{route('personajes.show', $asentamiento->gobernante_id)}}">{{$asentamiento->gobernante->nombre}}</a>
@@ -134,26 +134,28 @@
             </ul>
           </div>
           <div class="card-footer bg-light border-0 py-3 text-center">
-          <small class="text-muted d-block mb-2 text-uppercase font-weight-bold">Estatus</small>
-          @php
+            <small class="text-muted d-block mb-2 text-uppercase font-weight-bold">Estatus</small>
+            @php
             // Mapeo de clases de Bootstrap según el estatus
             $statusClasses = [
-                'Abandonado' => 'badge-warning text-dark',
-                'En ruinas'  => 'badge-danger',
-                'En uso'     => 'badge-success',
-                'Olvidado'   => 'badge-secondary'
+            'Abandonado' => 'badge-warning text-dark',
+            'En ruinas' => 'badge-danger',
+            'En uso' => 'badge-success',
+            'Olvidado' => 'badge-secondary'
             ];
             $currentClass = $statusClasses[$asentamiento->estatus] ?? 'badge-dark';
-          @endphp
-          <span class="badge badge-pill shadow-sm px-4 py-2 {{ $currentClass }}">
-            <i class="fas fa-history mr-1"></i> {{ $asentamiento->estatus }}
-          </span>
-        </div>
+            @endphp
+            <span class="badge badge-pill shadow-sm px-4 py-2 {{ $currentClass }}">
+              <i class="fas fa-history mr-1"></i> {{ $asentamiento->estatus }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
+        <div class="mt-4 pt-3 border-top text-right">
+          <h6><span class="mailbox-read-time text-muted font-weight-normal" style="font-size: 0.85rem;"><i class="far fa-calendar-alt mr-1"></i>Última edición: {{ $asentamiento->updated_at->format('d/m/Y') }}</span></h6>
+        </div>
   </div>
 </div>
-
 <!-- /.content -->
 @endsection
